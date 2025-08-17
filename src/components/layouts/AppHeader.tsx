@@ -1,4 +1,3 @@
-// src/components/layouts/AppHeader.tsx
 import React, { useCallback, useState } from "react";
 import { useStore } from "@nanostores/react";
 import { toggleConfigPanel } from "@/stores/ui";
@@ -20,6 +19,7 @@ import Logo from "@/components/ui/Logo";
 
 import { useEditorTabs } from "@/hooks/useEditorTabs";
 import ThemeToggleButton from "@/components/ThemeToggleButton";
+import { ProjectModal } from "@/components/projects/ProjectModal"; // Import the new ProjectModal
 
 interface AppHeaderProps {
   logo?: React.ReactNode | string;
@@ -40,6 +40,7 @@ export function AppHeader({ logo, childrean }: AppHeaderProps) {
   } = useEditorTabs();
 
   const [isFilePickerOpen, setIsFilePickerOpen] = useState(false);
+  const [isProjectModalOpen, setIsProjectModalOpen] = useState(false); // New state for project modal
 
   const handleOpenNewFile = useCallback(() => setIsFilePickerOpen(true), []);
   const handleCloseFilePicker = useCallback(
@@ -55,6 +56,14 @@ export function AppHeader({ logo, childrean }: AppHeaderProps) {
   );
 
   const displayPath = truncateFilePath(activeFilePath);
+
+  const handleOpenProjectModal = useCallback(() => {
+    setIsProjectModalOpen(true);
+  }, []);
+
+  const handleCloseProjectModal = useCallback(() => {
+    setIsProjectModalOpen(false);
+  }, []);
 
   const handlePathSelected = (selectedPath: string) => {
     console.log("Selected directory path:", selectedPath);
@@ -96,8 +105,8 @@ export function AppHeader({ logo, childrean }: AppHeaderProps) {
               <Logo color="text-sky-500" secondary="text-gray-100" />
               <Button
                 variant="secondary"
-                title="Toggle Left Sidebar"
-                onClick={toggleLeftSidebar}
+                title="Create Project"
+                onClick={handleOpenProjectModal} // Updated to open project modal
               >
                 <Icon icon="mdi:card-plus" width="2em" height="2em" />
                 Create Project
@@ -181,6 +190,11 @@ export function AppHeader({ logo, childrean }: AppHeaderProps) {
         isOpen={isFilePickerOpen}
         onClose={handleCloseFilePicker}
         onFileSelect={handleFilePickerSelect}
+      />
+      {/* Project Modal Integration */}
+      <ProjectModal
+        isOpen={isProjectModalOpen}
+        onClose={handleCloseProjectModal}
       />
     </>
   );

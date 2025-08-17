@@ -1,8 +1,7 @@
 import React, { FC, PropsWithChildren } from 'react';
 import { Icon } from '@/components/ui/Icon';
 import { Button } from '@/components/ui/Button';
-import { MotionModal } from '@/components/motion/MotionModal'; // Import MotionModal
-import '@/styles/modal.css'; // Keep existing styles
+import { MotionModal } from '@/components/motion/MotionModal';
 
 type ModalSize = 'sm' | 'md' | 'lg' | 'fullscreen';
 
@@ -23,7 +22,7 @@ export const Modal: FC<ModalProps> = ({
   onClose,
   title,
   className,
-  size = 'md', // Default size to 'md'
+  size = 'md',
   closeOnOverlayClick = true,
   closeOnEscape = true,
   zIndex,
@@ -40,29 +39,28 @@ export const Modal: FC<ModalProps> = ({
     <MotionModal
       isOpen={isOpen}
       onClose={onClose}
-      overlayClassName='modal-backdrop'
-      contentClassName={`relative modal-wrapper rounded-lg shadow-xl border w-full flex flex-col overflow-hidden ${sizeClasses[size]} ${className || ''}`}
+      overlayClassName='fixed inset-0 bg-dark/50 backdrop-blur-sm flex items-center justify-center overflow-y-auto'
+      contentClassName={`relative modal-body text-base rounded-lg shadow-xl border w-full flex flex-col overflow-hidden max-h-[90vh] ${sizeClasses[size]} ${className || ''}`}
       closeOnOverlayClick={closeOnOverlayClick}
       closeOnEscape={closeOnEscape}
       zIndex={zIndex}
     >
       {title && (
-        <div className='modal-header flex items-center justify-between px-2 pb-2 border-b flex-shrink-0'>
+        <div className='flex items-center justify-between py-4 px-6 border-b border-gray-200 dark:border-gray-700 flex-shrink-0'>
           <h2 className='text-lg font-semibold'>{title}</h2>
         </div>
       )}
       <Button
         onClick={onClose}
-        className='border-0 absolute top-2 right-2'
+        className='border-0 absolute top-2 right-2 z-10'
         aria-label='Close modal'
         variant='warning'
       >
         <div className='flex items-center'>
-          <Icon icon='mdi:close' className='w-5 h-5' />
+          <Icon icon='mdi:close' className='w-8 h-8' />
         </div>
       </Button>
-      {/* Modal Body */}
-      <div className='modal-body flex-1 overflow-y-auto custom-scrollbar'>{children}</div>
+      <div className='flex-1 overflow-y-auto custom-scrollbar p-6'>{children}</div>
     </MotionModal>
   );
 };

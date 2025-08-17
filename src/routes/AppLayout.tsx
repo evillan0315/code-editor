@@ -14,7 +14,7 @@ import { EditorLeftSidebar } from '@/components/editor/EditorLeftSidebar';
 import { EditorRightSidebar } from '@/components/editor/EditorRightSidebar';
 import { AiChatPanel } from '@/components/AiChatPanel';
 import ResumeOptimizerForm from '@/components/resume/ResumeOptimizerForm';
-
+import RecordingManager from '@/components/recording/RecordingManager';
 import Terminal from '@/components/terminal/TerminalOptimized';
 
 import { useResizablePanel } from '@/hooks/useResizablePanel';
@@ -243,6 +243,7 @@ export default function AppLayout({ children }: { children?: React.ReactNode }) 
                         style={{ height: rightSidebarBottomHeight }}
                         className="flex-shrink-0 bg-secondary overflow-auto text-sm"
                       >
+                           <RecordingManager />
                         <ResumeOptimizerForm />
                       </div>
                     </motion.div>

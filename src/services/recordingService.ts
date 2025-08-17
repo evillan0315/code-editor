@@ -1,4 +1,4 @@
-import { apiFetch } from "@/services/apiFetch";
+import { apiFetch } from '@/services/apiFetch';
 import {
   RecordingStatusResponse,
   StartRecordingResponse,
@@ -6,20 +6,20 @@ import {
   RecordingFilePath,
   RecordingMetadata,
   PaginationRecordingResultDto,
-} from "@/types/recording";
+} from '@/types/recording';
 
-const BASE_API_PATH = "/api/recording";
+const BASE_API_PATH = '/api/recording';
 
 export const recordingService = {
   getRecordingStatus(): Promise<RecordingStatusResponse> {
     return apiFetch<RecordingStatusResponse>(`${BASE_API_PATH}/status`, {
-      method: "GET",
+      method: 'GET',
     });
   },
 
   listRecordings(): Promise<RecordingFilePath[]> {
     return apiFetch<RecordingFilePath[]>(`${BASE_API_PATH}/list`, {
-      method: "GET",
+      method: 'GET',
     });
   },
 
@@ -31,7 +31,7 @@ export const recordingService = {
   ): Promise<PaginationRecordingResultDto> {
     return apiFetch<PaginationRecordingResultDto>(
       `${BASE_API_PATH}/paginated?page=${page}&pageSize=${pageSize}`,
-      { method: "GET" },
+      { method: 'GET' },
     );
   },
 
@@ -40,7 +40,7 @@ export const recordingService = {
     return apiFetch<RecordingMetadata>(
       `${BASE_API_PATH}/metadata?file=${encodeURIComponent(file)}`,
       {
-        method: "GET",
+        method: 'GET',
       },
     );
   },
@@ -48,26 +48,26 @@ export const recordingService = {
   captureScreen(): Promise<StopRecordingResponse> {
     // Backend API returns { id, status, path } for capture
     return apiFetch<StopRecordingResponse>(`${BASE_API_PATH}/capture`, {
-      method: "POST",
+      method: 'POST',
     });
   },
 
   startRecording(): Promise<StartRecordingResponse> {
     return apiFetch<StartRecordingResponse>(`${BASE_API_PATH}/record-start`, {
-      method: "POST",
+      method: 'POST',
     });
   },
 
   stopRecording(id: string): Promise<StopRecordingResponse> {
     return apiFetch<StopRecordingResponse>(
       `${BASE_API_PATH}/record-stop?id=${encodeURIComponent(id)}`,
-      { method: "POST" },
+      { method: 'POST' },
     );
   },
 
   deleteRecording(id: string): Promise<void> {
     return apiFetch<void>(`${BASE_API_PATH}/${id}`, {
-      method: "DELETE",
+      method: 'DELETE',
     });
   },
 };

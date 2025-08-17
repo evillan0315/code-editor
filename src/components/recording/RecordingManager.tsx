@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { recordingService } from '@/services/recordingService';
-import { useToast } from '@/hooks/useToast';
+import { showToast } from '@/stores/toast';
 import { Button } from '@/components/ui/Button';
 import { Icon } from '@/components/ui/Icon';
 import Loading from '@/components/Loading'; // Assuming this component exists
@@ -10,21 +10,34 @@ import {
 } from '@/types/recording';
 import { formatBytes } from '@/utils/formatters'; // Need a helper for file size formatting
 import { confirm } from '@/stores/modal'; // For confirmation dialogs
-import { isRecordingInProgress } from '@/stores/recordingStatus'; // Import the new store
+import { useStore } from '@nanostores/react';
+import { recordingAtom } from '@/stores/recording';
+import { Modal } from '@/components/ui/Modal'; // Import the Modal component
+import { API_URL } from '@/constants'; // Import API_URL for media streaming
 
 interface RecordingManagerProps {}
 
 const RecordingManager: React.FC<RecordingManagerProps> = () => {
-  const { showToast } = useToast();
+  // Use nanostore for reactive recording status
+  const {
+    isRecording,
+    id: currentRecordingId,
+    path: currentRecordingPath,
+    startedAt: currentRecordingStartedAt,
+    lastStoppedRecording,
+    mediaToOpen, // Destructure new mediaToOpen from atom
+  } = useStore(recordingAtom);
 
-  const [status, setStatus] = useState<RecordingStatusResponse | null>(null);
   const [recordings, setRecordings] = useState<RecordingResultDto[]>([]);
   const [isLoadingStatus, setIsLoadingStatus] = useState(false);
   const [isLoadingRecordings, setIsLoadingRecordings] = useState(false);
   const [isCapturing, setIsCapturing] = useState(false);
   const [isStartingRecording, setIsStartingRecording] = useState(false);
   const [isStoppingRecording, setIsStoppingRecording] = useState(false);
-  const [currentRecordingId, setCurrentRecordingId] = useState<string | null>(null); // To track the ID of the recording in progress
+
+  // Modal states for media playback
+  const [isMediaModalOpen, setIsMediaModalOpen] = useState(false);
+  const [selectedMedia, setSelectedMedia] = useState<RecordingResultDto | null>(null);
 
   // Pagination states
   const [currentPage, setCurrentPage] = useState(1);
@@ -35,24 +48,24 @@ const RecordingManager: React.FC<RecordingManagerProps> = () => {
     setIsLoadingStatus(true);
     try {
       const currentStatus = await recordingService.getRecordingStatus();
-      setStatus(currentStatus);
-      isRecordingInProgress.set(currentStatus.recording); // Update the global recording status store
-
-      if (currentStatus.recording) {
-        // If backend reports recording, try to get its ID (if available, usually from the start call)
-        // This might require a more robust way to map live recording to a DB ID.
-        // For now, assume if file is present, it's the current one.
-        // A better approach would be for /status to return the DB ID.
-        // Assuming currentStatus.id exists in the RecordingStatusResponse (if backend is modified)
-        setCurrentRecordingId((currentStatus as any).id || null);
-      } else {
-        setCurrentRecordingId(null);
-      }
+      // Update the global recording status store
+      recordingAtom.set({
+        ...recordingAtom.get(), // Preserve lastStoppedRecording and mediaToOpen
+        isRecording: currentStatus.recording,
+        id: currentStatus.id || null, // Ensure ID is passed from backend
+        path: currentStatus.file || null,
+        startedAt: currentStatus.startedAt || null,
+      });
     } catch (err: any) {
       showToast(`Error fetching recording status: ${err.message}`, 'error');
-      setStatus(null);
-      setCurrentRecordingId(null);
-      isRecordingInProgress.set(false); // Ensure store is false on error
+      // On error, assume recording is not active or status is unknown, reset store
+      recordingAtom.set({
+        ...recordingAtom.get(), // Preserve lastStoppedRecording and mediaToOpen
+        isRecording: false,
+        id: null,
+        path: null,
+        startedAt: null,
+      });
     } finally {
       setIsLoadingStatus(false);
     }
@@ -82,6 +95,15 @@ const RecordingManager: React.FC<RecordingManagerProps> = () => {
     return () => clearInterval(statusInterval);
   }, [fetchStatus, fetchRecordings]);
 
+  // New effect to open modal when mediaToOpen is set by other components (e.g., AppFooter)
+  useEffect(() => {
+    if (mediaToOpen && !isMediaModalOpen) {
+      handleOpenMedia(mediaToOpen);
+      // Clear mediaToOpen once the modal is opened
+      recordingAtom.set({ ...recordingAtom.get(), mediaToOpen: null });
+    }
+  }, [mediaToOpen, isMediaModalOpen]);
+
   const handleCaptureScreen = useCallback(async () => {
     setIsCapturing(true);
     try {
@@ -99,15 +121,31 @@ const RecordingManager: React.FC<RecordingManagerProps> = () => {
     setIsStartingRecording(true);
     try {
       const result = await recordingService.startRecording();
-      setCurrentRecordingId(result.id);
-      showToast(`Recording started: ${result.path}`, 'success');
-      fetchStatus(); // Update status immediately
+      // Update nanostore directly to reflect recording in progress (optimistic)
+      recordingAtom.set({
+        isRecording: true,
+        id: result.id,
+        path: result.path,
+        startedAt: new Date().toISOString(), // Use current time as startedAt
+        lastStoppedRecording: null, // Clear any previous stopped recording
+        mediaToOpen: null, // Ensure no media is pending to open
+      });
+      showToast(`Recording started: id: ${result.id} path: ${result.path}`, 'info');
+      // No need to call fetchStatus immediately as store is already updated
     } catch (err: any) {
       showToast(`Error starting recording: ${err.message}`, 'error');
+      // If start failed, ensure recording status is reset (or remains false)
+      recordingAtom.set({
+        ...recordingAtom.get(),
+        isRecording: false,
+        id: null,
+        path: null,
+        startedAt: null,
+      });
     } finally {
       setIsStartingRecording(false);
     }
-  }, [showToast, fetchStatus]);
+  }, [showToast]);
 
   const handleStopRecording = useCallback(async () => {
     if (!currentRecordingId) {
@@ -118,15 +156,23 @@ const RecordingManager: React.FC<RecordingManagerProps> = () => {
     try {
       const result = await recordingService.stopRecording(currentRecordingId);
       showToast(`Recording stopped: ${result.path}`, 'success');
-      setCurrentRecordingId(null); // Clear active recording ID
-      fetchStatus(); // Update status immediately
+      // Clear active recording state and set last stopped recording
+      recordingAtom.set({
+        isRecording: false,
+        id: null,
+        path: null,
+        startedAt: null,
+        lastStoppedRecording: result, // Store the stopped recording for potential playback
+        mediaToOpen: null, // Do NOT auto-open modal here
+      });
       fetchRecordings(); // Refresh list to show new recording
     } catch (err: any) {
       showToast(`Error stopping recording: ${err.message}`, 'error');
+      // If stopping failed, do NOT clear the recording state. Let fetchStatus (polling) update it later if it really died.
     } finally {
       setIsStoppingRecording(false);
     }
-  }, [currentRecordingId, showToast, fetchStatus, fetchRecordings]);
+  }, [currentRecordingId, showToast, fetchRecordings]);
 
   const handleDeleteRecording = useCallback(
     async (id: string, name: string) => {
@@ -151,6 +197,7 @@ const RecordingManager: React.FC<RecordingManagerProps> = () => {
       if (newPage > 0 && newPage <= totalPages) {
         setCurrentPage(newPage);
       }
+      a;
     },
     [totalPages],
   );
@@ -161,7 +208,7 @@ const RecordingManager: React.FC<RecordingManagerProps> = () => {
         // For security, backend should have a dedicated download endpoint that validates auth and file path.
         // E.g., /api/recording/download?file=path/to/file.mp4
         // For now, assuming a direct URL or backend serves downloads securely.
-        const url = `${import.meta.env.VITE_API_URL}/downloads/recordings/${fileName}`;
+        const url = `${API_URL}/downloads/recordings/${fileName}`;
         const link = document.createElement('a');
         link.href = url;
         link.download = fileName; // Suggests filename for download
@@ -176,6 +223,23 @@ const RecordingManager: React.FC<RecordingManagerProps> = () => {
     [showToast],
   );
 
+  const handleOpenMedia = useCallback((media: RecordingResultDto) => {
+    console.log(media, 'handleOpenMedia');
+    setSelectedMedia(media);
+    setIsMediaModalOpen(true);
+  }, []);
+
+  const handleCloseMediaModal = useCallback(() => {
+    setIsMediaModalOpen(false);
+    setSelectedMedia(null);
+  }, []);
+
+  const getMediaUrl = (filePath: string) => {
+    const fileName = filePath.split('/').pop();
+    // Using the /api/file/stream endpoint from NestJS backend as requested
+    return `${API_URL}/api/file/stream?filePath=${encodeURIComponent(filePath)}`;
+  };
+
   return (
     <div className='p-4 bg-dark text-gray-100 min-h-screen'>
       <h1 className='text-2xl font-bold mb-6'>Screen Recording & Capture</h1>
@@ -184,43 +248,44 @@ const RecordingManager: React.FC<RecordingManagerProps> = () => {
         {/* Recording Controls */}
         <div className='bg-secondary p-6 rounded-lg shadow-md border border-gray-700'>
           <h2 className='text-xl font-semibold mb-4'>Controls</h2>
-          <div className='space-y-4'>
-            <div className='flex items-center gap-4'>
-              <Button
-                onClick={handleCaptureScreen}
-                disabled={isCapturing || isStartingRecording || isStoppingRecording}
-                loading={isCapturing}
-                variant='primary'
-                size='lg'
-              >
-                <Icon icon='mdi:camera-outline' className='mr-2' />
-                {isCapturing ? 'Capturing...' : 'Capture Screenshot'}
-              </Button>
-              <Button
-                onClick={handleStartRecording}
-                disabled={
-                  status?.recording || isCapturing || isStartingRecording || isStoppingRecording
-                }
-                loading={isStartingRecording}
-                variant='success'
-                size='lg'
-              >
-                <Icon icon='mdi:record' className='mr-2' />
-                {isStartingRecording ? 'Starting...' : 'Start Recording'}
-              </Button>
+          <div className='flex items-center gap-4'>
+            <Button
+              onClick={handleCaptureScreen}
+              disabled={isCapturing || isStartingRecording || isStoppingRecording}
+              loading={isCapturing}
+              variant='primary'
+              size='lg'
+              title='Capture Screenshot'
+            >
+              <Icon icon='mdi:camera-outline' className='mr-2' />
+              {/* No text, icon only as per request */}
+            </Button>
+
+            {isRecording ? (
               <Button
                 onClick={handleStopRecording}
-                disabled={
-                  !status?.recording || isCapturing || isStartingRecording || isStoppingRecording
-                }
+                disabled={isCapturing || isStartingRecording || isStoppingRecording}
                 loading={isStoppingRecording}
                 variant='error'
                 size='lg'
+                title='Stop Recording'
               >
-                <Icon icon='mdi:stop' className='mr-2' />
-                {isStoppingRecording ? 'Stopping...' : 'Stop Recording'}
+                <Icon icon='mdi:stop' />
+                {/* No text, icon only as per request */}
               </Button>
-            </div>
+            ) : (
+              <Button
+                onClick={handleStartRecording}
+                disabled={isCapturing || isStartingRecording || isStoppingRecording}
+                loading={isStartingRecording}
+                variant='success'
+                size='lg'
+                title='Start Recording'
+              >
+                <Icon icon='mdi:record' />
+                {/* No text, icon only as per request */}
+              </Button>
+            )}
           </div>
         </div>
 
@@ -229,35 +294,35 @@ const RecordingManager: React.FC<RecordingManagerProps> = () => {
           <h2 className='text-xl font-semibold mb-4'>Current Status</h2>
           {isLoadingStatus ? (
             <Loading />
-          ) : status ? (
+          ) : (
             <div>
               <p className='text-lg'>
                 Status:{' '}
                 <span
-                  className={`font-semibold ${status.recording ? 'text-green-400' : 'text-red-400'}`}
+                  className={`font-semibold ${isRecording ? 'text-green-400' : 'text-red-400'}`}
                 >
-                  {status.recording ? 'RECORDING' : 'Idle'}
+                  {isRecording ? 'RECORDING' : 'Idle'}
                 </span>
               </p>
-              {status.file && (
+              {currentRecordingPath && (
                 <p className='text-sm mt-2'>
                   File:{' '}
                   <span className='font-mono text-gray-300 break-all'>
-                    {status.file.split('/').pop()}
+                    {currentRecordingPath.split('/').pop()}
                   </span>
                 </p>
               )}
-              {status.startedAt && (
-                <p className='text-sm'>Started At: {new Date(status.startedAt).toLocaleString()}</p>
+              {currentRecordingStartedAt && (
+                <p className='text-sm'>
+                  Started At: {new Date(currentRecordingStartedAt).toLocaleString()}
+                </p>
               )}
-              {!status.recording && (
+              {!isRecording && (
                 <p className='text-sm italic text-gray-400 mt-2'>
                   No active recording. Click 'Start Recording' to begin.
                 </p>
               )}
             </div>
-          ) : (
-            <p className='text-gray-400'>Could not fetch status.</p>
           )}
         </div>
       </div>
@@ -285,19 +350,7 @@ const RecordingManager: React.FC<RecordingManagerProps> = () => {
                       scope='col'
                       className='px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider'
                     >
-                      Type
-                    </th>
-                    <th
-                      scope='col'
-                      className='px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider'
-                    >
                       Status
-                    </th>
-                    <th
-                      scope='col'
-                      className='px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider'
-                    >
-                      Duration
                     </th>
                     <th
                       scope='col'
@@ -319,29 +372,48 @@ const RecordingManager: React.FC<RecordingManagerProps> = () => {
                 <tbody className='divide-y divide-gray-800'>
                   {recordings.map((rec) => (
                     <tr key={rec.id} className='hover:bg-gray-800'>
-                      <td className='px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-300 break-all'>
-                        {rec.path.split('/').pop()}
+                      <td className='px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-300 break-all flex items-center gap-2'>
+                        {rec.type === 'screenRecord' &&
+                          (rec.status === 'finished' || rec.status === 'ready') && (
+                            <Button
+                              onClick={() => handleOpenMedia(rec)}
+                              variant='primary'
+                              size='sm'
+                              title='Play Recording'
+                              className='flex-shrink-0'
+                            >
+                              <Icon icon='mdi:play' />
+                            </Button>
+                          )}
+                        {rec.type === 'screenShot' &&
+                          (rec.status === 'finished' || rec.status === 'ready') && (
+                            <Button
+                              onClick={() => handleOpenMedia(rec)}
+                              variant='primary'
+                              size='sm'
+                              title='View Screenshot'
+                              className='flex-shrink-0'
+                            >
+                              <Icon icon='mdi:play' />
+                            </Button>
+                          )}
+                        <span className='flex-grow'>{rec.path.split('/').pop()}</span>
                       </td>
-                      <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-400'>
-                        {rec.type === 'screenRecord' ? 'Screen Recording' : 'Screenshot'}
-                      </td>
-                      <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-400'>
-                        <span
-                          className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                            rec.status === 'finished' || rec.status === 'ready'
-                              ? 'bg-green-100 text-green-800'
-                              : rec.status === 'started'
-                                ? 'bg-blue-100 text-blue-800'
-                                : 'bg-gray-100 text-gray-800'
-                          }`}
-                        >
-                          {rec.status}
-                        </span>
-                      </td>
-                      <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-400'>
-                        {rec.data?.duration && typeof rec.data.duration === 'number'
-                          ? `${rec.data.duration.toFixed(1)} s`
-                          : 'N/A'}
+                      <td className='px-6 py-4 whitespace-nowrap text-sm'>
+                        <Icon
+                          icon='mdi:circle'
+                          className={`
+                            w-3 h-3 rounded-full inline-block mr-2
+                            ${
+                              rec.status === 'finished' || rec.status === 'ready'
+                                ? 'text-green-500' // Success
+                                : rec.status === 'started'
+                                  ? 'text-blue-500' // Info
+                                  : 'text-red-500' // Error/Other
+                            }
+                          `}
+                          title={rec.status}
+                        />
                       </td>
                       <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-400'>
                         {rec.data?.fileSize && typeof rec.data.fileSize === 'number'
@@ -412,6 +484,38 @@ const RecordingManager: React.FC<RecordingManagerProps> = () => {
           </>
         )}
       </div>
+
+      {/* Media Playback Modal */}
+      <Modal
+        isOpen={isMediaModalOpen}
+        onClose={handleCloseMediaModal}
+        title={selectedMedia ? `Opened: ${selectedMedia.path.split('/').pop()}` : 'Media Player'}
+        size='lg' // Changed to fullscreen as per request for modal sizes
+        className='bg-secondary p-2 flex flex-col' // Added flex flex-col for internal layout
+      >
+        {selectedMedia && (
+          <div className='flex items-center justify-center bg-secondary rounded-md flex-grow'>
+            {selectedMedia.type === 'screenRecord' ? (
+              <video
+                controls
+                src={getMediaUrl(selectedMedia.path)}
+                className='w-full h-full object-contain'
+                autoPlay
+              >
+                Your browser does not support the video tag.
+              </video>
+            ) : selectedMedia.type === 'screenShot' ? (
+              <img
+                src={getMediaUrl(selectedMedia.path)}
+                alt={selectedMedia.path.split('/').pop()}
+                className='w-full h-full object-contain'
+              />
+            ) : (
+              <p className='text-gray-400'>Unsupported media type.</p>
+            )}
+          </div>
+        )}
+      </Modal>
     </div>
   );
 };

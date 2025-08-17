@@ -1,0 +1,47 @@
+/* src/components/editor/EditorFileExplorer */
+.explorer {
+  user-select: none; /* Prevent text selection in explorer */
+}
+
+.explorer-node {
+  display: flex;
+  align-items: center;
+  padding: 4px 0;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: background-color 0.2s ease;
+  min-height: 24px; /* Ensure consistent height for rows */
+}
+
+.explorer-node:hover {
+  background-color: #31363f;
+}
+
+.explorer-node.active {
+  background-color: #4b5263; /* Active file highlight */
+  color: #fff;
+}
+
+.explorer-node .node-icon {
+  margin-right: 5px;
+  display: flex; /* For alignment */
+  align-items: center;
+}
+
+.explorer-node .folder-icon {
+  margin-right: 5px;
+  font-size: 1.1em;
+  color: #ffe082; /* Yellow for folder icons */
+  min-width: 20px; /* Give space to chevron */
+}
+
+.explorer-node .node-name {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex-grow: 1;
+}
+
+.folder-children {
+  /* No specific styling needed here, indentation is handled by paddingLeft in ExplorerNode */
+}

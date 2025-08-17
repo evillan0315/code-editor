@@ -1,0 +1,71 @@
+ /* src/components/Chat.css */
+@import 'tailwindcss';
+.ai-chat-wrapper {
+    color: var(--color-text);
+    @apply transition-colors duration-300;
+}
+.ai-chat-header {
+    background-color: var(--color-pre-bg);
+}
+.ai-chat-input {
+  background-color: var(--color-pre-bg);
+  @apply border shadow-none;
+  border-color: var(--color-border);
+  color: var(--color-text);
+}
+.ai-chat-wrapper .user-message-wrapper {
+  margn-top: 1em;
+  @apply shadow-lg;
+  @apply px-6 py-8 border-2;
+  border-color: var(--color-border);
+  background-color: var(--color-pre-bg);
+  @apply rounded-lg overflow-auto;
+  @apply max-h-[40vh];
+}
+
+.user-message-wrapper {
+  font-size: 1.2em;
+
+}
+.ai-chat-wrapper hr {
+  border-color: var(--color-border);
+}
+
+.ai-model-message-wrapper {
+
+  color: var(--color-text);
+  font-weight: light;
+}
+.ai-model-message-wrapper pre {
+white-space: nowrap;
+}
+.ai-model-message-wrapper p {
+ line-height: 1.6em;
+  text-transform: light;
+  font-size: 1.2em;
+  margin-bottom: 1em;
+  
+}
+.ai-model-message-wrapper p {
+margin-top: 1em;
+  
+}
+.ai-model-message-wrapper h3, .ai-model-message-wrapper h2 {
+color: var(--color-primary-text)
+
+}
+.ai-model-message-wrapper ul, .ai-model-message-wrapper ol {
+ line-height: 1.6em;
+  margin-bottom: 1em;
+  margin-top: 1em;
+}
+.ai-model-message-wrapper h1, .ai-model-message-wrapper h2, .ai-model-message-wrapper h3 {
+
+  margin-top: 1em;
+}
+.ai-model-message-wrapper ul > li , .ai-model-message-wrapper ol > li {
+ line-height: 1.6em;
+}
+.ai-model-message-wrapper code {
+ @ @apply text-sky-500;
+}

@@ -1,0 +1,82 @@
+/* src/StickyNote.css */
+
+.sticky-note {
+  /* Base styles are handled by inline styles in JS */
+}
+
+/* Header specific styles */
+.sticky-note-header {
+  /* Styles are handled by inline styles in JS */
+}
+
+/* Resize handle common styles */
+.resize-handle {
+  position: absolute;
+  background: transparent; /* Makes the handles invisible */
+}
+
+/* Corner handles */
+.resize-handle.top-left {
+  width: 10px;
+  height: 10px;
+  top: -5px;
+  left: -5px;
+  cursor: nwse-resize;
+}
+
+.resize-handle.top-right {
+  width: 10px;
+  height: 10px;
+  top: -5px;
+  right: -5px;
+  cursor: nesw-resize;
+}
+
+.resize-handle.bottom-left {
+  width: 10px;
+  height: 10px;
+  bottom: -5px;
+  left: -5px;
+  cursor: nesw-resize;
+}
+
+.resize-handle.bottom-right {
+  width: 10px;
+  height: 10px;
+  bottom: -5px;
+  right: -5px;
+  cursor: nwse-resize;
+}
+
+/* Edge handles */
+.resize-handle.top,
+.resize-handle.bottom {
+  left: 10px; /* Offset from corner handles */
+  right: 10px; /* Offset from corner handles */
+  height: 10px;
+  cursor: ns-resize;
+}
+
+.resize-handle.left,
+.resize-handle.right {
+  top: 10px; /* Offset from corner handles */
+  bottom: 10px; /* Offset from corner handles */
+  width: 10px;
+  cursor: ew-resize;
+}
+
+.resize-handle.top {
+  top: -5px;
+}
+
+.resize-handle.bottom {
+  bottom: -5px;
+}
+
+.resize-handle.left {
+  left: -5px;
+}
+
+.resize-handle.right {
+  right: -5px;
+}

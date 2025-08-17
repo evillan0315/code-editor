@@ -1,0 +1,30 @@
+/* src/index.css or your component's CSS */
+
+.typewriter-cursor {
+  display: inline-block;
+  vertical-align: middle;
+  width: 0.5em; /* Adjust cursor width as needed */
+  height: 1em; /* Adjust cursor height to match font size */
+  background-color: currentColor; /* Matches text color */
+  animation: blink-caret 0.75s step-end infinite;
+}
+
+/* For the cursor to remain visible but not blink after typing */
+.typewriter-cursor-static {
+  display: inline-block;
+  vertical-align: middle;
+  width: 0.5em;
+  height: 1em;
+  background-color: currentColor;
+}
+
+/* Blinking animation */
+@keyframes blink-caret {
+  from,
+  to {
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+}

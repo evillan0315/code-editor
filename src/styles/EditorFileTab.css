@@ -1,0 +1,36 @@
+/* Basic styling for editor tabs */
+.editor-file-tabs {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+
+.editor-file-tabs::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+}
+
+.file-tab {
+  position: relative;
+  border-right: 1px solid #333; /* Separator between tabs */
+}
+
+.file-tab:last-child {
+  border-right: none;
+}
+
+.file-tab.active {
+  /* Style for the active tab */
+  border-bottom: 2px solid #60a5fa; /* Example active indicator */
+  margin-bottom: -2px; /* Pull it slightly down to hide border */
+}
+
+.close-tab-button {
+  /* Style for the close button */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1; /* Ensure icon is vertically centered */
+}
+
+.close-tab-button:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}

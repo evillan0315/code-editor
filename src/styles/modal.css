@@ -1,0 +1,15 @@
+.modal-backdrop {
+  background-color: var(--color-modal-bg);
+}
+
+.modal-wrapper {
+  border-color: var(--color-border);
+}
+
+.modal-header {
+  background-color: var(--color-pre-bg);
+}
+
+.modal-wrapper input {
+  background-color: var(--color-modal-bg);
+}

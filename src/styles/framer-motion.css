@@ -1,0 +1,206 @@
+/* Basic custom scrollbar for better appearance */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 10px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+/* Dark mode scrollbar */
+.dark .custom-scrollbar::-webkit-scrollbar-track {
+  background: #333;
+}
+
+.dark .custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #666;
+}
+
+.dark .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #999;
+}
+
+/* Basic theme colors for mocks */
+.bg-dark-secondary {
+  background-color: #1e1e1e;
+}
+.bg-dark-extra {
+  background-color: #252526;
+}
+.border-l {
+  border-left-color: #333;
+}
+.bg-secondary {
+  background-color: #2d2d2d;
+}
+.border-r {
+  border-right-color: #333;
+}
+.bg-card {
+  background-color: #2d2d2d;
+}
+.bg-input {
+  background-color: #3c3c3c;
+}
+.text-foreground {
+  color: #f0f0f0;
+}
+.text-muted-foreground {
+  color: #aaaaaa;
+}
+.bg-primary {
+  background-color: #007acc;
+}
+.text-primary-foreground {
+  color: #ffffff;
+}
+.hover\:bg-primary\/90:hover {
+  background-color: #006bb3;
+}
+.bg-accent {
+  background-color: #3c3c3c;
+}
+.text-accent-foreground {
+  color: #cccccc;
+}
+.text-destructive {
+  color: #e03c3c;
+}
+.hover\:text-destructive\/80:hover {
+  color: #b33030;
+}
+
+/* For light mode (optional, adjust as needed for your theme) */
+html:not(.dark) .bg-dark-secondary {
+  background-color: #f8f8f8;
+}
+html:not(.dark) .bg-dark-extra {
+  background-color: #f0f0f0;
+}
+html:not(.dark) .border-l {
+  border-left-color: #e0e0e0;
+}
+html:not(.dark) .bg-secondary {
+  background-color: #f0f0f0;
+}
+html:not(.dark) .border-r {
+  border-right-color: #e0e0e0;
+}
+html:not(.dark) .bg-card {
+  background-color: #ffffff;
+}
+html:not(.dark) .bg-input {
+  background-color: #f5f5f5;
+}
+html:not(.dark) .text-foreground {
+  color: #333333;
+}
+html:not(.dark) .text-muted-foreground {
+  color: #666666;
+}
+html:not(.dark) .bg-primary {
+  background-color: #007bff;
+}
+html:not(.dark) .text-primary-foreground {
+  color: #ffffff;
+}
+html:not(.dark) .hover\:bg-primary\/90:hover {
+  background-color: #0069d9;
+}
+html:not(.dark) .bg-accent {
+  background-color: #e0e0e0;
+}
+html:not(.dark) .text-accent-foreground {
+  color: #333333;
+}
+html:not(.dark) .text-destructive {
+  color: #dc3545;
+}
+html:not(.dark) .hover\:text-destructive\/80:hover {
+  color: #c82333;
+}
+
+.dark .bg-blue-100 {
+  background-color: #1e3a8a;
+} /* dark blue */
+.dark .text-blue-900 {
+  color: #bfdbfe;
+} /* light blue text */
+.dark .bg-gray-100 {
+  background-color: #374151;
+} /* dark gray */
+.dark .text-gray-800 {
+  color: #d1d5db;
+} /* light gray text */
+
+.light .bg-blue-100 {
+  background-color: #cfe2ff;
+}
+.light .text-blue-900 {
+  color: #072a6b;
+}
+.light .bg-gray-100 {
+  background-color: #f0f0f0;
+}
+.light .text-gray-800 {
+  color: #1f2937;
+}
+
+/* Define CSS variables for easier theme switching if not using complex theme setup */
+:root {
+  --color-background: #ffffff;
+  --color-foreground: #1a202c;
+  --color-card-bg: #ffffff;
+}
+
+.dark {
+  --color-background: #1a202c;
+  --color-foreground: #f7fafc;
+  --color-card-bg: #2d3748;
+}
+
+.bg-background {
+  background-color: var(--color-background);
+}
+.text-foreground {
+  color: var(--color-foreground);
+}
+.bg-card {
+  background-color: var(--color-card-bg);
+}
+
+/* Define the animation */
+@keyframes slideInFromBottom {
+    from {
+        transform: translateY(100%); /* Start 100% down */
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0); /* End at natural position */
+        opacity: 1;
+    }
+}
+
+.sliding-element-animated {
+    /* Styling */
+    background-color: var(--color-background); /* A vibrant yellow */
+    color: var(--color-text);
+
+    /* Apply the animation */
+    animation: slideInFromBottom 0.8s ease-out forwards; /* forwards keeps the final state */
+}
+
+.sliding-element-animated h2 {
+    margin-top: 0;
+}

@@ -7,7 +7,9 @@ import {
   editorFilesMap,
   isFileUnsaved,
   codeMirrorStatus,
-  getFileContent
+  getFileContent,
+  editorActiveFilePath,
+  editorCurrentDirectory,
 } from '@/stores/editorContent';
 import { getLanguageExtensionByLangString } from '@/utils/editorLanguage';
 import { getThemeExtension } from '@/utils/editorTheme';
@@ -36,8 +38,12 @@ import {
 import { search, searchKeymap, highlightSelectionMatches } from '@codemirror/search';
 import { rectangularSelection, crosshairCursor } from '@codemirror/view';
 
-import { lintGutter, lintKeymap, linter } from '@codemirror/lint';
-import { triggerESLintLinting } from '@/utils/eslintLinter';
+import { lintGutter } from '@codemirror/lint';
+import {
+  eslintLinterCompartment,
+  initialESLintLinterExtension,
+  triggerFileLinting,
+} from '@/utils/eslintLinter'; // UPDATED import
 
 import { getSelectionOrDoc, formatCode } from '@/utils/codeMirror';
 import { ContextMenuActionItem } from '@/types/codeMirror';
@@ -65,6 +71,7 @@ const EditorCodeMirror: React.FC<EditorCodeMirrorProps> = ({
   const $theme = useStore(theme);
 
   const $editorFilesMap = useStore(editorFilesMap);
+  const $editorCurrentDirectory = useStore(editorCurrentDirectory);
 
   const { handleCodeMirrorChange } = useEditorExplorerActions();
   const { handleSave } = useEditorTabs();
@@ -75,35 +82,35 @@ const EditorCodeMirror: React.FC<EditorCodeMirrorProps> = ({
   const keymapCompartment = useRef(new Compartment()).current;
 
   const OptimizeCodeIcon = useMemo(
-    () => <Icon icon="mdi:speedometer" width="1.5em" height="1.5em" />,
+    () => <Icon icon='mdi:speedometer' width='1.5em' height='1.5em' />,
     [],
   );
   const AnalyzeCodeIcon = useMemo(
-    () => <Icon icon="mdi:magnify" width="1.5em" height="1.5em" />,
+    () => <Icon icon='mdi:magnify' width='1.5em' height='1.5em' />,
     [],
   );
   const RepairCodeIcon = useMemo(
-    () => <Icon icon="mdi:wrench-outline" width="1.5em" height="1.5em" />,
+    () => <Icon icon='mdi:wrench-outline' width='1.5em' height='1.5em' />,
     [],
   );
   const FormatCodeIcon = useMemo(
-    () => <Icon icon="mdi:format-align-left" width="1.5em" height="1.5em" />,
+    () => <Icon icon='mdi:format-align-left' width='1.5em' height='1.5em' />,
     [],
   );
   const RemoveCommentsIcon = useMemo(
-    () => <Icon icon="mdi:comment-remove-outline" width="1.5em" height="1.5em" />,
+    () => <Icon icon='mdi:comment-remove-outline' width='1.5em' height='1.5em' />,
     [],
   );
   const GenerateCodeIcon = useMemo(
-    () => <Icon icon="mdi:lightbulb-on-outline" width="1.5em" height="1.5em" />,
+    () => <Icon icon='mdi:lightbulb-on-outline' width='1.5em' height='1.5em' />,
     [],
   );
   const GenerateDocsIcon = useMemo(
-    () => <Icon icon="mdi:book-open-outline" width="1.5em" height="1.5em" />,
+    () => <Icon icon='mdi:book-open-outline' width='1.5em' height='1.5em' />,
     [],
   );
   const GenerateInlineDocsIcon = useMemo(
-    () => <Icon icon="mdi:comment-text-multiple-outline" width="1.5em" height="1.5em" />,
+    () => <Icon icon='mdi:comment-text-multiple-outline' width='1.5em' height='1.5em' />,
     [],
   );
 
@@ -114,6 +121,7 @@ const EditorCodeMirror: React.FC<EditorCodeMirrorProps> = ({
 
       if (action.id === 'format-code') {
         const { text, selection } = await getSelectionOrDoc(view);
+        // Correctly pass the language argument to formatCode
         const formattedText = await formatCode({ code: text, language });
         if (formattedText !== text) {
           view.dispatch({
@@ -128,7 +136,7 @@ const EditorCodeMirror: React.FC<EditorCodeMirrorProps> = ({
         }
       }
     },
-    [language],
+    [language], // `language` is a dependency for `formatCode` call
   );
 
   const memoizedCodeMirrorMenuItems = useMemo(() => {
@@ -251,12 +259,12 @@ const EditorCodeMirror: React.FC<EditorCodeMirrorProps> = ({
           ...closeBracketsKeymap,
           ...searchKeymap,
           indentWithTab,
-          ...lintKeymap,
         ]),
       ),
 
       lintGutter(),
-      linter(() => []), // Initial linter (actual linting will be triggered below and by updates)
+      // UPDATED: Use the compartment to provide the initial linter extension
+      eslintLinterCompartment.of(initialESLintLinterExtension),
 
       EditorView.updateListener.of((update) => {
         if (update.docChanged && viewRef.current) {
@@ -268,8 +276,8 @@ const EditorCodeMirror: React.FC<EditorCodeMirrorProps> = ({
           if (updatedContent !== getFileContent(activeFilePath)) {
             handleCodeMirrorChange(activeFilePath, updatedContent, language);
           }
-
-          triggerESLintLinting(viewRef.current, updatedContent, activeFilePath);
+          // Trigger file-level linting on doc change
+          triggerFileLinting(viewRef.current, updatedContent, activeFilePath);
         }
         if (update.selectionSet || update.docChanged) {
           const selection = update.state.selection.main;
@@ -298,7 +306,7 @@ const EditorCodeMirror: React.FC<EditorCodeMirrorProps> = ({
 
     viewRef.current = view;
 
-    // Set initial cursor status and trigger initial linting after view is created
+    // Set initial cursor status and trigger initial file linting after view is created
     const selection = view.state.selection.main;
     const line = view.state.doc.lineAt(selection.head);
     const initialCursorLine = line.number;
@@ -311,8 +319,8 @@ const EditorCodeMirror: React.FC<EditorCodeMirrorProps> = ({
       language: language || 'plaintext',
     });
 
-    triggerESLintLinting(view, value, activeFilePath);
-
+    // Initial linting call after view is established
+    triggerFileLinting(view, value, activeFilePath);
 
     // Cleanup function: destroys the CodeMirror instance when the component unmounts
     return () => {
@@ -321,14 +329,6 @@ const EditorCodeMirror: React.FC<EditorCodeMirrorProps> = ({
       codeMirrorStatus.set({ language: 'plaintext', line: 1, col: 1, isUnsaved: false });
     };
   }, [
-    // Dependencies list: This effect should run only ONCE to initialize the editor.
-    // Props like `value`, `language`, `$theme`, `readOnly`, `activeFilePath`
-    // are used for the *initial* state. Subsequent changes to these props are
-    // handled by separate `useEffect` calls that reconfigure the *existing* editor
-    // instance using compartments and dispatch methods.
-    // Callbacks (`handleCmSaveKeybind`, `handleCodeMirrorChange`) should be stable
-    // (wrapped in `useCallback`), and refs (`containerRef`, `languageCompartment`, etc.)
-    // are stable by nature.
     containerRef,
     handleCmSaveKeybind,
     handleCodeMirrorChange,
@@ -337,7 +337,8 @@ const EditorCodeMirror: React.FC<EditorCodeMirrorProps> = ({
     editableCompartment,
     keymapCompartment,
     activeFilePath,
-    
+    // Note: `value`, `language`, `$theme`, `readOnly` are dependencies for the *initial* setup
+    // but their changes are handled by the `useEffect` below for reconfigurations.
   ]);
 
   // This useEffect synchronizes the external 'value' prop with the CodeMirror editor.
@@ -373,6 +374,9 @@ const EditorCodeMirror: React.FC<EditorCodeMirrorProps> = ({
         languageCompartment.reconfigure(getLanguageExtensionByLangString(language || 'plaintext')),
         themeCompartment.reconfigure(getThemeExtension($theme)),
         editableCompartment.reconfigure(EditorView.editable.of(!readOnly)),
+        // No need to reconfigure eslintLinterCompartment here unless its *source function*
+        // or other properties need to change dynamically.
+        // `triggerFileLinting` handles refreshing diagnostics for the current linter instance.
       ],
     });
 
@@ -381,15 +385,16 @@ const EditorCodeMirror: React.FC<EditorCodeMirrorProps> = ({
       language: language || 'plaintext',
     });
 
-    triggerESLintLinting(view, view.state.doc.toString(), activeFilePath);
+    // Re-trigger linting when language, theme, or readOnly state changes
+    triggerFileLinting(view, view.state.doc.toString(), activeFilePath);
   }, [
-    
     language,
     $theme,
     readOnly,
     languageCompartment,
     themeCompartment,
     editableCompartment,
+    activeFilePath,
   ]);
 
   // This useEffect updates the unsaved status in the global store.
@@ -427,28 +432,21 @@ const EditorCodeMirror: React.FC<EditorCodeMirrorProps> = ({
 
   return (
     <>
-
-        {value === null || value === undefined ? (
-          <div className="flex h-full w-full items-center justify-center text-gray-500">
-            No file selected. Please select a file from the explorer.
-          </div>
-        ) : value === '' ? (
-          <div className="flex h-full w-full items-center  justify-center flex-col  text-gray-500">
-
-            <Logo />
-            <p className="text-sm">Add some content here to get started.</p>
-     
-          </div>
-        ) : (
-          <div className="h-full w-full">
-        <div ref={containerRef} className="h-full cm-editor" />
-      </div>
-
-        )}
-            <CodeMirrorContextMenuRenderer />
-    
-
-      
+      {value === null || value === undefined ? (
+        <div className='flex h-full w-full items-center justify-center text-gray-500'>
+          No file selected. Please select a file from the explorer.
+        </div>
+      ) : value === '' ? (
+        <div className='flex h-full w-full items-center  justify-center flex-col  text-gray-500'>
+          <Logo />
+          <p className='text-sm'>Add some content here to get started.</p>
+        </div>
+      ) : (
+        <div className='h-full w-full'>
+          <div ref={containerRef} className='h-full cm-editor' />
+        </div>
+      )}
+      <CodeMirrorContextMenuRenderer />
     </>
   );
 };

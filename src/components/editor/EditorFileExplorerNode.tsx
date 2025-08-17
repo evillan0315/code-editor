@@ -2,6 +2,7 @@ import React, { useCallback } from 'react';
 import type { FileItem } from '@/types/file-system';
 import { MdChevronRight, MdExpandMore } from 'react-icons/md';
 import { Icon } from '@iconify/react';
+import LoadingDots from '@/components/LoadingDots';
 import { getFileIcon } from '@/utils/fileIcon';
 import { useEditorExplorerActions } from '@/hooks/useEditorExplorerActions';
 import { editorCurrentDirectory } from '@/stores/editorContent';
@@ -95,10 +96,10 @@ const EditorFileExplorerNode: React.FC<EditorFileExplorerNodeProps> = ({
         <div className='folder-children'>
           {isLoadingChildren ? (
             <div
-              className='text-muted-foreground text-sm py-1 px-2 animate-pulse'
+              className='text-muted-foreground text-sm py-1 px-2'
               style={{ paddingLeft: paddingLeft + 16 }}
             >
-              Loading...
+              <LoadingDots />
             </div>
           ) : hasChildren ? (
             node.children!.map((child) => (

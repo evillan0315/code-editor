@@ -28,25 +28,36 @@ export default tseslint.config([
     },
     plugins: {
       'react-hooks': reactHooks,
-      'react-refresh': reactRefresh,
+      //'react-refresh': reactRefresh,
       'unused-imports': unusedImports,
     },
     rules: {
       ...js.configs.recommended.rules,
-      ...tseslint.configs.recommended.rules, // This includes @typescript-eslint/no-unused-vars by default
+      ...tseslint.configs.recommended.rules,
 
       'react-hooks/rules-of-hooks': 'error',
       'react-hooks/exhaustive-deps': 'warn',
 
-      ...reactRefresh.configs.vite.rules,
+      //...reactRefresh.configs.vite.rules,
 
-      // --- Rules to disable ---
-      'no-unused-vars': 'off', // Disable built-in ESLint rule
-      'no-control-regex': 'off', // Disable built-in ESLint rule (often included in recommended)
-      '@typescript-eslint/no-unused-vars': 'off', // Disable TypeScript-specific unused vars rule
-      'unused-imports/no-unused-vars': 'off', // Disable unused-imports plugin's unused vars rule
-      'unused-imports/no-unused-imports': 'off', // Disable unused-imports plugin's unused imports rule (if also desired)
-      // --- End rules to disable ---
+      // --- Rules for unused-imports (often preferred over default ESLint/TS rules) ---
+      // Disable default ESLint/TypeScript unused var rules
+      'no-unused-vars': 'off',
+      '@typescript-eslint/no-unused-vars': 'off',
+      // Enable unused-imports plugin rules
+      'unused-imports/no-unused-imports': 'error', // To detect unused imports
+      'unused-imports/no-unused-vars': [         // To detect unused variables
+        'warn',
+        {
+          vars: 'all',
+          varsIgnorePattern: '^_',
+          args: 'after-used',
+          argsIgnorePattern: '^_',
+        },
+      ],
+      // --- End unused-imports config ---
+
+      'no-control-regex': 'off', // Specific rule you want to disable
     },
   },
 ]);

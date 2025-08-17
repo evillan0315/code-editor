@@ -663,6 +663,13 @@ const Terminal: React.FC<TerminalProps> = ({ isResizing }) => {
       }
       addEntryOptimized('system', 'Type `help` for commands.\n');
       addEntryOptimized('system', '[SYSTEM] Connected to terminal backend.');
+
+      // NEW: Send the editor's current directory to the backend if it exists
+      const currentEditorCwd = editorCurrentDirectory.get();
+      if (currentEditorCwd && currentEditorCwd.trim() !== '') {
+        socketRef.current?.emit('set_cwd', { cwd: currentEditorCwd });
+      }
+
       scrollToBottom();
     });
 

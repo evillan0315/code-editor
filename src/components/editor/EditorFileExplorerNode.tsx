@@ -76,7 +76,9 @@ const EditorFileExplorerNode: React.FC<EditorFileExplorerNodeProps> = ({
         title={node.path}
       >
         {isFolder ? (
-          node.isOpen ? (
+          isLoadingChildren ? (
+            <Icon icon='mdi:loading' className='text-muted-foreground animate-spin' />
+          ) : node.isOpen ? (
             <MdExpandMore className='text-muted-foreground' />
           ) : (
             <MdChevronRight className='text-muted-foreground' />

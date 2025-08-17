@@ -1,14 +1,9 @@
-// src/utils/fileTree.ts
+import type { FileItem } from '../types/file-system';
 
-import type { FileItem } from "../types/file-system";
-
-export function findFileByPath(
-  path: string,
-  items: FileItem[],
-): FileItem | undefined {
+export function findFileByPath(path: string, items: FileItem[]): FileItem | undefined {
   for (const item of items) {
     if (item.path === path) return item;
-    if (item.type === "folder" && item.children) {
+    if (item.type === 'folder' && item.children) {
       const result = findFileByPath(path, item.children);
       if (result) return result;
     }
@@ -16,17 +11,13 @@ export function findFileByPath(
   return undefined;
 }
 
-export function updateFileContent(
-  path: string,
-  newContent: string,
-  items: FileItem[],
-): FileItem[] {
+export function updateFileContent(path: string, newContent: string, items: FileItem[]): FileItem[] {
   return items.map((item) => {
-    if (item.path === path && item.type === "file") {
-      console.log(item, "updateFileContent");
+    if (item.path === path && item.type === 'file') {
+      console.log(item, 'updateFileContent');
       return { ...item, content: newContent };
     }
-    if (item.type === "folder" && item.children) {
+    if (item.type === 'folder' && item.children) {
       return {
         ...item,
         children: updateFileContent(path, newContent, item.children),
@@ -36,6 +27,35 @@ export function updateFileContent(
   });
 }
 
+export function updateFolderStateRecursive(
+  path: string,
+  items: FileItem[],
+  newState: { isOpen?: boolean; isLoadingChildren?: boolean; children?: FileItem[] },
+): FileItem[] {
+  return items.map((item) => {
+    if (item.path === path && item.type === 'folder') {
+      return { ...item, ...newState };
+    }
+    if (item.type === 'folder' && item.children) {
+      return {
+        ...item,
+        children: updateFolderStateRecursive(path, item.children, newState),
+      };
+    }
+    return item;
+  });
+}
+
+export function ensureFolderDefaults(items: FileItem[]): FileItem[] {
+  return items.map((item) => ({
+    ...item,
+    ...(item.type === 'dir' && {
+      children: item.children || [],
+      isOpen: item.isOpen || false,
+      isLoadingChildren: item.isLoadingChildren || false,
+    }),
+  }));
+}
 export function toggleFolderState(path: string, items: FileItem[]): FileItem[] {
   return items.map((item) => {
     if (item.path === path && item.type === "folder") {

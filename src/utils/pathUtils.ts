@@ -1,63 +1,125 @@
-// src/utils/pathUtils.ts
-
-/**
- * Truncates a file path to show only the last two directory levels plus the filename.
- * Handles both Unix-like (/) and Windows-like (\) path separators.
- *
- * @param filePath The full file path string.
- * @returns The truncated file path, or an empty string if the input is invalid.
- */
-export function truncateFilePath(filePath: string): string {
-  if (!filePath || typeof filePath !== "string") {
-    return "";
+export const truncateFilePath = (filePath: string, maxLength = 30): string => {
+  if (filePath.length <= maxLength) {
+    return filePath;
   }
 
-  // Determine the primary path separator used in the given path
-  const separator = filePath.includes("/") ? "/" : "\\";
+  const parts = filePath.split('/');
+  if (parts.length <= 2) {
+    return `...${filePath.slice(-maxLength + 3)}`;
+  }
 
-  // Split the path by the separator and filter out any empty strings
-  const parts = filePath.split(separator).filter(Boolean);
+  const firstPart = parts[0];
+  const lastPart = parts[parts.length - 1];
 
-  // If there are 3 or more parts, take the last 3.
-  // Otherwise, take all available parts (for paths with fewer than 2 directories).
-  const truncatedParts = parts.slice(-3);
+  let middle = '';
+  let currentLength = firstPart.length + lastPart.length + 4; // 2 for '...', 2 for '/'
 
-  // Join the truncated parts back with the determined separator
-  return truncatedParts.join(separator);
+  for (let i = 1; i < parts.length - 1; i++) {
+    if (currentLength + parts[i].length + 1 < maxLength) {
+      middle += `/${parts[i]}`;
+      currentLength += parts[i].length + 1;
+    } else {
+      break;
+    }
+  }
+
+  if (middle.length > 0) {
+    return `${firstPart}/...${middle}/${lastPart}`;
+  }
+
+  // Fallback if middle parts are too long too, just show beginning and end
+  return `${firstPart}/.../${lastPart}`;
+};
+
+/**
+ * Joins all given path segments together, then normalizes the resulting path.
+ * Similar to Node.js `path.join` but simplified for browser contexts.
+ */
+export function joinPaths(...segments: string[]): string {
+  const parts: string[] = [];
+  for (const segment of segments) {
+    if (segment) {
+      // Split by '/', remove empty parts, and add to overall parts list
+      const segmentParts = segment.split('/').filter((p) => p !== '');
+      parts.push(...segmentParts);
+    }
+  }
+
+  // Filter out '..' and '.' in a simplified way (not full path.normalize)
+  const stack: string[] = [];
+  for (const part of parts) {
+    if (part === '.' || part === '') {
+      continue;
+    } else if (part === '..') {
+      if (stack.length > 0) {
+        stack.pop();
+      }
+    } else {
+      stack.push(part);
+    }
+  }
+
+  let result = stack.join('/');
+
+  // If the first segment started with a slash, the result should too
+  if (segments[0]?.startsWith('/')) {
+    result = '/' + result;
+  }
+  // If all segments were empty or resolved to '', return '.' or '/'
+  if (result === '') {
+    return segments[0]?.startsWith('/') ? '/' : '.';
+  }
+
+  return result;
 }
 
 /**
- * Extracts all hierarchical segments from a given file or directory path.
- * Each segment, including the final one (which might be a filename), is returned
- * as an item with its name and full path. This function provides the building blocks
- * for path navigation.
- *
- * @param filePath The full file or directory path string (e.g., "/a/b/c/file.txt" or "C:\dir1\dir2\file.js").
- * @returns An array of objects, each with a `name` (the segment's name) and `fullPath` (the full absolute path up to that segment).
- *          Returns an empty array if the input is invalid or no segments are found.
- *
- * Examples:
- * - `getDirectoryPaths("/media/user/proj/file.txt")` =>
- *   [{ name: '/', fullPath: '/' }, { name: 'media', fullPath: '/media' }, { name: 'user', fullPath: '/media/user' }, { name: 'proj', fullPath: '/media/user/proj' }, { name: 'file.txt', fullPath: '/media/user/proj/file.txt' }]
- * - `getDirectoryPaths("/media/user/proj/")` =>
- *   [{ name: '/', fullPath: '/' }, { name: 'media', fullPath: '/media' }, { name: 'user', fullPath: '/media/user' }, { name: 'proj', fullPath: '/media/user/proj' }]
- * - `getDirectoryPaths("/media/user/proj")` =>
- *   [{ name: '/', fullPath: '/' }, { name: 'media', fullPath: '/media' }, { name: 'user', fullPath: '/media/user' }, { name: 'proj', fullPath: '/media/user/proj' }]
- * - `getDirectoryPaths("C:\dir\file.txt")` =>
- *   [{ name: 'C:', fullPath: 'C:\' }, { name: 'dir', fullPath: 'C:\dir' }, { name: 'file.txt', fullPath: 'C:\dir\file.txt' }]
- * - `getDirectoryPaths("C:\dir")` =>
- *   [{ name: 'C:', fullPath: 'C:\' }, { name: 'dir', fullPath: 'C:\dir' }]
- * - `getDirectoryPaths("file.txt")` =>
- *   [{ name: 'file.txt', fullPath: 'file.txt' }]
- * - `getDirectoryPaths("my_dir")` =>
- *   [{ name: 'my_dir', fullPath: 'my_dir' }]
- * - `getDirectoryPaths("/")` =>
- *   [{ name: '/', fullPath: '/' }]
- * - `getDirectoryPaths("C:\")` =>
- *   [{ name: 'C:', fullPath: 'C:\' }]
- * - `getDirectoryPaths(".")` =>
- *   [{ name: '.', fullPath: '.' }]
+ * Returns the last portion of a path, similar to Node.js `path.basename`.
+ * Handles trailing slashes by ignoring them.
  */
+export function getBasename(filePath: string): string {
+  if (typeof filePath !== 'string') {
+    throw new TypeError('Path must be a string. Received ' + typeof filePath);
+  }
+  if (filePath === '') {
+    return '';
+  }
+
+  // Remove trailing slashes (unless it's just '/')
+  const normalizedPath =
+    filePath.endsWith('/') && filePath.length > 1 ? filePath.slice(0, -1) : filePath;
+
+  const lastSlashIndex = normalizedPath.lastIndexOf('/');
+  if (lastSlashIndex === -1) {
+    return normalizedPath; // No slashes, so the whole path is the basename
+  }
+  return normalizedPath.substring(lastSlashIndex + 1);
+}
+
+/**
+ * Returns the directory name of a path, similar to Node.js `path.dirname`.
+ */
+export function getDirname(filePath: string): string {
+  if (typeof filePath !== 'string') {
+    throw new TypeError('Path must be a string. Received ' + typeof filePath);
+  }
+  if (filePath === '') {
+    return '.';
+  }
+
+  // Remove trailing slashes (unless it's just '/')
+  const normalizedPath =
+    filePath.endsWith('/') && filePath.length > 1 ? filePath.slice(0, -1) : filePath;
+
+  const lastSlashIndex = normalizedPath.lastIndexOf('/');
+  if (lastSlashIndex === -1) {
+    return '.'; // No slashes, so dirname is current directory
+  }
+  if (lastSlashIndex === 0) {
+    return '/'; // Only a root slash (e.g., '/foo' -> '/')
+  }
+  return normalizedPath.substring(0, lastSlashIndex);
+}
 export function getDirectoryPaths(
   filePath: string,
 ): Array<{ name: string; fullPath: string }> {

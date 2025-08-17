@@ -14,11 +14,12 @@ import { toggleTerminal } from '@/stores/layout';
 import { io, Socket } from 'socket.io-client';
 import { Icon } from '@/components/ui/Icon';
 import { Button } from '@/components/ui/Button';
-import { truncateFilePath } from '@/utils/pathUtils';
+import { truncateFilePath, joinPaths, getDirname, getBasename } from '@/utils/pathUtils'; // Import browser-compatible path utilities
 import CommandLineOutputViewer from '@/components/terminal/CommandLineOutputViewer';
 
 import { useEditorExplorerActions } from '@/hooks/useEditorExplorerActions';
 import InputContextMenu from '@/components/terminal/InputContextMenu';
+import { fileService } from '@/services';
 
 // Define CommandDetail interface here, as Terminal.tsx now manages this data
 interface CommandDetail {
@@ -471,9 +472,11 @@ const Terminal: React.FC<TerminalProps> = ({ isResizing }) => {
   );
 
   const handleMainInputKeyDown = useCallback(
-    (e: KeyboardEvent<HTMLTextAreaElement>): void => {
+    async (e: KeyboardEvent<HTMLTextAreaElement>): Promise<void> => {
+      const textarea = e.currentTarget;
+      const caretPos = textarea.selectionStart;
+
       if (e.key === 'Enter') {
-        const textarea = e.currentTarget;
         if (!e.shiftKey) {
           e.preventDefault();
 
@@ -493,11 +496,97 @@ const Terminal: React.FC<TerminalProps> = ({ isResizing }) => {
           textarea.style.height = `${textarea.scrollHeight}px`;
         }
       } else if (e.key === 'Tab') {
+        e.preventDefault(); // Always prevent default tab behavior
+
         if (showContextMenu && filteredContextMenuOptions.length > 0) {
-          e.preventDefault(); // Prevent default tab behavior (e.g., focus change)
           const firstOption = filteredContextMenuOptions[0].name;
           setCmd(`/${firstOption}`); // Set the command to the first filtered option
           setShowContextMenu(false); // Hide the context menu after auto-completion
+        } else if (
+          cmd.startsWith('cd ') ||
+          cmd.startsWith('ls ') ||
+          cmd.startsWith('cat ') ||
+          cmd.startsWith('mkdir ') ||
+          cmd.startsWith('rm ') ||
+          cmd.startsWith('touch ') ||
+          cmd.startsWith('mv ') ||
+          cmd.startsWith('cp ')
+        ) {
+          // Add more path-related commands as needed
+          const commandPart = cmd.split(' ')[0];
+          const pathArgument = cmd.substring(commandPart.length + 1);
+
+          let baseDirectory = '';
+          let partialFileName = '';
+
+          if (pathArgument.includes('/')) {
+            baseDirectory = joinPaths(editorCurrentDir, getDirname(pathArgument));
+            partialFileName = getBasename(pathArgument);
+          } else {
+            baseDirectory = editorCurrentDir;
+            partialFileName = pathArgument;
+          }
+
+          try {
+            // Fetch files/directories from the baseDirectory
+            const items = await fileService.list(baseDirectory);
+
+            // Filter items that start with the partialFileName
+            const matchingItems = items.filter((item) =>
+              item.name.toLowerCase().startsWith(partialFileName.toLowerCase()),
+            );
+
+            if (matchingItems.length > 0) {
+              // Sort for consistent completion (e.g., directories first or alphabetically)
+              matchingItems.sort((a, b) => {
+                if (a.isDirectory && !b.isDirectory) return -1;
+                if (!a.isDirectory && b.isDirectory) return 1;
+                return a.name.localeCompare(b.name);
+              });
+
+              const firstMatch = matchingItems[0];
+
+              // Find the longest common prefix among all matching items if there are multiple,
+              // otherwise just use the first match's full name.
+              let commonPrefix = firstMatch.name;
+              if (matchingItems.length > 1) {
+                // Calculate longest common prefix for multiple matches
+                for (let i = 1; i < matchingItems.length; i++) {
+                  const currentName = matchingItems[i].name;
+                  let j = 0;
+                  while (
+                    j < commonPrefix.length &&
+                    j < currentName.length &&
+                    commonPrefix[j] === currentName[j]
+                  ) {
+                    j++;
+                  }
+                  commonPrefix = commonPrefix.substring(0, j);
+                }
+              }
+
+              let completedPathSegment = commonPrefix;
+              if (matchingItems.length === 1 && firstMatch.isDirectory) {
+                completedPathSegment += '/'; // Append '/' for directories when there's a unique match
+              }
+
+              const newPathArgument = joinPaths(getDirname(pathArgument), completedPathSegment);
+              const newCmd = `${commandPart} ${newPathArgument}`;
+              setCmd(newCmd);
+
+              // Manually set cursor position after updating value
+              setTimeout(() => {
+                if (mainInputRef.current) {
+                  mainInputRef.current.selectionStart = mainInputRef.current.selectionEnd =
+                    newCmd.length;
+                  mainInputRef.current.focus();
+                }
+              }, 0);
+            }
+          } catch (error) {
+            console.error('Error fetching path completions:', error);
+            addEntryOptimized('error', `Error auto-completing path: ${(error as Error).message}`);
+          }
         }
       } else if (e.key === 'ArrowUp') {
         e.preventDefault();
@@ -542,6 +631,7 @@ const Terminal: React.FC<TerminalProps> = ({ isResizing }) => {
       filteredContextMenuOptions,
       commandHistory,
       historyIndex,
+      editorCurrentDir,
     ],
   );
 

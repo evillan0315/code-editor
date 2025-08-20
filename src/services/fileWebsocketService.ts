@@ -18,14 +18,15 @@ import {
   editorFileTreeNodes,
 } from "@/stores/editorContent";
 import {
-  type APIProps,
-  type FileItem,
-  type FileReadResponse,
-  type FileWriteRequest,
-  type FileMoveRequest,
-  type FileDeleteRequest,
-  type FileUploadRequest,
-} from "@/types/file-system";
+  FileItem,
+  FileReadResponse,
+  FileWriteRequest,
+  FileMoveRequest,
+  FileDeleteRequest,
+  FileUploadRequest,
+  APIProps,
+} from "@/types";
+
 import {
   updateFileContent as updateFileContentInTree,
 } from "@/utils/fileTree";
@@ -46,6 +47,9 @@ export class FileService implements IFileService {
     socketFactory: SocketFactory = (uri, opts) => io(uri, opts) as ISocket,
   ) {
     this.base = BASE_URL_API.replace(/\/$/, "");
+    //this.eventPrefix = EVENT_PREFIX;
+    //this.socketEvents = SOCKET_EVENTS;
+    //this.apiEndpoints = SOCKET_EVENTS_MERGED;
     this.socketFactory = socketFactory;
   }
 
@@ -75,13 +79,13 @@ export class FileService implements IFileService {
     });
     // Handle global progress/response events that are not tied to a specific promise-based request
     this.socket.on(
-      SOCKET_EVENTS.FILE_UPLOAD_PROGRESS,
+      SOCKET_EVENTS_MERGED.FILE_UPLOAD_PROGRESS,
       (progress: { percent: number }) => {
         /* ... */
       },
     );
     this.socket.on(
-      SOCKET_EVENTS.FILE_DOWNLOAD_PROGRESS,
+      SOCKET_EVENTS_MERGED.FILE_DOWNLOAD_PROGRESS,
       (progress: { percent: number }) => {
         /* ... */
       },
@@ -98,7 +102,7 @@ export class FileService implements IFileService {
         /* ... */
       },
     );
-    this.socket.on(SOCKET_EVENTS.FILE_UPLOAD_RESPONSE, (data: any) => {
+    this.socket.on(SOCKET_EVENTS_MERGED.FILE_UPLOAD_RESPONSE, (data: any) => {
       console.log("Upload complete:", data);
     });
     this.socket.on(SOCKET_EVENTS_MERGED.GET_FILES_RESPONSE, (data: any) => {
@@ -113,26 +117,26 @@ export class FileService implements IFileService {
     this.socket.on(SOCKET_EVENTS_MERGED.WRITE_FILE_RESPONSE, (data: any) => {
       console.log(data, "SOCKET_EVENTS_MERGED.WRITE_FILE_RESPONSE");
     });
-    this.socket.on(SOCKET_EVENTS.RENAME_FILE_RESPONSE, (data: any) => {
+    this.socket.on(SOCKET_EVENTS_MERGED.RENAME_FILE_RESPONSE, (data: any) => {
       /* ... */
     }); // Old rename response
-    this.socket.on(SOCKET_EVENTS.FORMAT_CODE_RESPONSE, (data: any) => {
+    this.socket.on(SOCKET_EVENTS_MERGED.FORMAT_CODE_RESPONSE, (data: any) => {
       /* ... */
     });
-    this.socket.on(SOCKET_EVENTS.OPTIMIZE_CODE_RESPONSE, (data: any) => {
+    this.socket.on(SOCKET_EVENTS_MERGED.OPTIMIZE_CODE_RESPONSE, (data: any) => {
       /* ... */
     });
-    this.socket.on(SOCKET_EVENTS.REMOVE_CODE_COMMENT_RESPONSE, (data: any) => {
+    this.socket.on(SOCKET_EVENTS_MERGED.REMOVE_CODE_COMMENT_RESPONSE, (data: any) => {
       /* ... */
     });
     // New handlers for delete, move, upload responses (these typically trigger FS_CHANGE events from server)
-    this.socket.on(SOCKET_EVENTS.DELETE_FILES_RESPONSE, (data: any) => {
+    this.socket.on(SOCKET_EVENTS_MERGED.DELETE_FILES_RESPONSE, (data: any) => {
       console.log("Delete files response:", data);
     });
-    this.socket.on(SOCKET_EVENTS.MOVE_FILE_RESPONSE, (data: any) => {
+    this.socket.on(SOCKET_EVENTS_MERGED.MOVE_FILE_RESPONSE, (data: any) => {
       console.log("Move file response:", data);
     });
-    this.socket.on(SOCKET_EVENTS.UPLOAD_FILE_RESPONSE, (data: any) => {
+    this.socket.on(SOCKET_EVENTS_MERGED.UPLOAD_FILE_RESPONSE, (data: any) => {
       console.log("Upload file response:", data);
     });
 
@@ -179,11 +183,11 @@ export class FileService implements IFileService {
         return reject(new Error("Socket not available for emitting event."));
       }
 
-      this.socket.emit(SOCKET_EVENTS.DYNAMIC_FILE_EVENT, data);
+      this.socket.emit(SOCKET_EVENTS_MERGED.DYNAMIC_FILE_EVENT, data);
 
       const responseEvent = `${data.event}Response`;
       const errorEvent = `${data.event}Error`;
-      console.log(responseEvent, data);
+
       // Define a cleanup function to remove listeners after resolution/rejection
       const cleanup = () => {
         this.socket?.off(responseEvent);
@@ -219,7 +223,7 @@ export class FileService implements IFileService {
     const response = await this.emitDynamicFileEvent<FileItem[]>({
       endpoint: `${API_ENDPOINTS._FILE.GET_FILES}?directory=${encodeURIComponent(directoryPath)}&recursive=false`,
       method: "GET",
-      event: EVENT_PREFIX.LIST_DIRECTORY_CHILDREN,
+      event: EVENT_PREFIX.GET_FILES,
     });
     return response;
   }
@@ -235,7 +239,7 @@ export class FileService implements IFileService {
   public async loadFile(filePath: string): Promise<FileReadResponse> {
     try {
       const response = await this.emitDynamicFileEvent<FileReadResponse>({
-        endpoint: API_ENDPOINTS._FILE.READ_FILE_CONTENT,
+        endpoint: API_ENDPOINTS._FILE.READ_FILE,
         method: "POST",
         body: { filePath },
         event: EVENT_PREFIX.READ_FILE,
@@ -270,10 +274,10 @@ export class FileService implements IFileService {
     const writeRequest: FileWriteRequest = { filePath, content };
     try {
       await this.emitDynamicFileEvent({
-        endpoint: API_ENDPOINTS._FILE.WRITE_FILE_CONTENT,
+        endpoint: API_ENDPOINTS._FILE.WRITE_FILE,
         method: "POST",
         body: writeRequest,
-        event: EVENT_PREFIX.SAVE_FILE,
+        event: EVENT_PREFIX.WRITE_FILE,
       });
 
       // Update cached content for this file in the fileTree store
@@ -293,54 +297,6 @@ export class FileService implements IFileService {
     }
   }
 
-  // --- New Methods for TanStack Query ---
-
-  /**
-   * Deletes one or more files/folders on the backend.
-   * @param paths - An array of paths to delete.
-   * @returns A Promise that resolves when the deletion is successful.
-   */
-  public async delete(paths: FileDeleteRequest): Promise<void> {
-    try {
-      await this.emitDynamicFileEvent({
-        endpoint: `/files/delete`, // Example endpoint (adjust to your backend)
-        method: "POST", // Or 'DELETE' depending on your backend's API design
-        body: { paths }, // Send paths in the body
-        event: EVENT_PREFIX.DELETE_FILES,
-      });
-      // Backend should emit FS_CHANGE_DELETED event, which useEditorExplorerActions will handle
-      showToast(`Deleted ${paths.length} item(s).`, "success");
-    } catch (error: any) {
-      console.error(`Error deleting files ${paths}:`, error);
-      showToast(`Error deleting: ${error.message}`, "error");
-      throw error;
-    }
-  }
-
-  /**
-   * Moves or renames a file/folder on the backend.
-   * @param request - An object containing oldPath and newPath.
-   * @returns A Promise that resolves when the operation is successful.
-   */
-  public async move(request: FileMoveRequest): Promise<void> {
-    try {
-      await this.emitDynamicFileEvent({
-        endpoint: `/files/move`, // Example endpoint (adjust to your backend)
-        method: "POST", // Or 'PUT' or 'PATCH'
-        body: request,
-        event: EVENT_PREFIX.MOVE_FILE,
-      });
-      // Backend should emit FS_CHANGE_RENAMED event, which useEditorExplorerActions will handle
-      showToast(
-        `Moved/Renamed ${request.oldPath.split("/").pop()} to ${request.newPath.split("/").pop()}.`,
-        "success",
-      );
-    } catch (error: any) {
-      console.error(`Error moving file ${request.oldPath}:`, error);
-      showToast(`Error moving/renaming: ${error.message}`, "error");
-      throw error;
-    }
-  }
 
   /**
    * Uploads a file to the backend.

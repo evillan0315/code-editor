@@ -1,8 +1,8 @@
 // src/hooks/useExplorerNavigation.ts
-import { useCallback } from "react";
-import { editorCurrentDirectory } from "@/stores/editorContent";
-import { useToast } from "@/hooks/useToast";
-import { getParentPath } from "@/utils/fileTreeUtils";
+import { useCallback } from 'react';
+import { editorCurrentDirectory } from '@/stores/editorContent';
+import { useToast } from '@/hooks/useToast';
+import { getParentPath } from '@/utils/fileTree';
 
 export function useExplorerNavigation() {
   const { showToast } = useToast();
@@ -11,7 +11,7 @@ export function useExplorerNavigation() {
     (path: string) => {
       if (path && path !== editorCurrentDirectory.get()) {
         editorCurrentDirectory.set(path);
-        showToast(`Navigated to: ${path}`, "info");
+        showToast(`Navigated to: ${path}`, 'info');
       }
     },
     [showToast],
@@ -21,8 +21,8 @@ export function useExplorerNavigation() {
     const dir = editorCurrentDirectory.get();
     const parentPath = getParentPath(dir);
     editorCurrentDirectory.set(parentPath);
-    showToast(`Navigated to: ${parentPath}`, "info");
-  }, [showToast]); // getParentPath is pure, no need to be in deps unless it's a memoized fn
+    showToast(`Navigated to: ${parentPath}`, 'info');
+  }, [showToast]);
 
   return {
     handleSelectedPath,

@@ -1,22 +1,17 @@
-// frontend/src/api.ts
-import { type EndpointInfo } from "@/types/endpoint";
-
-import {
-  apiFetch,
-  ApiError,
-  type HttpMethod,
-  API_URL,
-} from "@/services/apiFetch";
+// src/services/api.ts
+import { type EndpointInfo, type HttpMethod } from '@/types';
+import { BASE_URL_API } from '@/constants';
+import { apiFetch, ApiError } from '@/services/apiFetch';
 
 export const fetchAllEndpoints = async (): Promise<EndpointInfo[]> => {
   try {
-    const data = await apiFetch<EndpointInfo[]>("/endpoints", {
-      method: "GET",
-      baseURL: API_URL,
+    const data = await apiFetch<EndpointInfo[]>('/endpoints', {
+      method: 'GET',
+      baseURL: BASE_URL_API,
     });
     return data;
   } catch (error) {
-    console.error("Error fetching all endpoints:", error);
+    console.error('Error fetching all endpoints:', error);
 
     if (error instanceof ApiError && error.status === 404) {
       return [];
@@ -29,19 +24,13 @@ export const fetchEndpointsByController = async (
   controllerName: string,
 ): Promise<EndpointInfo[]> => {
   try {
-    const data = await apiFetch<EndpointInfo[]>(
-      `/endpoints/${controllerName}`,
-      {
-        method: "GET",
-        baseURL: API_URL,
-      },
-    );
+    const data = await apiFetch<EndpointInfo[]>(`/endpoints/${controllerName}`, {
+      method: 'GET',
+      baseURL: BASE_URL_API,
+    });
     return data;
   } catch (error) {
-    console.error(
-      `Error fetching endpoints for controller ${controllerName}:`,
-      error,
-    );
+    console.error(`Error fetching endpoints for controller ${controllerName}:`, error);
 
     if (error instanceof ApiError && error.status === 404) {
       return [];
@@ -70,7 +59,7 @@ export const executeEndpointRequest = async (
       method: httpMethod,
       body: body,
       headers: headers,
-      baseURL: API_URL,
+      baseURL: BASE_URL_API,
     });
 
     const status = resBody === undefined ? 204 : 200;
@@ -85,7 +74,7 @@ export const executeEndpointRequest = async (
   } catch (error: any) {
     let status = 0;
     let responseBody: any = null;
-    let errorMessage: string = "Unknown error during request execution.";
+    let errorMessage: string = 'Unknown error during request execution.';
     const responseHeaders: Record<string, string> = {};
 
     if (error instanceof ApiError) {

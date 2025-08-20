@@ -4,114 +4,182 @@ import React, {
   useState,
   useRef,
   useEffect,
+  useCallback,
   type ReactNode,
-  isValidElement, // Import to check if children is a valid React element
-  cloneElement, // Import to clone and modify children props
-} from "react";
-import { Button } from "@/components/ui/Button";
-/**
- * Type definition for the DropdownMenu context.
- * The triggerRef type is broadened to HTMLElement to support any trigger element when `asChild` is true.
- */
+  isValidElement, 
+  cloneElement, 
+} from 'react';
+import { Button } from '@/components/ui/Button';
+
 export interface DropdownMenuContextType {
   open: boolean;
   setOpen: (value: boolean) => void;
   triggerRef: React.RefObject<HTMLElement | null>;
 }
 
-/**
- * Context for DropdownMenu components to share state and references.
- */
+
 const DropdownMenuContext = createContext<DropdownMenuContextType | null>(null);
 
-/**
- * DropdownMenu component provides the context for its children (Trigger, Content, etc.).
- * It manages the open/closed state of the dropdown.
- */
-export const DropdownMenu: React.FC<{ children: ReactNode }> = ({
-  children,
-}) => {
+
+export const DropdownMenu: React.FC<{
+  children: ReactNode;
+  className?: string;
+  direction?: 'down' | 'up';
+  width?: string | number;
+}> = ({ children, className, direction = 'down', width }) => {
   const [open, setOpen] = useState(false);
-  // Ref to the element that triggers the dropdown (button, div, etc.)
+  
   const triggerRef = useRef<HTMLElement>(null);
+
+  const [position, setPosition] = useState<React.CSSProperties>({ top: 0, left: 0, width: 'auto' });
+
+  const calculatePosition = useCallback(() => {
+    if (!triggerRef.current) {
+      return;
+    }
+
+    const triggerRect = triggerRef.current.getBoundingClientRect();
+
+    let newTop: number;
+    let newLeft: number;
+    const spacing = 4;
+
+    
+    let effectiveWidth = width;
+    if (effectiveWidth === undefined || effectiveWidth === 'auto') {
+      
+      
+      
+      
+      effectiveWidth = triggerRect.width; 
+    }
+    const styleWidth = width ?? triggerRect.width; 
+
+    if (direction === 'down') {
+      newTop = triggerRect.bottom + spacing;
+    } else {
+      
+      
+      
+      
+      newTop = triggerRect.top - (typeof width === 'number' ? width : 0) - spacing; 
+    }
+
+    newLeft = triggerRect.left;
+
+    const viewportWidth = window.innerWidth;
+    
+    if (newLeft + (typeof effectiveWidth === 'number' ? effectiveWidth : 0) > viewportWidth) {
+      newLeft = Math.min(
+        newLeft,
+        viewportWidth - (typeof effectiveWidth === 'number' ? effectiveWidth : 0) - spacing,
+      );
+    }
+    newLeft = Math.max(spacing, newLeft); 
+
+    setPosition({
+      top: newTop,
+      left: newLeft,
+      width: styleWidth, 
+    });
+  }, [direction, width]);
+
+  
+  useEffect(() => {
+    let animationFrameId: number | null = null;
+    if (open) {
+      animationFrameId = requestAnimationFrame(calculatePosition);
+      window.addEventListener('resize', calculatePosition);
+    }
+    return () => {
+      if (animationFrameId !== null) {
+        cancelAnimationFrame(animationFrameId);
+      }
+      window.removeEventListener('resize', calculatePosition);
+    };
+  }, [open, calculatePosition]);
 
   return (
     <DropdownMenuContext.Provider value={{ open, setOpen, triggerRef }}>
-      {/* A relative container to position the dropdown content */}
-      <div className="relative inline-block">{children}</div>
+      {}
+      <div className={`relative inline-block z-1000 ${className}`}>
+        {children}
+        {open && (
+          <div
+            className='fixed z-[1000] border border-gray-200 dark:border-gray-700
+            rounded-md shadow-lg overflow-y-auto max-h-[80vh]'
+            style={position}
+            role='menu'
+            aria-orientation='vertical'
+          >
+            {}
+          </div>
+        )}
+      </div>
     </DropdownMenuContext.Provider>
   );
 };
 
-/**
- * DropdownMenuTrigger component.
- * This component is responsible for toggling the dropdown's visibility.
- *
- * @param {Object} props - Component props.
- * @param {ReactNode} props.children - The element(s) to be rendered inside or as the trigger.
- * @param {boolean} [props.asChild] - If true, the trigger's props are merged into its child,
- *                                    preventing it from rendering its own wrapper element.
- */
+
 export const DropdownMenuTrigger: React.FC<{
   children: ReactNode;
   asChild?: boolean;
 }> = ({ children, asChild }) => {
   const ctx = useContext(DropdownMenuContext);
-  if (!ctx)
-    throw new Error("DropdownMenuTrigger must be used within DropdownMenu");
+  if (!ctx) throw new Error('DropdownMenuTrigger must be used within DropdownMenu');
 
-  // Handler for opening/closing the dropdown
+  
   const handleClick = (event: React.MouseEvent) => {
     ctx.setOpen(!ctx.open);
   };
 
-  // Common props for the trigger element, whether it's a native button or a cloned child
+  
   const commonProps = {
     ref: ctx.triggerRef,
     onClick: handleClick,
-    // ARIA attributes for accessibility:
-    // aria-haspopup="menu" indicates it triggers a menu.
-    // aria-expanded reflects the current open state.
-    "aria-haspopup": "menu",
-    "aria-expanded": ctx.open,
+    
+    
+    
+    'aria-haspopup': 'menu',
+    'aria-expanded': ctx.open,
   };
 
-  // If asChild is true, clone the child and inject trigger props
+  
   if (asChild) {
     if (!isValidElement(children)) {
-      // Warn if asChild is true but children is not a single React element.
-      // This makes the `asChild` pattern ineffective.
+      
+      
       console.warn(
-        "DropdownMenuTrigger: When `asChild` is true, its child must be a single React element. Received:",
+        'DropdownMenuTrigger: When `asChild` is true, its child must be a single React element. Received:',
         children,
       );
-      // Fallback: Render children as is, but it won't receive trigger functionality.
+      
       return <>{children}</>;
     }
 
-    // Merge refs: Combine the original child's ref with our context ref.
-    // This ensures both refs receive the DOM node.
+    
+    
     const childRef = (children as any).ref;
     const mergedRef = (node: HTMLElement | null) => {
       ctx.triggerRef.current = node;
-      if (typeof childRef === "function") {
+      if (typeof childRef === 'function') {
         childRef(node);
-      } else if (childRef && typeof childRef === "object") {
+      } else if (childRef && typeof childRef === 'object') {
         (childRef as React.MutableRefObject<HTMLElement | null>).current = node;
       }
     };
 
-    // Compose onClick: Call our trigger logic AND the original child's onClick handler.
+    
     const originalOnClick = (children as any).props?.onClick;
     const newOnClick = (event: React.MouseEvent) => {
-      handleClick(event); // Our click logic (toggle dropdown)
+      handleClick(event); 
       if (originalOnClick) {
-        originalOnClick(event); // Call original click handler if it exists
+        originalOnClick(event); 
       }
     };
 
-    // Clone the child element and apply our trigger props.
-    // The ref and onClick are explicitly overridden to ensure proper merging.
+    
+    
     return cloneElement(children, {
       ...commonProps,
       ref: mergedRef,
@@ -119,34 +187,28 @@ export const DropdownMenuTrigger: React.FC<{
     });
   }
 
-  // Default behavior: Render a native button element.
+  
   return (
     <button
-      {...commonProps} // Apply all common trigger props
-      className="focus:outline-none" // Tailwind class for no default focus outline
+      {...commonProps} 
+      className='focus:outline-none' 
     >
       {children}
     </button>
   );
 };
 
-/**
- * DropdownMenuContent component displays the actual dropdown menu items.
- * It is conditionally rendered based on the 'open' state from the context.
- */
-export const DropdownMenuContent: React.FC<{ children: ReactNode }> = ({
-  children,
-}) => {
+
+export const DropdownMenuContent: React.FC<{ children: ReactNode }> = ({ children }) => {
   const ctx = useContext(DropdownMenuContext);
-  if (!ctx)
-    throw new Error("DropdownMenuContent must be used within DropdownMenu");
+  if (!ctx) throw new Error('DropdownMenuContent must be used within DropdownMenu');
 
   const menuRef = useRef<HTMLDivElement>(null);
 
-  // Effect to close the dropdown when clicking outside of it or its trigger.
+  
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      // Check if the click occurred outside the menu content AND outside the trigger.
+      
       if (
         menuRef.current &&
         !menuRef.current.contains(event.target as Node) &&
@@ -158,56 +220,45 @@ export const DropdownMenuContent: React.FC<{ children: ReactNode }> = ({
     };
 
     if (ctx.open) {
-      // Add event listener only when dropdown is open
-      document.addEventListener("mousedown", handleClickOutside);
+      
+      document.addEventListener('mousedown', handleClickOutside);
     }
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [ctx]); // Dependency array ensures effect re-runs if context changes.
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [ctx]); 
 
-  // Don't render content if dropdown is closed.
+  
   if (!ctx.open) return null;
 
-  return (
-    <div
-      ref={menuRef}
-      role="menu" // ARIA role for a menu, indicating it's a list of choices.
-      className="dropdown-menu absolute right-0 mt-2 w-80 max-w-90 rounded-md shadow-lg bg-secondary border z-50" // Tailwind classes for styling
-    >
-      {children}
-    </div>
-  );
+  
+  
+  return <>{children}</>;
 };
 
-/**
- * DropdownMenuItem component represents a single item within the dropdown menu.
- */
+
 export const DropdownMenuItem: React.FC<{
   children: ReactNode;
-  onSelect?: () => void; // Optional callback when the item is selected
+  onSelect?: () => void; 
 }> = ({ children, onSelect }) => {
   const ctx = useContext(DropdownMenuContext);
-  if (!ctx)
-    throw new Error("DropdownMenuItem must be used within DropdownMenu");
+  if (!ctx) throw new Error('DropdownMenuItem must be used within DropdownMenu');
 
   const handleClick = () => {
     if (onSelect) onSelect();
-    ctx.setOpen(false); // Close the dropdown after an item is selected
+    ctx.setOpen(false); 
   };
 
   return (
     <Button
       onClick={handleClick}
-      role="menuitem" // ARIA role for a menu item.
-      className="w-full text-left px-4 py-4 justify-start" // Tailwind classes for styling and focus
+      role='menuitem' 
+      className='w-full text-left px-4 py-4 justify-start' 
     >
       {children}
     </Button>
   );
 };
 
-/**
- * A visual separator for dropdown menu items, enhancing readability.
- */
+
 export const DropdownMenuSeparator: React.FC = () => {
-  return <div role="separator" className="my-1 h-px bg-border" />; // ARIA role for a separator.
+  return <div role='separator' className='my-1 h-px bg-border' />; 
 };

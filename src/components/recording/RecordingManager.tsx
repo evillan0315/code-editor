@@ -5,7 +5,6 @@ import { Button } from '@/components/ui/Button';
 import { Icon } from '@/components/ui/Icon';
 import Loading from '@/components/Loading'; // Assuming this component exists
 import {
-  RecordingStatusResponse,
   RecordingResultDto, // For displaying database-stored recordings
 } from '@/types/recording';
 import { formatBytes } from '@/utils/formatters'; // Need a helper for file size formatting
@@ -84,8 +83,12 @@ const RecordingManager: React.FC<RecordingManagerProps> = () => {
     } finally {
       setIsLoadingRecordings(false);
     }
-  }, [currentPage, showToast]);
-
+  }, [currentPage]);
+  const handleOpenMedia = useCallback((media: RecordingResultDto) => {
+    console.log(media, 'handleOpenMedia');
+    setSelectedMedia(media);
+    setIsMediaModalOpen(true);
+  }, []);
   useEffect(() => {
     fetchStatus();
     fetchRecordings();
@@ -102,7 +105,7 @@ const RecordingManager: React.FC<RecordingManagerProps> = () => {
       // Clear mediaToOpen once the modal is opened
       recordingAtom.set({ ...recordingAtom.get(), mediaToOpen: null });
     }
-  }, [mediaToOpen, isMediaModalOpen]);
+  }, [mediaToOpen, isMediaModalOpen, handleOpenMedia]);
 
   const handleCaptureScreen = useCallback(async () => {
     setIsCapturing(true);
@@ -115,7 +118,7 @@ const RecordingManager: React.FC<RecordingManagerProps> = () => {
     } finally {
       setIsCapturing(false);
     }
-  }, [showToast, fetchRecordings]);
+  }, [fetchRecordings]);
 
   const handleStartRecording = useCallback(async () => {
     setIsStartingRecording(true);
@@ -145,7 +148,7 @@ const RecordingManager: React.FC<RecordingManagerProps> = () => {
     } finally {
       setIsStartingRecording(false);
     }
-  }, [showToast]);
+  }, []);
 
   const handleStopRecording = useCallback(async () => {
     if (!currentRecordingId) {
@@ -172,7 +175,7 @@ const RecordingManager: React.FC<RecordingManagerProps> = () => {
     } finally {
       setIsStoppingRecording(false);
     }
-  }, [currentRecordingId, showToast, fetchRecordings]);
+  }, [currentRecordingId, fetchRecordings]);
 
   const handleDeleteRecording = useCallback(
     async (id: string, name: string) => {
@@ -189,7 +192,7 @@ const RecordingManager: React.FC<RecordingManagerProps> = () => {
         showToast(`Error deleting recording '${name}': ${err.message}`, 'error');
       }
     },
-    [showToast, fetchRecordings],
+    [fetchRecordings],
   );
 
   const handlePageChange = useCallback(
@@ -220,14 +223,10 @@ const RecordingManager: React.FC<RecordingManagerProps> = () => {
         showToast(`Error preparing download: ${err.message}`, 'error');
       }
     },
-    [showToast],
+    [],
   );
 
-  const handleOpenMedia = useCallback((media: RecordingResultDto) => {
-    console.log(media, 'handleOpenMedia');
-    setSelectedMedia(media);
-    setIsMediaModalOpen(true);
-  }, []);
+  
 
   const handleCloseMediaModal = useCallback(() => {
     setIsMediaModalOpen(false);
@@ -241,12 +240,12 @@ const RecordingManager: React.FC<RecordingManagerProps> = () => {
   };
 
   return (
-    <div className='p-4 bg-dark text-gray-100 min-h-screen'>
+    <div className='p-4 bg-dark  min-h-screen'>
       <h1 className='text-2xl font-bold mb-6'>Screen Recording & Capture</h1>
 
       <div className='grid grid-cols-1 md:grid-cols-2 gap-6 mb-8'>
         {/* Recording Controls */}
-        <div className='bg-secondary p-6 rounded-lg shadow-md border border-gray-700'>
+        <div className='bg-secondary p-4 rounded-lg shadow-md border'>
           <h2 className='text-xl font-semibold mb-4'>Controls</h2>
           <div className='flex items-center gap-4'>
             <Button
@@ -290,7 +289,7 @@ const RecordingManager: React.FC<RecordingManagerProps> = () => {
         </div>
 
         {/* Current Status */}
-        <div className='bg-secondary p-6 rounded-lg shadow-md border border-gray-700'>
+        <div className='bg-secondary p-4 rounded-lg shadow-md border '>
           <h2 className='text-xl font-semibold mb-4'>Current Status</h2>
           {isLoadingStatus ? (
             <Loading />
@@ -328,8 +327,9 @@ const RecordingManager: React.FC<RecordingManagerProps> = () => {
       </div>
 
       {/* Recordings List */}
-      <div className='bg-secondary p-6 rounded-lg shadow-md border border-gray-700'>
-        <h2 className='text-xl font-semibold mb-4'>Saved Recordings & Screenshots</h2>
+      <h2 className='text-lg my-3'>Saved Recordings & Screenshots</h2>
+      <div className='bg-dark rounded-lg shadow-md border'>
+        
         {isLoadingRecordings ? (
           <Loading />
         ) : recordings.length === 0 ? (
@@ -337,30 +337,30 @@ const RecordingManager: React.FC<RecordingManagerProps> = () => {
         ) : (
           <>
             <div className='overflow-x-auto'>
-              <table className='min-w-full divide-y divide-gray-700'>
-                <thead className='bg-gray-800'>
+              <table className='min-w-full divide-y divide-neutral-300 dark:divide-neutral-800'>
+                <thead className='bg-secondary'>
                   <tr>
                     <th
                       scope='col'
-                      className='px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider'
+                      className='px-2 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider'
                     >
                       Name
                     </th>
                     <th
                       scope='col'
-                      className='px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider'
+                      className='px-2 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider'
                     >
                       Status
                     </th>
                     <th
                       scope='col'
-                      className='px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider'
+                      className='px-2 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider'
                     >
                       Size
                     </th>
                     <th
                       scope='col'
-                      className='px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider'
+                      className='px-2 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider'
                     >
                       Created At
                     </th>
@@ -369,10 +369,10 @@ const RecordingManager: React.FC<RecordingManagerProps> = () => {
                     </th>
                   </tr>
                 </thead>
-                <tbody className='divide-y divide-gray-800'>
+                <tbody className='divide-y divide-neutral-800'>
                   {recordings.map((rec) => (
-                    <tr key={rec.id} className='hover:bg-gray-800'>
-                      <td className='px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-300 break-all flex items-center gap-2'>
+                    <tr key={rec.id} className='hover:bg-neutral-800'>
+                      <td className='px-2 py-3 whitespace-nowrap text-sm font-medium text-neutral-300 break-all flex items-center gap-2'>
                         {rec.type === 'screenRecord' &&
                           (rec.status === 'finished' || rec.status === 'ready') && (
                             <Button
@@ -399,7 +399,7 @@ const RecordingManager: React.FC<RecordingManagerProps> = () => {
                           )}
                         <span className='flex-grow'>{rec.path.split('/').pop()}</span>
                       </td>
-                      <td className='px-6 py-4 whitespace-nowrap text-sm'>
+                      <td className='px-2 py-3 whitespace-nowrap text-sm'>
                         <Icon
                           icon='mdi:circle'
                           className={`
@@ -415,15 +415,15 @@ const RecordingManager: React.FC<RecordingManagerProps> = () => {
                           title={rec.status}
                         />
                       </td>
-                      <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-400'>
+                      <td className='px-2 py-3 whitespace-nowrap text-sm text-neutral-400'>
                         {rec.data?.fileSize && typeof rec.data.fileSize === 'number'
                           ? formatBytes(rec.data.fileSize)
                           : 'N/A'}
                       </td>
-                      <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-400'>
+                      <td className='px-2 py-3 whitespace-nowrap text-sm text-neutral-400'>
                         {new Date(rec.createdAt).toLocaleDateString()}
                       </td>
-                      <td className='px-6 py-4 whitespace-nowrap text-right text-sm font-medium'>
+                      <td className='px-2 py-3 whitespace-nowrap text-right text-sm font-medium'>
                         <div className='flex justify-end space-x-2'>
                           <Button
                             onClick={() => handleDownloadFile(rec.path, rec.path.split('/').pop()!)}
@@ -453,7 +453,7 @@ const RecordingManager: React.FC<RecordingManagerProps> = () => {
 
             {/* Pagination Controls */}
             {totalPages > 1 && (
-              <nav className='flex items-center justify-between pt-4 border-t border-gray-700 mt-4'>
+              <nav className='flex items-center justify-between p-2 border-t'>
                 <div className='flex-1 flex justify-between sm:justify-end'>
                   <Button
                     onClick={() => handlePageChange(currentPage - 1)}
@@ -491,7 +491,7 @@ const RecordingManager: React.FC<RecordingManagerProps> = () => {
         onClose={handleCloseMediaModal}
         title={selectedMedia ? `Opened: ${selectedMedia.path.split('/').pop()}` : 'Media Player'}
         size='lg' // Changed to fullscreen as per request for modal sizes
-        className='bg-secondary p-2 flex flex-col' // Added flex flex-col for internal layout
+        className='bg-secondary flex flex-col' // Added flex flex-col for internal layout
       >
         {selectedMedia && (
           <div className='flex items-center justify-center bg-secondary rounded-md flex-grow'>

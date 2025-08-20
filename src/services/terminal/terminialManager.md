@@ -1,12 +1,12 @@
-import { Terminal, type ITerminalOptions } from "@xterm/xterm";
-import { FitAddon } from "@xterm/addon-fit";
-import { getTerminalTheme } from "@/themes/terminal";
+import { Terminal, type ITerminalOptions } from '@xterm/xterm';
+import { FitAddon } from '@xterm/addon-fit';
+import { getTerminalTheme } from '@/themes/terminal';
 import {
 SPINNER_FRAMES,
 TERMINAL_COMMANDS,
 PROMPT_PREFIX,
-} from "@/constants/gemini";
-import { delay } from "@/utils/terminal";
+} from '@/constants/refactored/ui';
+import { delay } from '@/utils/terminal';
 
 export interface TerminalManagerOptions {
 fontSize?: number;
@@ -22,7 +22,7 @@ private termRef?: Terminal;
 private fitAddon?: FitAddon;
 private spinnerInterval?: ReturnType<typeof setInterval>;
 private spinnerState = 0;
-private inputBuffer = "";
+private inputBuffer = '';
 private commandHistory: string[];
 private historyIndex = -1;
 private prompt: string;
@@ -50,12 +50,12 @@ this.onTypingInterrupted = onTypingInterrupted;
     const terminalOptions: ITerminalOptions = {
       fontSize: options.fontSize ?? 12,
       convertEol: true,
-      fontFamily: "monospace",
+      fontFamily: 'monospace',
       theme: getTerminalTheme(this.terminalTheme()),
       cursorBlink: true,
       macOptionIsMeta: true,
       altClickMovesCursor: true,
-      bellStyle: "none",
+      bellStyle: 'none',
     };
 
     this.termRef = new Terminal(terminalOptions);
@@ -90,7 +90,7 @@ public writePrompt(): void {
 this.termRef?.write(`\r\n${this.prompt}`);
 }
 
-public writeLine(text: string, colorCode = "0"): void {
+public writeLine(text: string, colorCode = '0'): void {
 this.termRef?.write(`\x1b[${colorCode}m${text}\x1b[0m\r\n`);
 }
 
@@ -105,7 +105,7 @@ return;
 }
 
     for (const char of text) {
-      if (char === "\x03") {
+      if (char === '\x03') {
         this.onTypingInterrupted(true);
         break;
       }
@@ -119,9 +119,9 @@ public async typeMultiline(
 text: string | string[],
 delayMs: number = this.typingDelay,
 ): Promise<void> {
-const lines = Array.isArray(text) ? text : text.split("\n");
+const lines = Array.isArray(text) ? text : text.split('\n');
 for (const line of lines) {
-await this.typeText(line + "\n", delayMs);
+await this.typeText(line + '\n', delayMs);
 }
 }
 
@@ -138,7 +138,7 @@ this.spinnerState++;
 
 public stopSpinner(): void {
 clearInterval(this.spinnerInterval);
-this.termRef?.write("\x1b[2K\r");
+this.termRef?.write('\x1b[2K\r');
 this.spinnerInterval = undefined;
 this.spinnerState = 0;
 }
@@ -156,11 +156,11 @@ this.commandHistory = history;
 
 private setupDataHandler(): void {
 this.termRef?.onData(async (data: string) => {
-if (data === "\x03") {
+if (data === '\x03') {
 this.onTypingInterrupted(true);
 this.stopSpinner();
-this.termRef?.write("^C\r\n");
-this.inputBuffer = "";
+this.termRef?.write('^C\r\n');
+this.inputBuffer = '';
 this.writePrompt();
 return;
 }
@@ -170,13 +170,13 @@ return;
       const charCode = data.charCodeAt(0);
 
       if (charCode === 13) {
-        this.termRef?.write("\r\n");
+        this.termRef?.write('\r\n');
         await this.onCommandInput(this.inputBuffer.trim());
-        this.inputBuffer = "";
+        this.inputBuffer = '';
         this.historyIndex = -1;
       } else if (charCode === 127) {
         if (this.inputBuffer.length > 0) {
-          this.termRef?.write("\b \b");
+          this.termRef?.write('\b \b');
           this.inputBuffer = this.inputBuffer.slice(0, -1);
         }
       } else if (charCode === 9) {
@@ -188,13 +188,13 @@ return;
           this.inputBuffer += suffix;
           this.termRef?.write(suffix);
         }
-      } else if (data === "\x1b[A" || data === "\x1b[B") {
-        if (data === "\x1b[A") {
+      } else if (data === '\x1b[A' || data === '\x1b[B') {
+        if (data === '\x1b[A') {
           if (this.historyIndex < this.commandHistory.length - 1) {
             this.historyIndex++;
             this.inputBuffer = this.commandHistory[this.historyIndex];
           }
-        } else if (data === "\x1b[B") {
+        } else if (data === '\x1b[B') {
           if (this.historyIndex > 0) {
             this.historyIndex--;
           } else {
@@ -203,9 +203,9 @@ return;
           this.inputBuffer =
             this.historyIndex >= 0
               ? this.commandHistory[this.historyIndex]
-              : "";
+              : '';
         }
-        this.termRef?.write("\x1b[2K\r");
+        this.termRef?.write('\x1b[2K\r');
         this.termRef?.write(this.prompt + this.inputBuffer);
       } else if (charCode >= 32 && charCode <= 126) {
         this.termRef?.write(data);
@@ -223,10 +223,10 @@ try {
 const response = await fetch(
 `/api/conversation/${conversationId}/history`,
 );
-if (!response.ok) throw new Error("Failed to fetch conversation history");
+if (!response.ok) throw new Error('Failed to fetch conversation history');
 return await response.json();
 } catch (err: any) {
-console.error("Error fetching conversation history:", err);
+console.error('Error fetching conversation history:', err);
 throw err;
 }
 }

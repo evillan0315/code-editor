@@ -24,7 +24,7 @@ import { basicSetup } from "codemirror";
 import Logo from "@/components/ui/Logo";
 
 
-import { CODE_MIRROR_CONTEXT_MENU_ITEMS } from "@/constants/codemirror";
+import { CODE_MIRROR_CONTEXT_MENU_ITEMS } from "@/constants";
 import "@/styles/code-mirror.css";
 
 interface MarkdownCodeMirrorProps {

@@ -1,13 +1,13 @@
 // frontend/src/EndpointExplorer.tsx
-/*import React, { useEffect, useState, useMemo } from "react";
+/*import React, { useEffect, useState, useMemo } from 'react';
 import {
   fetchAllEndpoints,
   fetchEndpointsByController,
   executeEndpointRequest,
-} from "@/services/api";
-import type { EndpointInfo, SwaggerParameterDTO } from "@/types/endpoint";
-import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
-import { coy } from "react-syntax-highlighter/dist/esm/styles/prism"; // A nice, light theme
+} from '@/services/api';
+import type { EndpointInfo, SwaggerParameterDTO } from '@/types/endpoint';
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { coy } from 'react-syntax-highlighter/dist/esm/styles/prism'; // A nice, light theme
 
 interface RequestInput {
   path: string;
@@ -17,8 +17,8 @@ interface RequestInput {
 
 const EndpointExplorer: React.FC = () => {
   const [allEndpoints, setAllEndpoints] = useState<EndpointInfo[]>([]);
-  const [selectedController, setSelectedController] = useState<string | "all">(
-    "all",
+  const [selectedController, setSelectedController] = useState<string | 'all'>(
+    'all',
   );
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -28,9 +28,9 @@ const EndpointExplorer: React.FC = () => {
     null,
   );
   const [requestInput, setRequestInput] = useState<RequestInput>({
-    path: "",
+    path: '',
     query: {},
-    body: "",
+    body: '',
   });
   const [response, setResponse] = useState<any>(null);
   const [responseLoading, setResponseLoading] = useState<boolean>(false);
@@ -62,11 +62,11 @@ const EndpointExplorer: React.FC = () => {
 
   const controllers = useMemo(() => {
     const names = new Set(allEndpoints.map((ep) => ep.controller));
-    return ["all", ...Array.from(names).sort()];
+    return ['all', ...Array.from(names).sort()];
   }, [allEndpoints]);
 
   const filteredEndpoints = useMemo(() => {
-    if (selectedController === "all") {
+    if (selectedController === 'all') {
       return allEndpoints;
     }
     return allEndpoints.filter((ep) => ep.controller === selectedController);
@@ -80,16 +80,16 @@ const EndpointExplorer: React.FC = () => {
       path: endpoint.path,
       query:
         endpoint.swaggerInfo?.parameters
-          ?.filter((p) => p.in === "query")
-          .reduce((acc, p) => ({ ...acc, [p.name]: "" }), {}) || {},
+          ?.filter((p) => p.in === 'query')
+          .reduce((acc, p) => ({ ...acc, [p.name]: '' }), {}) || {},
       body: endpoint.swaggerInfo?.requestBody
         ? JSON.stringify(
-            endpoint.swaggerInfo.requestBody.content?.["application/json"]
+            endpoint.swaggerInfo.requestBody.content?.['application/json']
               ?.schema || {},
             null,
             2,
           )
-        : "",
+        : '',
     });
   };
 
@@ -110,7 +110,7 @@ const EndpointExplorer: React.FC = () => {
 
     // Replace path parameters if any
     activeEndpoint.swaggerInfo?.parameters
-      ?.filter((p) => p.in === "path")
+      ?.filter((p) => p.in === 'path')
       .forEach((p) => {
         const paramValue = requestInput.query[p.name]; // Reusing query state for path params
         if (paramValue) {
@@ -124,7 +124,7 @@ const EndpointExplorer: React.FC = () => {
       if (
         requestInput.query[key] &&
         !activeEndpoint.swaggerInfo?.parameters?.some(
-          (p) => p.name === key && p.in === "path",
+          (p) => p.name === key && p.in === 'path',
         ) // Don't add path params as query params
       ) {
         queryParams.append(key, requestInput.query[key]);
@@ -136,14 +136,14 @@ const EndpointExplorer: React.FC = () => {
 
     let requestBodyParsed: any = undefined;
     if (
-      activeEndpoint.method === "POST" ||
-      activeEndpoint.method === "PUT" ||
-      activeEndpoint.method === "PATCH"
+      activeEndpoint.method === 'POST' ||
+      activeEndpoint.method === 'PUT' ||
+      activeEndpoint.method === 'PATCH'
     ) {
       try {
         requestBodyParsed = JSON.parse(requestInput.body);
       } catch (e) {
-        alert("Invalid JSON in request body.");
+        alert('Invalid JSON in request body.');
         setResponseLoading(false);
         return;
       }
@@ -161,7 +161,7 @@ const EndpointExplorer: React.FC = () => {
         status: 0,
         headers: {},
         body: null,
-        error: err.message || "Request failed",
+        error: err.message || 'Request failed',
       });
     } finally {
       setResponseLoading(false);
@@ -169,29 +169,29 @@ const EndpointExplorer: React.FC = () => {
   };
 
   if (loading) return <div>Loading endpoints...</div>;
-  if (error) return <div style={{ color: "red" }}>Error: {error}</div>;
+  if (error) return <div style={{ color: 'red' }}>Error: {error}</div>;
 
   return (
-    <div className="endpoint-explorer-container">
+    <div className='endpoint-explorer-container'>
       <h1>API Endpoint Explorer</h1>
 
-      <div className="controller-selector">
-        <label htmlFor="controller-select">Select Controller:</label>
+      <div className='controller-selector'>
+        <label htmlFor='controller-select'>Select Controller:</label>
         <select
-          id="controller-select"
+          id='controller-select'
           value={selectedController}
           onChange={(e) => setSelectedController(e.target.value)}
         >
           {controllers.map((ctrl) => (
             <option key={ctrl} value={ctrl}>
-              {ctrl === "all" ? "All Controllers" : ctrl}
+              {ctrl === 'all' ? 'All Controllers' : ctrl}
             </option>
           ))}
         </select>
       </div>
 
-      <div className="main-content">
-        <div className="endpoint-list">
+      <div className='main-content'>
+        <div className='endpoint-list'>
           <h2>Endpoints</h2>
           {filteredEndpoints.length === 0 ? (
             <p>No endpoints found for this controller.</p>
@@ -200,12 +200,12 @@ const EndpointExplorer: React.FC = () => {
               {filteredEndpoints.map((endpoint, index) => (
                 <li
                   key={index}
-                  className={activeEndpoint === endpoint ? "active" : ""}
+                  className={activeEndpoint === endpoint ? 'active' : ''}
                 >
                   <button onClick={() => handleEndpointClick(endpoint)}>
                     <span className={`method-tag ${endpoint.method}`}>
                       {endpoint.method}
-                    </span>{" "}
+                    </span>{' '}
                     {endpoint.path}
                     <br />
                     <small>{endpoint.swaggerInfo?.summary}</small>
@@ -216,18 +216,18 @@ const EndpointExplorer: React.FC = () => {
           )}
         </div>
 
-        <div className="endpoint-tester">
+        <div className='endpoint-tester'>
           {activeEndpoint ? (
             <>
               <h2>Test Endpoint: {activeEndpoint.handler}</h2>
-              <div className="endpoint-details">
+              <div className='endpoint-details'>
                 <p>
                   <strong>Method:</strong> {activeEndpoint.method}
                 </p>
                 <p>
-                  <strong>Path:</strong>{" "}
+                  <strong>Path:</strong>{' '}
                   <input
-                    type="text"
+                    type='text'
                     value={requestInput.path}
                     onChange={(e) =>
                       setRequestInput((prev) => ({
@@ -235,35 +235,35 @@ const EndpointExplorer: React.FC = () => {
                         path: e.target.value,
                       }))
                     }
-                    className="path-input"
-                    title="Modify path for path parameters (e.g., /users/123)"
+                    className='path-input'
+                    title='Modify path for path parameters (e.g., /users/123)'
                   />
                 </p>
                 {activeEndpoint.swaggerInfo?.summary && (
                   <p>
-                    <strong>Summary:</strong>{" "}
+                    <strong>Summary:</strong>{' '}
                     {activeEndpoint.swaggerInfo.summary}
                   </p>
                 )}
                 {activeEndpoint.swaggerInfo?.description && (
                   <p>
-                    <strong>Description:</strong>{" "}
+                    <strong>Description:</strong>{' '}
                     {activeEndpoint.swaggerInfo.description}
                   </p>
                 )}
 
                 {activeEndpoint.swaggerInfo?.parameters &&
                   activeEndpoint.swaggerInfo.parameters.length > 0 && (
-                    <div className="param-section">
+                    <div className='param-section'>
                       <h3>Parameters:</h3>
                       {activeEndpoint.swaggerInfo.parameters.map((p) => (
-                        <div key={p.name} className="param-input">
+                        <div key={p.name} className='param-input'>
                           <label>
-                            {p.name} ({p.in}) {p.required ? "*" : ""}:
+                            {p.name} ({p.in}) {p.required ? '*' : ''}:
                           </label>
                           <input
-                            type="text"
-                            value={requestInput.query[p.name] || ""} // Reusing query state for both path and query params
+                            type='text'
+                            value={requestInput.query[p.name] || ''} // Reusing query state for both path and query params
                             onChange={(e) =>
                               handleQueryParamChange(p.name, e.target.value)
                             }
@@ -274,11 +274,11 @@ const EndpointExplorer: React.FC = () => {
                     </div>
                   )}
 
-                {(activeEndpoint.method === "POST" ||
-                  activeEndpoint.method === "PUT" ||
-                  activeEndpoint.method === "PATCH") &&
+                {(activeEndpoint.method === 'POST' ||
+                  activeEndpoint.method === 'PUT' ||
+                  activeEndpoint.method === 'PATCH') &&
                   activeEndpoint.swaggerInfo?.requestBody && (
-                    <div className="body-section">
+                    <div className='body-section'>
                       <h3>Request Body (JSON):</h3>
                       <textarea
                         value={requestInput.body}
@@ -290,7 +290,7 @@ const EndpointExplorer: React.FC = () => {
                         }
                         rows={10}
                         cols={50}
-                        placeholder="Enter JSON body here..."
+                        placeholder='Enter JSON body here...'
                       ></textarea>
                       {activeEndpoint.swaggerInfo.requestBody.description && (
                         <small>
@@ -303,45 +303,45 @@ const EndpointExplorer: React.FC = () => {
                 <button
                   onClick={handleExecute}
                   disabled={responseLoading}
-                  className="execute-button"
+                  className='execute-button'
                 >
-                  {responseLoading ? "Executing..." : "Execute Request"}
+                  {responseLoading ? 'Executing...' : 'Execute Request'}
                 </button>
 
   
                 {response && (
-                  <div className="response-section">
+                  <div className='response-section'>
                     <h3>Response:</h3>
-                    <div className="response-status">
+                    <div className='response-status'>
                       <strong>Status:</strong> {response.status}
                     </div>
                     {response.error && (
-                      <div className="response-error" style={{ color: "red" }}>
+                      <div className='response-error' style={{ color: 'red' }}>
                         <strong>Error:</strong> {response.error}
                       </div>
                     )}
-                    <div className="response-body">
+                    <div className='response-body'>
                       <h4>Body:</h4>
                       <SyntaxHighlighter
-                        language="json"
+                        language='json'
                         style={coy}
                         showLineNumbers
                       >
                         {response.body
                           ? JSON.stringify(response.body, null, 2)
-                          : "No body"}
+                          : 'No body'}
                       </SyntaxHighlighter>
                     </div>
-                    <div className="response-headers">
+                    <div className='response-headers'>
                       <h4>Headers:</h4>
                       <SyntaxHighlighter
-                        language="json"
+                        language='json'
                         style={coy}
                         showLineNumbers
                       >
                         {response.headers
                           ? JSON.stringify(response.headers, null, 2)
-                          : "No headers"}
+                          : 'No headers'}
                       </SyntaxHighlighter>
                     </div>
                   </div>

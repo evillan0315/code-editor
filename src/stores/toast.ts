@@ -2,7 +2,7 @@
 import { atom } from "nanostores";
 import { nanoid } from "nanoid";
 
-export type ToastType = "success" | "error" | "info";
+export type ToastType = "success" | "error" | "info" | "warning";
 export type ToastPosY = "top" | "center" | "bottom";
 export type ToastPosX = "left" | "center" | "right";
 

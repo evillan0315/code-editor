@@ -1,5 +1,6 @@
 import { apiFetch } from '@/services/apiFetch';
-import { API_ENDPOINTS, EVENT_PREFIX } from '@/constants';
+import { API_ENDPOINTS, EVENT_PREFIX } from '@/constants/refactored';
+import { VITE_BASE_DIR } from '@/constants/refactored/app';
 import { Diagnostic } from '@/types/eslint';
 
 interface LintFile {
@@ -18,8 +19,8 @@ export const eslintService = {
   async lintCode(code: string, filePath?: string, cwd?: string): Promise<Diagnostic[]> {
     return apiFetch<Diagnostic[]>(API_ENDPOINTS._ESLINT.LINT_CODE, {
       method: 'POST',
-      body: { code, filePath, cwd },
-      wsEvent: EVENT_PREFIX.LINT_CODE,
+      body: { code, filePath, cwd: VITE_BASE_DIR },
+      event: EVENT_PREFIX.LINT_CODE,
     });
   },
 
@@ -32,8 +33,8 @@ export const eslintService = {
   async lintFiles(files: LintFile[], cwd?: string): Promise<Record<string, Diagnostic[]>> {
     return apiFetch<Record<string, Diagnostic[]>>(API_ENDPOINTS._ESLINT.LINT_FILES, {
       method: 'POST',
-      body: { files, cwd },
-      wsEvent: EVENT_PREFIX.LINT_FILES,
+      body: { files, cwd: VITE_BASE_DIR },
+      event: EVENT_PREFIX.LINT_FILES,
     });
   },
 
@@ -46,8 +47,8 @@ export const eslintService = {
   async lintDirectory(directoryPath: string, cwd?: string): Promise<Record<string, Diagnostic[]>> {
     return apiFetch<Record<string, Diagnostic[]>>(API_ENDPOINTS._ESLINT.LINT_DIRECTORY, {
       method: 'POST',
-      body: { directoryPath, cwd },
-      wsEvent: EVENT_PREFIX.LINT_DIRECTORY,
+      body: { directoryPath, cwd: VITE_BASE_DIR },
+      event: EVENT_PREFIX.LINT_DIRECTORY,
     });
   },
 };

@@ -8,7 +8,6 @@ import {
   isFileUnsaved,
   codeMirrorStatus,
   getFileContent,
-  editorActiveFilePath,
   editorCurrentDirectory,
 } from '@/stores/editorContent';
 import { getLanguageExtensionByLangString } from '@/utils/editorLanguage';
@@ -34,6 +33,7 @@ import {
   completionKeymap,
   closeBrackets,
   closeBracketsKeymap,
+  CompletionSource, CompletionResult, CompletionContext, Completion 
 } from '@codemirror/autocomplete';
 import { search, searchKeymap, highlightSelectionMatches } from '@codemirror/search';
 import { rectangularSelection, crosshairCursor } from '@codemirror/view';
@@ -43,12 +43,15 @@ import {
   eslintLinterCompartment,
   initialESLintLinterExtension,
   triggerFileLinting,
-} from '@/utils/eslintLinter'; // UPDATED import
+} from '@/utils/eslintLinter';
 
 import { getSelectionOrDoc, formatCode } from '@/utils/codeMirror';
-import { ContextMenuActionItem } from '@/types/codeMirror';
-import { CODE_MIRROR_CONTEXT_MENU_ITEMS } from '@/constants/codemirror';
+import { ContextMenuActionItem } from '@/types';
+import { CODE_MIRROR_CONTEXT_MENU_ITEMS } from '@/constants';
 import '@/styles/code-mirror.css';
+
+// 🚀 NEW IMPORT: Your client-side import detection plugin
+import { importDetectionPlugin } from '@/utils/codeMirrorImportDetector';
 
 interface EditorCodeMirrorProps {
   activeFilePath?: string;
@@ -80,6 +83,10 @@ const EditorCodeMirror: React.FC<EditorCodeMirrorProps> = ({
   const themeCompartment = useRef(new Compartment()).current;
   const editableCompartment = useRef(new Compartment()).current;
   const keymapCompartment = useRef(new Compartment()).current;
+
+  // If you need to reconfigure the import detection plugin later (e.g., change debounce time)
+  // you would use a compartment for it:
+  // const importDetectionCompartment = useRef(new Compartment()).current;
 
   const OptimizeCodeIcon = useMemo(
     () => <Icon icon='mdi:speedometer' width='1.5em' height='1.5em' />,
@@ -121,7 +128,7 @@ const EditorCodeMirror: React.FC<EditorCodeMirrorProps> = ({
 
       if (action.id === 'format-code') {
         const { text, selection } = await getSelectionOrDoc(view);
-        // Correctly pass the language argument to formatCode
+
         const formattedText = await formatCode({ code: text, language });
         if (formattedText !== text) {
           view.dispatch({
@@ -136,7 +143,7 @@ const EditorCodeMirror: React.FC<EditorCodeMirrorProps> = ({
         }
       }
     },
-    [language], // `language` is a dependency for `formatCode` call
+    [language],
   );
 
   const memoizedCodeMirrorMenuItems = useMemo(() => {
@@ -214,7 +221,6 @@ const EditorCodeMirror: React.FC<EditorCodeMirrorProps> = ({
     const container = containerRef.current;
     if (!container) return;
 
-    // Destroy existing view if it somehow exists (e.g., hot reload or previous render issue)
     if (viewRef.current) {
       viewRef.current.destroy();
       viewRef.current = null;
@@ -243,9 +249,6 @@ const EditorCodeMirror: React.FC<EditorCodeMirrorProps> = ({
         'aria-multiline': 'true',
       }),
 
-      //placeholder('Start typing or select a file...'),
-
-      // Use compartments for configurable extensions. Initial values are captured here.
       languageCompartment.of(getLanguageExtensionByLangString(language || 'typescript')),
       themeCompartment.of(getThemeExtension($theme)),
       editableCompartment.of(EditorView.editable.of(!readOnly)),
@@ -263,20 +266,22 @@ const EditorCodeMirror: React.FC<EditorCodeMirrorProps> = ({
       ),
 
       lintGutter(),
-      // UPDATED: Use the compartment to provide the initial linter extension
       eslintLinterCompartment.of(initialESLintLinterExtension),
+
+      // 🚀 ADDED: Your new client-side import detection plugin here
+      // It will receive the activeFilePath to provide context in its console logs.
+      importDetectionPlugin(activeFilePath),
+      // If using a compartment:
+      // importDetectionCompartment.of(importDetectionPlugin(activeFilePath)),
 
       EditorView.updateListener.of((update) => {
         if (update.docChanged && viewRef.current) {
           const updatedContent = update.state.doc.toString();
 
-          // Only call handleCodeMirrorChange if content actually differs
-          // This prevents infinite loops if the parent component's state update
-          // causes the 'value' prop to be the same as 'updatedContent'
           if (updatedContent !== getFileContent(activeFilePath)) {
             handleCodeMirrorChange(activeFilePath, updatedContent, language);
           }
-          // Trigger file-level linting on doc change
+
           triggerFileLinting(viewRef.current, updatedContent, activeFilePath);
         }
         if (update.selectionSet || update.docChanged) {
@@ -295,7 +300,7 @@ const EditorCodeMirror: React.FC<EditorCodeMirrorProps> = ({
     ];
 
     const startState = EditorState.create({
-      doc: value, // Use the initial 'value' prop for the document
+      doc: value,
       extensions: initialExtensions,
     });
 
@@ -306,7 +311,6 @@ const EditorCodeMirror: React.FC<EditorCodeMirrorProps> = ({
 
     viewRef.current = view;
 
-    // Set initial cursor status and trigger initial file linting after view is created
     const selection = view.state.selection.main;
     const line = view.state.doc.lineAt(selection.head);
     const initialCursorLine = line.number;
@@ -319,10 +323,8 @@ const EditorCodeMirror: React.FC<EditorCodeMirrorProps> = ({
       language: language || 'plaintext',
     });
 
-    // Initial linting call after view is established
     triggerFileLinting(view, value, activeFilePath);
 
-    // Cleanup function: destroys the CodeMirror instance when the component unmounts
     return () => {
       view.destroy();
       viewRef.current = null;
@@ -336,13 +338,10 @@ const EditorCodeMirror: React.FC<EditorCodeMirrorProps> = ({
     themeCompartment,
     editableCompartment,
     keymapCompartment,
-    activeFilePath,
-    // Note: `value`, `language`, `$theme`, `readOnly` are dependencies for the *initial* setup
-    // but their changes are handled by the `useEffect` below for reconfigurations.
+    activeFilePath, // Re-create plugin if activeFilePath changes
+    // If using a compartment: importDetectionCompartment,
   ]);
 
-  // This useEffect synchronizes the external 'value' prop with the CodeMirror editor.
-  // It dispatches changes to the existing editor without re-initializing it.
   useEffect(() => {
     const view = viewRef.current;
     if (!view) return;
@@ -357,14 +356,13 @@ const EditorCodeMirror: React.FC<EditorCodeMirrorProps> = ({
           insert: value,
         },
         selection: view.state.selection.main.empty
-          ? EditorSelection.cursor(value.length) // Place cursor at end if no active selection
-          : view.state.selection, // Preserve selection if user has one
+          ? EditorSelection.cursor(value.length)
+          : view.state.selection,
         userEvent: 'external.update',
       });
     }
-  }, [value]); // Correctly depends only on 'value'
+  }, [value]);
 
-  // This useEffect reconfigures editor extensions when relevant props change.
   useEffect(() => {
     const view = viewRef.current;
     if (!view) return;
@@ -374,9 +372,8 @@ const EditorCodeMirror: React.FC<EditorCodeMirrorProps> = ({
         languageCompartment.reconfigure(getLanguageExtensionByLangString(language || 'plaintext')),
         themeCompartment.reconfigure(getThemeExtension($theme)),
         editableCompartment.reconfigure(EditorView.editable.of(!readOnly)),
-        // No need to reconfigure eslintLinterCompartment here unless its *source function*
-        // or other properties need to change dynamically.
-        // `triggerFileLinting` handles refreshing diagnostics for the current linter instance.
+        // If importDetectionCompartment was used, reconfigure it here too if `activeFilePath` changes:
+        // importDetectionCompartment.reconfigure(importDetectionPlugin(activeFilePath)),
       ],
     });
 
@@ -385,7 +382,7 @@ const EditorCodeMirror: React.FC<EditorCodeMirrorProps> = ({
       language: language || 'plaintext',
     });
 
-    // Re-trigger linting when language, theme, or readOnly state changes
+    // Re-trigger linting when language/theme/readOnly changes, or on re-render related to activeFilePath
     triggerFileLinting(view, view.state.doc.toString(), activeFilePath);
   }, [
     language,
@@ -397,7 +394,6 @@ const EditorCodeMirror: React.FC<EditorCodeMirrorProps> = ({
     activeFilePath,
   ]);
 
-  // This useEffect updates the unsaved status in the global store.
   useEffect(() => {
     const currentIsUnsaved = isFileUnsaved(activeFilePath);
     codeMirrorStatus.set({
@@ -406,7 +402,6 @@ const EditorCodeMirror: React.FC<EditorCodeMirrorProps> = ({
     });
   }, [activeFilePath, $editorFilesMap]);
 
-  // This useEffect handles the context menu.
   useEffect(() => {
     const editorDom = containerRef.current;
     if (!editorDom || !viewRef.current) return;
@@ -452,3 +447,4 @@ const EditorCodeMirror: React.FC<EditorCodeMirrorProps> = ({
 };
 
 export default EditorCodeMirror;
+

@@ -99,7 +99,7 @@ export const MotionModal: React.FC<MotionModalProps> = ({
         >
           <motion.div
             ref={contentRef}
-            className={`bg-background rounded-lg shadow-xl relative ${contentClassName}`}
+            className={`bg-dark rounded-lg shadow-xl relative ${contentClassName}`}
             variants={modalVariants}
             onClick={(e) => e.stopPropagation()} // Prevent clicks on content from closing modal
           >

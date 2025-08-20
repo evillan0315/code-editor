@@ -12,11 +12,8 @@ import {
   MAX_FILE_SIZE_BYTES,
   CONVERSATION_LIST_LIMIT,
   CONVERSATION_HISTORY_LIMIT,
-} from '@/constants/chat';
-import {
-  SYSTEM_INSTRUCTIONS_REACT_EXPERT,
-  PERSONAS,
-} from '@/constants/gemini';
+} from '@/constants';
+import { SYSTEM_INSTRUCTIONS_REACT_EXPERT, PERSONAS } from '@/constants';
 
 import ChatHeader from '@/components/chat/ChatHeader';
 import ChatMessages from '@/components/chat/ChatMessages';
@@ -129,13 +126,16 @@ export function AiChatPanel() {
     async (convId: string) => {
       setLoadingHistory(true);
       try {
-        const response: PaginatedResponse<ModelResponse> = await apiService.conversation.getHistory(convId, {
-          page: 1,
-          limit: CONVERSATION_HISTORY_LIMIT,
-        } as PaginationParams);
+        const response: PaginatedResponse<ModelResponse> = await apiService.conversation.getHistory(
+          convId,
+          {
+            page: 1,
+            limit: CONVERSATION_HISTORY_LIMIT,
+          } as PaginationParams,
+        );
 
         // Convert ModelResponse to ConversationHistoryItem by adding an ID
-        const historyWithIds: ConversationHistoryItem[] = response.data.map(item => ({
+        const historyWithIds: ConversationHistoryItem[] = response.data.map((item) => ({
           ...item,
           id: uuidv4(), // Assign a unique ID for React keys
         }));
@@ -204,7 +204,7 @@ export function AiChatPanel() {
     const conversationToUseId = isNewConversation ? uuidv4() : activeConversationId;
 
     const userMessage: ConversationHistoryItem = {
-      id: uuidv4(), /* ADDED: Generate ID for user message */
+      id: uuidv4() /* ADDED: Generate ID for user message */,
       role: 'user',
       parts: [],
       createdAt: new Date().toISOString(),
@@ -266,7 +266,7 @@ export function AiChatPanel() {
         // Clone the modelResponse and add a unique ID to make it a ConversationHistoryItem
         const modelHistoryItem: ConversationHistoryItem = {
           ...response.modelResponse,
-          id: uuidv4(), /* ADDED: Generate ID for model message */
+          id: uuidv4() /* ADDED: Generate ID for model message */,
         };
         setChatHistory((prev) => [...prev, modelHistoryItem]);
       } else {
@@ -327,7 +327,7 @@ export function AiChatPanel() {
         // Clone the initial modelResponse and add a unique ID
         const initialModelHistoryItem: ConversationHistoryItem = {
           ...response.modelResponse,
-          id: uuidv4(), /* ADDED: Generate ID for initial model message */
+          id: uuidv4() /* ADDED: Generate ID for initial model message */,
         };
         setChatHistory([initialModelHistoryItem]);
       } else {
@@ -380,7 +380,7 @@ export function AiChatPanel() {
       for (const file of files) {
         if (file.size > MAX_FILE_SIZE_BYTES) {
           showToast(
-            `File "${file.name}" exceeds ${MAX_FILE_SIZE_MB}MB limit and will be skipped.`,
+            `File '${file.name}' exceeds ${MAX_FILE_SIZE_MB}MB limit and will be skipped.`,
             'warning',
           );
           continue;
@@ -390,7 +390,7 @@ export function AiChatPanel() {
           const { base64, mimeType } = await readFileAsDataURL(file);
           newFiles.push({ file, base64, mimeType });
         } catch (error: any) {
-          showToast(`Could not read file "${file.name}": ${error.message}`, 'error');
+          showToast(`Could not read file '${file.name}': ${error.message}`, 'error');
         }
       }
 
@@ -474,7 +474,7 @@ export function AiChatPanel() {
   if (!$visible) return null;
 
   return (
-    <aside className="ai-chat-wrapper h-full w-full bg-dark overflow-hidden flex flex-col relative">
+    <aside className='ai-chat-wrapper h-full w-full bg-dark overflow-hidden flex flex-col relative'>
       <ChatHeader
         showConversationList={showConversationList}
         onToggleChatList={() => setShowConversationList(!showConversationList)}
@@ -485,11 +485,11 @@ export function AiChatPanel() {
       />
 
       {}
-      <div className="flex-1 flex overflow-hidden">
+      <div className='flex-1 flex overflow-hidden'>
         <AnimatePresence>
           {showConversationList && (
             <ConversationListView
-              key="conversation-list-view"
+              key='conversation-list-view'
               conversations={filteredConversations}
               loadingConversations={loadingConversations}
               onSelectConversation={handleSelectConversation}
@@ -504,10 +504,9 @@ export function AiChatPanel() {
 
         {}
         <div
-          className="flex-1 flex flex-col min-w-0"
+          className='flex-1 flex flex-col min-w-0'
           onClick={() => setShowConversationList(false)}
         >
-
           <ChatMessages
             chatHistory={chatHistory}
             isSendingMessage={isSendingMessage}

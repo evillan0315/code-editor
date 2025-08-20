@@ -1,4 +1,5 @@
-export type Severity = 'info' | 'warning' | 'error';
+// src/types/eslint.ts
+export type Severity = 'info' | 'warning' | 'error' | 'hint'; // ADDED 'hint'
 
 export interface DiagnosticAction {
   name: string;
@@ -13,3 +14,6 @@ export interface Diagnostic {
   source?: string; // e.g., 'eslint'
   actions?: DiagnosticAction[];
 }
+
+// ADDED THIS EXPORTED TYPE
+export type DirectoryDiagnostics = Record<string, Diagnostic[]>;

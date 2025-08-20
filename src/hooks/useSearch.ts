@@ -1,6 +1,6 @@
 // src/hooks/useSearch.ts
-import { useCallback, useState } from "react";
-import { editorFilesMap } from "@/stores/editorContent";
+import { useCallback, useState } from 'react';
+import { editorFilesMap } from '@/stores/editorContent';
 
 export interface SearchResult {
   path: string;
@@ -9,7 +9,7 @@ export interface SearchResult {
   lineContent: string;
 }
 export function useSearch() {
-  const [query, setQuery] = useState("");
+  const [query, setQuery] = useState('');
   const [results, setResults] = useState<SearchResult[]>([]);
 
   const searchFiles = useCallback((searchText: string) => {
@@ -20,7 +20,7 @@ export function useSearch() {
     Object.entries(files).forEach(([path, file]) => {
       if (!file?.content) return;
 
-      const lines = file.content.split("\n");
+      const lines = file.content.split('\n');
       lines.forEach((line, index) => {
         const matchIndex = line.toLowerCase().indexOf(searchText.toLowerCase());
         if (matchIndex !== -1) {

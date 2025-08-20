@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { projectService } from '@/services/projectService';
-import { Project, PaginationProjectQueryDto } from '@/types/project';
+import { Project } from '@/types/project';
 import { Button } from '@/components/ui/Button';
-import { Icon } from '@/components/ui/Icon';
 import { showToast } from '@/stores/toast';
 import { ProjectModal } from './ProjectModal';
 import { confirm } from '@/stores/modal';

@@ -1,13 +1,13 @@
 // src/hooks/useEditorFileContent.ts
-import { useCallback } from "react";
+import { useCallback } from 'react';
 import {
   editorActiveFilePath,
   editorOpenFiles,
   editorFilesMap,
   type EditorFileEntry,
-} from "@/stores/editorContent";
-import { fileService } from "@/services/fileService";
-import { useToast } from "@/hooks/useToast";
+} from '@/stores/editorContent';
+import { fileService } from '@/services/fileService';
+import { useToast } from '@/hooks/useToast';
 
 export function useEditorFileContent() {
   const { showToast } = useToast();
@@ -35,10 +35,10 @@ export function useEditorFileContent() {
 
         editorActiveFilePath.set(path);
       } catch (err) {
-        showToast(`Error reading file: ${String(err)}`, "error");
+        showToast(`Error reading file: ${String(err)}`, 'error');
       }
     },
-    [showToast], // editorActiveFilePath is modified inside, not a dependency for useCallback itself
+    [showToast],
   );
 
   const handleCodeMirrorChange = useCallback(

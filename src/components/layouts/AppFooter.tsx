@@ -21,7 +21,6 @@ export function AppFooter() {
     try {
       const result = await recordingService.captureScreen();
       showToast(`Screenshot captured: ${result.path}`, 'success');
-      // No need to fetch recordings here, RecordingManager will do it via polling
     } catch (err: any) {
       showToast(`Error capturing screen: ${err.message}`, 'error');
     } finally {
@@ -38,14 +37,14 @@ export function AppFooter() {
         id: result.id,
         path: result.path,
         startedAt: new Date().toISOString(),
-        lastStoppedRecording: null, // Clear last stopped recording when a new one starts
-        mediaToOpen: null, // Clear any pending media to open
+        lastStoppedRecording: null,
+        mediaToOpen: null,
       });
       showToast(`Recording started: id: ${result.id}`, 'info');
     } catch (err: any) {
       showToast(`Error starting recording: ${err.message}`, 'error');
       recordingAtom.set({
-        ...recordingAtom.get(), // Preserve lastStoppedRecording if it exists
+        ...recordingAtom.get(),
         isRecording: false,
         id: null,
         path: null,
@@ -70,8 +69,8 @@ export function AppFooter() {
         id: null,
         path: null,
         startedAt: null,
-        lastStoppedRecording: result, // Set the last stopped recording
-        mediaToOpen: null, // Ensure mediaToOpen is null when recording stops
+        lastStoppedRecording: result,
+        mediaToOpen: null,
       });
     } catch (err: any) {
       showToast(`Error stopping recording: ${err.message}`, 'error');
@@ -82,9 +81,7 @@ export function AppFooter() {
 
   const handlePlayLastRecording = useCallback(() => {
     if (lastStoppedRecording) {
-      // Check if the recording status is ready or finished before trying to open the modal
       if (lastStoppedRecording.status === 'ready' || lastStoppedRecording.status === 'finished') {
-        // Signal to RecordingManager to open the modal for this media
         recordingAtom.setKey('mediaToOpen', lastStoppedRecording);
       } else {
         showToast(

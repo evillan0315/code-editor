@@ -13,16 +13,7 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["src/*"],
-      "@components/*": ["src/components/*"],
-      "@contexts/*": ["src/contexts/*"],
-      "@hooks/*": ["src/hooks/*"],
-      "@utils/*": ["src/utils/*"],
-      "@services/*": ["src/services/*"],
-      "@stores/*": ["src/stores/*"],
-      "@providers/*": ["src/providers/*"],
-      "@types/*": ["src/types/*"],
-      "@lib/*": ["src/lib/*"]
     }
   },
-  "include": ["src"]
+  "include": ["src","cli"]
 }

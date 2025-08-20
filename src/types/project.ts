@@ -1,15 +1,12 @@
-import { IsString, IsOptional, IsPositive } from 'class-validator';
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { Type } from 'class-transformer';
-
+import {PROJECT_STATUSES} from '@/constants';
 // Define the ProjectStatus enum, matching the backend's (Prisma's) values
 export enum ProjectStatus {
-  ACTIVE = 'active',
-  DEVELOPMENT = 'development',
-  MAINTENANCE = 'maintenance',
-  ON_HOLD = 'on-hold',
-  ARCHIVED = 'archived',
-  DEPRECATED = 'deprecated',
+  ACTIVE = 'ACTIVE',
+  DEVELOPMENT = 'DEVELOPMENT',
+  MAINTENANCE = 'MAINTENANCE',
+  ON_HOLD = 'ON_HOLD',
+  ARCHIVED = 'ARCHIVED',
+  DEPRECATED = 'DEPRECATED',
 }
 
 export enum VersionControl {

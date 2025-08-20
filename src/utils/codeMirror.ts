@@ -1,7 +1,7 @@
 // @/utils/codemirror
-import { EditorView } from "@codemirror/view";
-import { utilsService } from "@/services";
-import { FormatCodeType } from "@/types/codeMirror";
+import { EditorView } from '@codemirror/view';
+import { utilsService } from '@/services';
+import { FormatCodeType } from '@/types/editor'; // Updated import path
 
 export const getSelectionOrDoc = async (view: EditorView): Promise<any> => {
   const selection = view.state.selection.main; // Get the primary selection

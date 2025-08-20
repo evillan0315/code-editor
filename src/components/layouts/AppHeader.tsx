@@ -195,6 +195,7 @@ export function AppHeader({ logo, childrean }: AppHeaderProps) {
       <ProjectModal
         isOpen={isProjectModalOpen}
         onClose={handleCloseProjectModal}
+        size='md'
       />
     </>
   );

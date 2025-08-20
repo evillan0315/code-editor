@@ -1,5 +1,3 @@
-// src/constants/socket.ts
-
 export const HTTP_STATUS = {
   PROGRESS: 'Progress',
   RESPONSE: 'Response',
@@ -17,7 +15,8 @@ export const EVENT_PREFIX = {
   DELETE_FILE: 'deleteFile',
   CREATE_FILE: 'createFile',
   CREATE_FOLDER: 'createFolder',
-
+  UPLOAD_FILE: 'uploadFile',
+  SAVE_FILE: 'writeFile',
   GET_FILES: 'getFiles',
   FORMAT_CODE: 'formatCode',
   OPTIMIZE_CODE: 'optimizeCode',
@@ -25,7 +24,9 @@ export const EVENT_PREFIX = {
   STRIP_CODE_BLOCK: 'stripCodeBlock',
   REPAIR_CODE: 'repairCode',
   ANALYZE_CODE: 'analyzeCode',
-  DYNAMIC_FILE_EVENT: 'dynamicFileEvent',
+  LINT_CODE: 'lintCode',
+  LINT_FILES: 'lintFiles',
+  LINT_DIRECTORY: 'lintDirectory'
 } as const;
 
 export const SOCKET_EVENTS = {

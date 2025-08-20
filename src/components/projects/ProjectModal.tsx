@@ -10,9 +10,15 @@ interface ProjectModalProps {
   isOpen: boolean;
   onClose: () => void;
   projectToEdit?: Project | null;
+  size: string;
 }
 
-export const ProjectModal: React.FC<ProjectModalProps> = ({ isOpen, onClose, projectToEdit }) => {
+export const ProjectModal: React.FC<ProjectModalProps> = ({
+  isOpen,
+  onClose,
+  projectToEdit,
+  size,
+}) => {
   const queryClient = useQueryClient();
 
   const createMutation = useMutation({
@@ -55,7 +61,7 @@ export const ProjectModal: React.FC<ProjectModalProps> = ({ isOpen, onClose, pro
       isOpen={isOpen}
       onClose={onClose}
       title={projectToEdit ? 'Edit Project' : 'Create New Project'}
-      size='md'
+      size={size || 'md'}
     >
       <ProjectForm
         initialData={projectToEdit || undefined}

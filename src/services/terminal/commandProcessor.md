@@ -16,7 +16,7 @@ SYSTEM_INSTRUCTIONS_BASH_ADMIN_EXPERT,
 SYSTEM_INSTRUCTIONS_DEVOPS_EXPERT,
 SYSTEM_INSTRUCTIONS_FULLSTACK_DEVELOPER_EXPERT,
 SYSTEM_INSTRUCTIONS_SOFTWARE_ENGINEER_EXPERT,
-} from '@/constants/gemini';
+} from '@/constants/refactored/ai';
 import { TerminalManager } from '@/services/terminal/terminalManager';
 
 export interface CommandProcessorDeps {
@@ -174,14 +174,14 @@ return finish();
       } else {
         content = d.lastResponse;
         if (!content.trim()) {
-          d.termManager.writeLine('Nothing to save — response is empty.', '31');
+          d.termManager.writeLine('Nothing to save \u2014 response is empty.', '31');
           return finish();
         }
       }
 
       const blob = new Blob([content], { type: 'text/plain' });
       window.open(URL.createObjectURL(blob), '_blank');
-      d.termManager.writeLine('Saved successfully. ✅', '32');
+      d.termManager.writeLine('Saved successfully. \u2705', '32');
     } catch (err: any) {
       d.termManager.writeLine(`Error saving: ${err.message}`, '31');
     }

@@ -30,8 +30,8 @@ export const Modal: FC<ModalProps> = ({
 }) => {
   const sizeClasses = {
     sm: 'max-w-sm',
-    md: 'max-w-md',
-    lg: 'max-w-[80%]',
+    md: 'max-w-[50%]',
+    lg: 'max-w-[70%]',
     fullscreen: 'w-full max-w-full h-full max-h-[100vh-100px] rounded-none',
   };
 
@@ -39,14 +39,14 @@ export const Modal: FC<ModalProps> = ({
     <MotionModal
       isOpen={isOpen}
       onClose={onClose}
-      overlayClassName='fixed inset-0 bg-dark/50 backdrop-blur-sm flex items-center justify-center overflow-y-auto'
-      contentClassName={`relative modal-body text-base rounded-lg shadow-xl border w-full flex flex-col overflow-hidden max-h-[90vh] ${sizeClasses[size]} ${className || ''}`}
+      overlayClassName='fixed z-900 inset-0 bg-dark/50 backdrop-blur-sm flex items-center justify-center overflow-y-auto'
+      contentClassName={`relative modal-body z-2000 text-base rounded-lg shadow-xl border w-full flex flex-col h-auto overflow-hidden ${sizeClasses[size]} ${className || ''}`}
       closeOnOverlayClick={closeOnOverlayClick}
       closeOnEscape={closeOnEscape}
       zIndex={zIndex}
     >
       {title && (
-        <div className='flex items-center justify-between py-4 px-6 border-b border-gray-200 dark:border-gray-700 flex-shrink-0'>
+        <div className='flex items-center justify-between py-4 px-6 border-b flex-shrink-0 bg-secondary'>
           <h2 className='text-lg font-semibold'>{title}</h2>
         </div>
       )}
@@ -54,7 +54,7 @@ export const Modal: FC<ModalProps> = ({
         onClick={onClose}
         className='border-0 absolute top-2 right-2 z-10'
         aria-label='Close modal'
-        variant='warning'
+        variant='error'
       >
         <div className='flex items-center'>
           <Icon icon='mdi:close' className='w-8 h-8' />

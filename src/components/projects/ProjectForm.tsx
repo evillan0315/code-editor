@@ -2,8 +2,8 @@ import React from 'react';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { useStore } from '@nanostores/react'; // Added import
-import { authStore } from '@/stores/authStore'; // Added import
+import { useStore } from '@nanostores/react';
+import { authStore } from '@/stores/authStore';
 import { Button } from '@/components/ui/Button';
 import {
   CreateProjectDto,
@@ -13,6 +13,7 @@ import {
   VersionControl,
 } from '@/types/project'; // Import enums
 import { PROJECT_STATUSES, VERSION_CONTROL_SYSTEMS } from '@/constants'; // Import constants for dropdowns
+import { useProjectOperations } from '@/hooks/useProjectOperations'; // Added import
 
 const projectSchema = z.object({
   name: z.string().min(1, 'Project name is required').max(255, 'Name too long'),
@@ -52,21 +53,24 @@ type ProjectFormValues = CreateProjectDto;
 
 interface ProjectFormProps {
   initialData?: Project; // For editing existing projects
-  onSubmit: (data: CreateProjectDto | UpdateProjectDto) => void;
+  // onSubmit: (data: CreateProjectDto | UpdateProjectDto) => void; // Removed, now handled by hook
   onCancel: () => void;
-  isSubmitting: boolean;
+  // isSubmitting: boolean; // Removed, now handled by hook
 }
 
 export const ProjectForm: React.FC<ProjectFormProps> = ({
   initialData,
-  onSubmit,
+  // onSubmit,
   onCancel,
-  isSubmitting,
+  // isSubmitting, // Removed from destructuring
 }) => {
-  const { $auth } = useStore(authStore);
+  const $auth = useStore(authStore);
   const currentUserId = $auth.user?.id;
 
+  const { handleCreateProject, isCreatingProject } = useProjectOperations(); // Use the hook
+
   const {
+    // isSubmitting is no longer directly a prop
     register,
     handleSubmit,
     formState: { errors },
@@ -87,7 +91,10 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
   });
 
   const handleFormSubmit: SubmitHandler<ProjectFormValues> = (data) => {
-    onSubmit(data);
+    // Now call the function from the hook
+    // You might want to add a callback to `onSuccess` in useProjectOperations
+    // to handle closing the form, etc. For now, just submit.
+    void handleCreateProject(data);
   };
 
   return (
@@ -101,7 +108,7 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
           type='text'
           {...register('name')}
           className='mt-1 block w-full rounded-md shadow-sm bg-secondary text-base'
-          disabled={isSubmitting}
+          disabled={isCreatingProject} // Use isCreatingProject from the hook
         />
         {errors.name && <p className='mt-1 text-sm text-red-600'>{errors.name.message}</p>}
       </div>
@@ -115,7 +122,7 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
           {...register('description')}
           rows={2} // Reduced rows
           className='mt-1 block w-full rounded-md shadow-sm bg-secondary text-base'
-          disabled={isSubmitting}
+          disabled={isCreatingProject} // Use isCreatingProject from the hook
         ></textarea>
         {errors.description && (
           <p className='mt-1 text-sm text-red-600'>{errors.description.message}</p>
@@ -131,7 +138,7 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
           type='text'
           {...register('path')}
           className='mt-1 block w-full rounded-md shadow-sm bg-secondary text-base'
-          disabled={isSubmitting}
+          disabled={isCreatingProject} // Use isCreatingProject from the hook
         />
         {errors.path && <p className='mt-1 text-sm text-red-600'>{errors.path.message}</p>}
       </div>
@@ -144,7 +151,7 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
           id='status'
           {...register('status')}
           className='mt-1 block w-full rounded-md shadow-sm bg-secondary text-base'
-          disabled={isSubmitting}
+          disabled={isCreatingProject} // Use isCreatingProject from the hook
         >
           {PROJECT_STATUSES.map((status) => (
             <option key={status} value={status}>
@@ -165,7 +172,7 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
           {...register('technologies')}
           className='mt-1 block w-full rounded-md shadow-sm bg-secondary text-base'
           placeholder='e.g., React, Node.js, TypeScript'
-          disabled={isSubmitting}
+          disabled={isCreatingProject} // Use isCreatingProject from the hook
         />
         {errors.technologies && (
           <p className='mt-1 text-sm text-red-600'>{errors.technologies.message}</p>
@@ -180,7 +187,7 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
           id='versionControl'
           {...register('versionControl')}
           className='mt-1 block w-full rounded-md shadow-sm bg-secondary text-base'
-          disabled={isSubmitting}
+          disabled={isCreatingProject} // Use isCreatingProject from the hook
         >
           <option value=''>Select...</option>
           {VERSION_CONTROL_SYSTEMS.map((vcs) => (
@@ -203,7 +210,7 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
           type='url' // Use type 'url' for browser validation
           {...register('repositoryUrl')}
           className='mt-1 block w-full rounded-md shadow-sm bg-secondary text-base'
-          disabled={isSubmitting}
+          disabled={isCreatingProject} // Use isCreatingProject from the hook
         />
         {errors.repositoryUrl && (
           <p className='mt-1 text-sm text-red-600'>{errors.repositoryUrl.message}</p>
@@ -224,16 +231,16 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
           rows={4}
           className='mt-1 block w-full rounded-md shadow-sm bg-secondary text-base font-mono text-xs'
           placeholder='{`key:` `value`, number: 123}'
-          disabled={isSubmitting}
+          disabled={isCreatingProject} // Use isCreatingProject from the hook
         ></textarea>
         {errors.metadata && <p className='mt-1 text-sm text-red-600'>{errors.metadata.message}</p>}
       </div>
 
       <div className='flex justify-end space-x-2'>
-        <Button type='button' variant='secondary' onClick={onCancel} disabled={isSubmitting}>
+        <Button type='button' variant='secondary' onClick={onCancel} disabled={isCreatingProject}>
           Cancel
         </Button>
-        <Button type='submit' variant='secondary' loading={isSubmitting}>
+        <Button type='submit' variant='secondary' loading={isCreatingProject}>
           {initialData ? 'Update Project' : 'Create Project'}
         </Button>
       </div>

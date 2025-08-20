@@ -1,7 +1,4 @@
-// src/types/file-system.ts
-
-import { ActionItem } from "./codeMirror";
-export type FileType = "file" | "folder";
+export type FileType = 'file' | 'folder';
 
 export interface FileItem {
   name: string;
@@ -77,40 +74,3 @@ export interface FileUploadRequest {
   file: File;
   onProgress?: (percent: number) => void;
 }
-
-export interface FormatCodeType {
-  code: string;
-  language: string;
-}
-
-export interface ContextMenuItem {
-  id?: string;
-  icon?: string;
-  label?: string;
-  action?: (file: FileItem) => void;
-  className?: string;
-  type?: ActionItem;
-  disabled?: boolean;
-}
-
-export interface ContextMenuStore {
-  x: number;
-  y: number;
-  visible: boolean;
-  title?: string;
-  subtitle?: string;
-  items: ContextMenuItem[];
-  id?: string;
-  file: FileItem;
-}
-export const initialFiles: FileItem[] = [];
-
-// Add APIProps if it's not already defined elsewhere
-export interface APIProps {
-  endpoint: string;
-  method: "GET" | "POST" | "PUT" | "DELETE";
-  body?: any;
-  event: string; // The specific event name for the dynamic file event
-}
-
-

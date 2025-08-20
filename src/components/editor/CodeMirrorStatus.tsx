@@ -9,7 +9,6 @@ import {
   editorCurrentDirectory,
   directoryLintDiagnostics,
 } from '@/stores/editorContent';
-import { Diagnostic, Severity } from '@/types/eslint';
 import { triggerDirectoryLinting } from '@/utils/eslintLinter';
 
 export const CodeMirrorStatus: React.FC = () => {

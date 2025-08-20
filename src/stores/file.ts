@@ -11,11 +11,14 @@ export const shuffledQueue = atom<number[]>([]);
 export const queueIndex = atom<number>(0);
 
 // Current working directory
-export const currentDirectory = persistentAtom<string>(
+export const editorCurrentDirectory = persistentAtom<string>(
   "currentDirectory",
   "./",
 );
-
+export const activeTerminalId = persistentAtom<string>(
+  "activeTerminalId",
+  "",
+);
 // Currently selected file
 export const selectedFile = atom<FileItem | null>(null);
 

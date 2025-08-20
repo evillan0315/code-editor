@@ -29,12 +29,12 @@ export const ToastRenderer = () => {
             key={positionKey}
             className={`fixed z-50 space-y-2 ${vertical} ${horizontal}`}
           >
-            <button
+            <Button
               onClick={removeAllToasts}
               className="hidden mb-6 text-xs text-white bg-gray-700 px-2 py-1 rounded hover:bg-gray-600"
             >
               Dismiss All
-            </button>
+            </Button>
             <AnimatePresence initial={false}>
               {toasts.map((toast) => (
                 <motion.div
@@ -43,7 +43,7 @@ export const ToastRenderer = () => {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
                   transition={{ duration: 0.2 }}
-                  className={`relative px-4 py-4 rounded shadow text-white pr-10 max-w-[400px]  ${
+                  className={`relative px-4 py-4 rounded shadow text-white pr-10 max-w-[400px] min-h-[60px] ${
                     toast.type === "success"
                       ? "bg-green-600"
                       : toast.type === "error"
@@ -51,11 +51,13 @@ export const ToastRenderer = () => {
                         : "bg-sky-500"
                   }`}
                 >
+
                   {toast.message}
                   <Button
                     onClick={() => removeToast(toast.id)}
-                    className="absolute right-2 top-1 text-white text-sm hover:opacity-80"
+                    className="absolute right-0 top-0 text-white text-sm hover:opacity-80 border"
                     aria-label="Dismiss toast"
+                    variant="outlined"
                   >
                     <Icon icon="mdi:close" width="1.2em" height="1.2em" />
                   </Button>

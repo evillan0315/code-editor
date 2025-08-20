@@ -1,7 +1,13 @@
+// src/stores/editorContent.ts
 import { atom, computed } from 'nanostores';
 import { persistentAtom } from '@/utils/persistentAtom';
 import { FileItem } from '@/types/file-system';
-import { Diagnostic } from '@/types/eslint';
+// We no longer directly use Diagnostic from '@/types/eslint' for the stores,
+// as the transformed CodeMirror Diagnostics are what's stored.
+// import { Diagnostic } from '@/types/eslint';
+
+// Import CodeMirror's Diagnostic type specifically for the stores
+import { Diagnostic as CodeMirrorDiagnostic } from '@codemirror/lint';
 
 export interface EditorFileEntry {
   content: string;
@@ -38,9 +44,9 @@ export const editorFileTreeNodes = atom<FileItem[]>([]);
 
 export const fileSystemEvents = atom<FileSystemEvent | null>(null);
 
-// New atoms for ESLint diagnostics
-export const lintDiagnostics = atom<Record<string, Diagnostic[]>>({}); // Stores diagnostics for individually linted files (e.g., active editor file)
-export const directoryLintDiagnostics = atom<Record<string, Diagnostic[]>>({}); // Stores diagnostics for all files in a linted directory
+// Updated atoms for ESLint diagnostics to use CodeMirror's Diagnostic type
+export const lintDiagnostics = atom<Record<string, CodeMirrorDiagnostic[]>>({}); // Stores diagnostics for individually linted files (e.g., active editor file)
+export const directoryLintDiagnostics = atom<Record<string, CodeMirrorDiagnostic[]>>({}); // Stores diagnostics for all files in a linted directory
 
 export const activeFileEntry = computed([editorActiveFilePath, editorFilesMap], (path, map) => {
   return path && map?.[path] ? map[path] : null;

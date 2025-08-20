@@ -65,6 +65,7 @@ const Terminal: React.FC<TerminalProps> = ({ isResizing }) => {
   const [entries, setEntries] = useState<TerminalEntry[]>([]);
   const socketRef = useRef<Socket | null>(null);
   const [cmd, setCmd] = useState<string>('');
+  const [placeholder, setPlaceholder] = useState<string>('Type a command...');
   const [cwd, setCwd] = useState<string>(editorCurrentDir);
   const [homeDir, setHomeDir] = useState<string>('~');
   const [isAuth, setIsAuth] = useState<boolean>(true);
@@ -449,7 +450,7 @@ const Terminal: React.FC<TerminalProps> = ({ isResizing }) => {
         setHistoryIndex(0);
       } else {
         // Display the selected command as if typed by user
-        addEntryOptimized('command', `${cwd} $ ${option}\n`);
+        addEntryOptimized('command', `${cwd}  $ ${option}\n`);
 
         // Add to history and send
         setCommandHistory((prevHistory) => {
@@ -626,7 +627,6 @@ const Terminal: React.FC<TerminalProps> = ({ isResizing }) => {
       cmd,
       sendCommand,
       addEntryOptimized,
-      cwd,
       showContextMenu,
       filteredContextMenuOptions,
       commandHistory,
@@ -640,6 +640,9 @@ const Terminal: React.FC<TerminalProps> = ({ isResizing }) => {
 
     const s = io(`${import.meta.env.VITE_WS_URL}/terminal`, {
       auth: { token: `Bearer ${token}` },
+      query: {
+        initialCwd: editorCurrentDir 
+      },
       transports: ['websocket', 'polling'],
       forceNew: true,
     });
@@ -719,7 +722,7 @@ const Terminal: React.FC<TerminalProps> = ({ isResizing }) => {
     return () => {
       s.disconnect();
     };
-  }, [addEntryOptimized, editorCurrentDirectory, fetchAndSetFileTree, scrollToBottom]);
+  }, [editorCurrentDir, addEntryOptimized, fetchAndSetFileTree, scrollToBottom]);
 
   useEffect(() => {
     if (mainInputRef.current) {
@@ -893,9 +896,9 @@ const Terminal: React.FC<TerminalProps> = ({ isResizing }) => {
                   ? 'password'
                   : 'text'
               }
-              className={`flex-1 w-full text-lg text-yellow-400 font-bold px-1 py-1 focus:outline-none focus:ring-0 resize-none overflow-hidden 
+              className={`flex-1 text-sm w-full text-yellow-400 focus:outline-none focus:ring-0 resize-none overflow-hidden absolute left-2 z-50 p-2 
                 ${!isAuth || !awaitingTextInputPrompt ? 'opacity-50 cursor-not-allowed' : ''}`}
-              placeholder='Enter response...'
+              placeholder='Enter password...'
               value={textInputValue}
               onChange={(e) => setTextInputValue(e.target.value)}
               onKeyDown={handleTextInputEnter}
@@ -911,7 +914,7 @@ const Terminal: React.FC<TerminalProps> = ({ isResizing }) => {
               status === 'Connected' ? 'font-bold' : 'text-red-400'
             } px-1 py-1 focus:outline-none focus:ring-0 resize-none overflow-hidden 
               ${awaitingTextInputPrompt || interactivePromptState ? 'opacity-50 cursor-not-allowed' : ''}`}
-            placeholder={`${status === 'Connected' ? 'Type a command...' : status}`}
+            placeholder={`${status === 'Connected' ? ( awaitingTextInputPrompt ? '' : 'Type a command...'): status}`}
             value={cmd}
             autoFocus={!awaitingTextInputPrompt && !interactivePromptState} // Only auto-focus if no prompt
             onChange={handleInput}

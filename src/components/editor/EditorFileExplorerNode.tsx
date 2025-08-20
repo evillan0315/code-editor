@@ -11,6 +11,8 @@ interface EditorFileExplorerNodeProps {
   node: FileItem;
   level: number;
   activeFilePath: string | null;
+  onFileSelect: (path: string) => void;
+  onToggleFolder: (path: string) => Promise<void>;
   onContextMenu: (e: React.MouseEvent, node: FileItem) => void;
 }
 
@@ -18,9 +20,11 @@ const EditorFileExplorerNode: React.FC<EditorFileExplorerNodeProps> = ({
   node,
   level,
   activeFilePath,
+  onFileSelect,
+  onToggleFolder,
   onContextMenu,
 }) => {
-  const { handleFileSelect, handleToggleFolder, fetchAndSetFileTree } = useEditorExplorerActions();
+  const { fetchAndSetFileTree } = useEditorExplorerActions(); // Keep this for double-click into directory
 
   const paddingLeft = level * 16 + 8;
   const isFolder = node.type === 'folder';
@@ -37,29 +41,29 @@ const EditorFileExplorerNode: React.FC<EditorFileExplorerNodeProps> = ({
   const handleClick = useCallback(async () => {
     // If it's a folder, toggle its expanded state
     if (isFolder) {
-      await handleToggleFolder(node.path);
+      await onToggleFolder(node.path);
     } else {
       // If it's a file, select it to open in the editor
-      await handleFileSelect(node.path);
+      onFileSelect(node.path);
     }
-  }, [isFolder, node.path, handleToggleFolder, handleFileSelect]);
+  }, [isFolder, node.path, onToggleFolder, onFileSelect]);
 
   const handleDoubleClick = useCallback(async () => {
     if (isFolder) {
       // If it's a folder and currently closed, toggle to open it
       if (!node.isOpen) {
-        await handleToggleFolder(node.path);
+        await onToggleFolder(node.path);
       }
       // Set the current directory to this folder's path and refresh the file tree
       editorCurrentDirectory.set(node.path);
       await fetchAndSetFileTree();
     }
-  }, [isFolder, node.isOpen, node.path, handleToggleFolder, fetchAndSetFileTree]);
+  }, [isFolder, node.isOpen, node.path, onToggleFolder, fetchAndSetFileTree]);
 
-  const handleContextMenu = useCallback(
+  const handleNodeContextMenu = useCallback(
     async (event: React.MouseEvent) => {
       event.preventDefault();
-      await onContextMenu?.(event, node);
+      await onContextMenu(event, node);
     },
     [onContextMenu, node],
   );
@@ -67,13 +71,12 @@ const EditorFileExplorerNode: React.FC<EditorFileExplorerNodeProps> = ({
   return (
     <div className='explorer-node-container'>
       <div
-        className={`flex items-center  gap-1 px-2 py-1 hover:bg-neutral-500/10 cursor-pointer select-none ${
-          isActive ? 'active' : ''
-        }`}
+        className={`flex items-center  gap-1 px-2 py-1 hover:bg-neutral-500/10 cursor-pointer select-none ${isActive ? 'active' : ''}
+        file-node`}
         style={{ paddingLeft }}
         onClick={handleClick}
         onDoubleClick={handleDoubleClick}
-        onContextMenu={handleContextMenu}
+        onContextMenu={handleNodeContextMenu}
         title={node.path}
       >
         {isFolder ? (
@@ -108,6 +111,8 @@ const EditorFileExplorerNode: React.FC<EditorFileExplorerNodeProps> = ({
                 node={child}
                 level={level + 1}
                 activeFilePath={activeFilePath}
+                onFileSelect={onFileSelect}
+                onToggleFolder={onToggleFolder}
                 onContextMenu={onContextMenu}
               />
             ))

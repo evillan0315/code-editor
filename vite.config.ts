@@ -12,19 +12,6 @@ export default defineConfig(({ mode }) => {
     resolve: {
       alias: {
         '@': path.resolve(__dirname, 'src'),
-        '@components': path.resolve(__dirname, 'src/components'),
-        '@contexts': path.resolve(__dirname, 'src/contexts'),
-        '@hooks': path.resolve(__dirname, 'src/hooks'),
-        '@utils': path.resolve(__dirname, 'src/utils'),
-        '@services': path.resolve(__dirname, 'src/services'),
-        '@stores': path.resolve(__dirname, 'src/stores'),
-        '@providers': path.resolve(__dirname, 'src/providers'),
-        '@types': path.resolve(__dirname, 'src/types'),
-        '@styles': path.resolve(__dirname, 'src/styles'),
-        '@libs': path.resolve(__dirname, 'src/libs'),
-        '@routes': path.resolve(__dirname, 'src/routes'),
-        '@themes': path.resolve(__dirname, 'src/themes'),
-        '@constants': path.resolve(__dirname, 'src/constants'),
       },
     },
     build: {
@@ -51,7 +38,7 @@ export default defineConfig(({ mode }) => {
         allowedHeaders: ['Content-Type', 'Authorization'],
         credentials: true,
       },
-      allowedHosts: ['board-api.duckdns.org', 'localhost'],
+      allowedHosts: ['localhost'],
     },
     define: {
       'process.env.NODE_ENV': JSON.stringify(mode),

@@ -3,6 +3,8 @@ import { atom, onMount } from 'nanostores';
 // --- Types ---
 export type TerminalMode = 'none' | 'ai' | 'local';
 export type FileExplorerViewMode = 'list' | 'thumbnail';
+export type RightSidebarTab = 'codeAssist' | 'preview' | 'none';
+export type PreviewContentType = 'url' | 'markdown' | 'svg' | null;
 
 // --- Atoms ---
 export const showLeftSidebar = atom<boolean>(true);
@@ -12,6 +14,12 @@ export const showBottomRight = atom<boolean>(false);
 export const activeTerminal = atom<TerminalMode>('local');
 export const showTerminal = atom<boolean>(true);
 export const fileExplorerViewMode = atom<FileExplorerViewMode>('list');
+export const rightSidebarActiveTab = atom<RightSidebarTab>('codeAssist');
+export const previewContent = atom<{ type: PreviewContentType; content: string | null }>({
+  type: null,
+  content: null,
+});
+
 // --- Keys ---
 const STORAGE_KEYS = {
   left: 'showLeftSidebar',
@@ -21,6 +29,7 @@ const STORAGE_KEYS = {
   showTerminal: 'showTerminal',
   terminal: 'activeTerminal',
   fileExplorerView: 'fileExplorerViewMode',
+  rightSidebarTab: 'rightSidebarActiveTab',
 };
 
 // --- Helpers ---
@@ -51,6 +60,11 @@ const readFileExplorerViewMode = (): FileExplorerViewMode => {
   return saved === 'list' || saved === 'thumbnail' ? saved : 'list';
 };
 
+const readRightSidebarTab = (): RightSidebarTab => {
+  const saved = localStorage.getItem(STORAGE_KEYS.rightSidebarTab);
+  return saved === 'codeAssist' || saved === 'preview' ? saved : 'codeAssist';
+};
+
 // --- Initialization from localStorage ---
 onMount(showLeftSidebar, () => {
   showLeftSidebar.set(readBool(STORAGE_KEYS.left));
@@ -73,15 +87,16 @@ onMount(activeTerminal, () => {
 onMount(fileExplorerViewMode, () => {
   fileExplorerViewMode.set(readFileExplorerViewMode());
 });
+onMount(rightSidebarActiveTab, () => {
+  rightSidebarActiveTab.set(readRightSidebarTab());
+});
 
 // --- Subscriptions to persist state ---
 showLeftSidebar.subscribe((value) => writeBool(STORAGE_KEYS.left, value));
 showRightSidebar.subscribe((value) => writeBool(STORAGE_KEYS.right, value));
 showBottomLeft.subscribe((value) => writeBool(STORAGE_KEYS.bottomLeft, value));
 showTerminal.subscribe((value) => writeBool(STORAGE_KEYS.showTerminal, value));
-showBottomRight.subscribe((value) =>
-  writeBool(STORAGE_KEYS.bottomRight, value),
-);
+showBottomRight.subscribe((value) => writeBool(STORAGE_KEYS.bottomRight, value));
 activeTerminal.subscribe((value) => {
   try {
     localStorage.setItem(STORAGE_KEYS.terminal, value);
@@ -92,6 +107,13 @@ activeTerminal.subscribe((value) => {
 fileExplorerViewMode.subscribe((value) => {
   try {
     localStorage.setItem(STORAGE_KEYS.fileExplorerView, value);
+  } catch {
+    // Ignore
+  }
+});
+rightSidebarActiveTab.subscribe((value) => {
+  try {
+    localStorage.setItem(STORAGE_KEYS.rightSidebarTab, value);
   } catch {
     // Ignore
   }
@@ -124,7 +146,13 @@ export const toggleTerminal = () => {
 };
 
 export const toggleFileExplorerViewMode = () => {
-  fileExplorerViewMode.set(
-    fileExplorerViewMode.get() === 'list' ? 'thumbnail' : 'list',
-  );
+  fileExplorerViewMode.set(fileExplorerViewMode.get() === 'list' ? 'thumbnail' : 'list');
 };
+export const setPreviewContent = (type: PreviewContentType, content: string | null) => {
+  previewContent.set({ type, content });
+};
+
+export const setRightSidebarActiveTab = (tab: RightSidebarTab) => {
+  rightSidebarActiveTab.set(tab);
+};
+

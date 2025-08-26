@@ -9,6 +9,8 @@ import {
   showLeftSidebar,
   showRightSidebar,
   showTerminal,
+  setRightSidebarActiveTab,
+  setPreviewContent,
 } from '@/stores/layout';
 import { editorActiveFilePath } from '@/stores/editorContent';
 import { Icon } from '@/components/ui/Icon';
@@ -27,6 +29,9 @@ interface AppHeaderProps {
   middleColumn?: React.ReactNode;
 }
 
+// TODO: Make this configurable via env variable (e.g., VITE_DEV_SERVER_URL)
+const DEFAULT_DEV_SERVER_URL = 'http://localhost:5173';
+
 export function AppHeader({ logo, childrean }: AppHeaderProps) {
   const $editorActiveFilePath = useStore(editorActiveFilePath);
 
@@ -43,10 +48,7 @@ export function AppHeader({ logo, childrean }: AppHeaderProps) {
   const [isProjectModalOpen, setIsProjectModalOpen] = useState(false); // New state for project modal
 
   const handleOpenNewFile = useCallback(() => setIsFilePickerOpen(true), []);
-  const handleCloseFilePicker = useCallback(
-    () => setIsFilePickerOpen(false),
-    [],
-  );
+  const handleCloseFilePicker = useCallback(() => setIsFilePickerOpen(false), []);
   const handleFilePickerSelect = useCallback(
     (path: string) => {
       handleSetActiveFile(path);
@@ -68,6 +70,17 @@ export function AppHeader({ logo, childrean }: AppHeaderProps) {
   const handlePathSelected = (selectedPath: string) => {
     console.log('Selected directory path:', selectedPath);
   };
+
+  const handleRunProject = useCallback(() => {
+    showRightSidebar.set(true);
+    //setRightSidebarActiveTab('preview');
+    //setPreviewContent({ type: 'url', content: DEFAULT_DEV_SERVER_URL });
+  }, []);
+
+  const handleBuildProject = useCallback(() => {
+    // TODO: Implement actual build logic
+    alert('Build functionality not yet implemented.');
+  }, []);
 
   return (
     <>
@@ -131,9 +144,7 @@ export function AppHeader({ logo, childrean }: AppHeaderProps) {
 
         <div className="flex-shrink-1 flex items-center min-w-[calc(30%)] px-3">
           <div className="flex items-center gap-2 justify-between w-full">
-            <div className="flex items-center justify-start gap-4 font-semibold">
-              {}
-            </div>
+            <div className="flex items-center justify-start gap-4 font-semibold"></div>
             <div className="flex items-center gap-2 justify-end ">
               <div className="flex items-center gap-2 ">
                 <Button
@@ -143,12 +154,14 @@ export function AppHeader({ logo, childrean }: AppHeaderProps) {
                   title="Save (Ctrl+S)"
                 >
                   Save
-                  <Icon
-                    icon="mdi:content-save"
-                    width="2em"
-                    height="2em"
-                    className="ml-3"
-                  />
+                  <Icon icon="mdi:content-save" width="2em" height="2em" className="ml-3" />
+                </Button>
+
+                <Button variant="secondary" onClick={handleRunProject} title="Run Project">
+                  <Icon icon="mdi:play" width="2em" height="2em" />
+                </Button>
+                <Button variant="secondary" onClick={handleBuildProject} title="Build Project">
+                  <Icon icon="mdi:hammer" width="2em" height="2em" />
                 </Button>
               </div>
 
@@ -192,11 +205,7 @@ export function AppHeader({ logo, childrean }: AppHeaderProps) {
         onFileSelect={handleFilePickerSelect}
       />
       {/* Project Modal Integration */}
-      <ProjectModal
-        isOpen={isProjectModalOpen}
-        onClose={handleCloseProjectModal}
-        size="md"
-      />
+      <ProjectModal isOpen={isProjectModalOpen} onClose={handleCloseProjectModal} size="md" />
     </>
   );
 }

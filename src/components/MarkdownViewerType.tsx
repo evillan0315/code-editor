@@ -112,7 +112,7 @@ const MarkdownViewer: React.FC<MarkdownViewerProps> = ({ markdown }) => {
         };
         return (
           <div className="relative group markdown-code-wrapper">
-            <div className="absolute -top-8 inset-x-0 flex items-center justify-between px-4 py-1 bg-dark rounded-t-md border-t border-l border-r text-sm font-light z-10">
+            <div className="absolute -top-8 inset-x-0 flex items-start justify-between px-4 py-1 bg-dark rounded-t-md border-t border-l border-r text-sm font-light z-10">
               <div className="flex">
                 {displayLanguage} {}
               </div>

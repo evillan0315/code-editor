@@ -188,3 +188,18 @@ export function getDirectoryPaths(
 
   return result;
 }
+
+export function getFileExtension(filename: string): string | undefined {
+  const parts = filename.split('.');
+  if (parts.length > 1) {
+    return parts.pop()?.toLowerCase();
+  }
+  return undefined;
+}
+
+export function getFileName(filePath: string): string {
+  const parts = filePath.split('/');
+  return parts[parts.length - 1];
+}
+
+

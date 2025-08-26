@@ -2,6 +2,9 @@
 
 This repository contains the front-end application for a feature-rich code editor, built with React, TypeScript, and Tailwind CSS. It integrates various functionalities including a file explorer, CodeMirror editor, AI chat, terminal, and more.
 
+![Demo](demo.gif)
+
+
 ## Table of Contents
 
 - [Installation](#installation)

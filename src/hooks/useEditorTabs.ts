@@ -11,6 +11,7 @@ import {
 import { useToast } from '@/hooks/useToast';
 import { confirm } from '@/stores/modal';
 import { fileService } from '@/services/fileService';
+import { useEditorExplorerActions } from '@/hooks/useEditorExplorerActions'; // Import to get handleRename
 
 interface UseEditorTabsResult {
   activeFilePath: string;
@@ -26,11 +27,13 @@ interface UseEditorTabsResult {
   handleNavigateRight: () => void;
   handleSave: () => Promise<void>;
   handleRefresh: () => void;
+  handleRename: (oldPath: string, newPath: string) => Promise<void>; // Expose handleRename
   activeTabRef: React.RefObject<HTMLButtonElement>;
 }
 
 export function useEditorTabs(): UseEditorTabsResult {
   const { showToast } = useToast();
+  const { handleRename } = useEditorExplorerActions(); // Get handleRename from explorer actions
 
   const $activeFilePath = useStore(editorActiveFilePath);
   const $openFiles = useStore(editorOpenFiles);
@@ -110,9 +113,7 @@ export function useEditorTabs(): UseEditorTabsResult {
   );
 
   const handleCloseAllTabs = useCallback(async () => {
-    const unsavedFiles = Object.entries($filesMap).filter(
-      ([_, entry]) => entry.unsaved,
-    );
+    const unsavedFiles = Object.entries($filesMap).filter(([_, entry]) => entry.unsaved);
     if (unsavedFiles.length > 0) {
       const confirmed = await confirm(
         `Unsaved changes in ${unsavedFiles.length} files. Close all anyway?`,
@@ -176,6 +177,7 @@ export function useEditorTabs(): UseEditorTabsResult {
     handleNavigateRight,
     handleSave,
     handleRefresh,
+    handleRename, // Expose handleRename
     activeTabRef,
   };
 }

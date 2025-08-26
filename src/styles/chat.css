@@ -4,6 +4,7 @@
     color: var(--color-text);
     @apply transition-colors duration-300;
 }
+
 .ai-chat-header {
     background-color: var(--color-pre-bg);
 }

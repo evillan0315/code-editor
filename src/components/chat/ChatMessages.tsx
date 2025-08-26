@@ -43,7 +43,7 @@ const ChatMessages = memo(
     }
 
     return (
-      <div className="ai-chaat-messages-wrapper flex-1 overflow-y-auto py-3 space-y-4 text-sm scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 dark:scrollbar-thumb-gray-700 dark:scrollbar-track-gray-800">
+      <div className="ai-chat-messages-wrapper flex-1 overflow-y-auto py-3 space-y-4 text-sm scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 dark:scrollbar-thumb-gray-700 dark:scrollbar-track-gray-800">
         {chatHistory.map((msg, index) => {
           const isUser = msg.role === 'user';
           const isLastMessage = index === chatHistory.length - 1;

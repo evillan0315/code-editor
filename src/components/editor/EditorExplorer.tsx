@@ -5,6 +5,8 @@ import {
   editorActiveFilePath,
   editorFileTreeNodes,
   editorCurrentDirectory,
+  renamingPath,
+  renamingOriginalName,
 } from '@/stores/editorContent';
 import { type FileItem, type ContextMenuItem } from '@/types/file-system';
 import { useEditorExplorerActions } from '@/hooks/useEditorExplorerActions';
@@ -143,13 +145,15 @@ const EditorExplorer: React.FC = () => {
           icon: RenameIcon,
           label: 'Rename',
           action: (file) => {
-            handleRename?.(file.path);
+            // Trigger inline edit mode for the specific node
+            renamingPath.set(file.path);
+            renamingOriginalName.set(file.name);
             hideFileExplorerContextMenu();
           },
         },
         {
           icon: CopyIcon,
-          label: `Copy ${isFile ? 'File' : 'Folder'}`,
+          label: `Copy ${isFile ? 'File' : 'Folder'}`, // Keep Copy option
           action: (file) => {
             handleCopy?.(file.path);
             hideFileExplorerContextMenu();
@@ -157,7 +161,7 @@ const EditorExplorer: React.FC = () => {
         },
         {
           icon: MoveIcon,
-          label: `Move ${isFile ? 'File' : 'Folder'}`,
+          label: `Move ${isFile ? 'File' : 'Folder'}`, // Keep Move option
           action: (file) => {
             handleMove?.(file.path);
             hideFileExplorerContextMenu();
@@ -223,7 +227,6 @@ const EditorExplorer: React.FC = () => {
       handleOpenFile,
       handleCopyPath,
       handleDelete,
-      handleRename,
       handleCopy,
       handleMove,
       handleCreateNewFile,
@@ -271,6 +274,15 @@ const EditorExplorer: React.FC = () => {
     [renderContextMenuItems],
   );
 
+  const handleRenameSubmit = useCallback(
+    async (oldPath: string, newName: string) => {
+      await handleRename(oldPath, newName);
+      renamingPath.set(null); // Exit rename mode
+      renamingOriginalName.set(null);
+    },
+    [handleRename],
+  );
+
   return (
     <div className="flex flex-col min-w-full">
       <EditorExplorerHeader
@@ -291,6 +303,7 @@ const EditorExplorer: React.FC = () => {
             level={0}
             activeFilePath={activeFilePath}
             onContextMenu={handleNodeContextMenu}
+            onRenameSubmit={handleRenameSubmit} // Pass rename submit handler
           />
         ))}
 

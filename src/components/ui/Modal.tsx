@@ -39,14 +39,14 @@ export const Modal: FC<ModalProps> = ({
     <MotionModal
       isOpen={isOpen}
       onClose={onClose}
-      overlayClassName="fixed z-900 inset-0 bg-dark/50 backdrop-blur-sm flex items-center justify-center overflow-y-auto"
+      overlayClassName="fixed z-900 inset-0 bg-dark/50 backdrop-blur-sm flex overflow-y-auto"
       contentClassName={`relative modal-body z-2000 text-base rounded-lg shadow-xl border w-full flex flex-col h-auto overflow-hidden ${sizeClasses[size]} ${className || ''}`}
       closeOnOverlayClick={closeOnOverlayClick}
       closeOnEscape={closeOnEscape}
       zIndex={zIndex}
     >
       {title && (
-        <div className="flex items-center justify-between py-4 px-6 border-b flex-shrink-0 bg-secondary">
+        <div className="flex items-center justify-between py-1 px-6 border-b flex-shrink-0 bg-secondary">
           <h2 className="text-lg font-semibold">{title}</h2>
         </div>
       )}
@@ -60,7 +60,7 @@ export const Modal: FC<ModalProps> = ({
           <Icon icon="mdi:close" className="w-8 h-8" />
         </div>
       </Button>
-      <div className="flex-1 overflow-y-auto custom-scrollbar p-6">
+      <div className="flex-1 overflow-y-auto custom-scrollbar p-2">
         {children}
       </div>
     </MotionModal>

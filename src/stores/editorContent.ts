@@ -1,4 +1,3 @@
-// src/stores/editorContent.ts
 import { atom, computed } from 'nanostores';
 import { persistentAtom } from '@/utils/persistentAtom';
 import { FileItem } from '@/types/file-system';
@@ -34,15 +33,9 @@ export const editorCurrentDirectory = persistentAtom<string>(
 
 export const editorOpenFiles = persistentAtom<string[]>('editorOpenFiles', []);
 
-export const editorFilesMap = persistentAtom<Record<string, EditorFileEntry>>(
-  'editorFilesMap',
-  {},
-);
+export const editorFilesMap = persistentAtom<Record<string, EditorFileEntry>>('editorFilesMap', {});
 
-export const editorActiveFilePath = persistentAtom<string>(
-  'editorActiveFilePath',
-  '',
-);
+export const editorActiveFilePath = persistentAtom<string>('editorActiveFilePath', '');
 
 export const editorLanguage = atom<string>('plain');
 export const isTerminalOpen = persistentAtom<boolean>('isTerminalOpen', false);
@@ -50,18 +43,17 @@ export const editorFileTreeNodes = atom<FileItem[]>([]);
 
 export const fileSystemEvents = atom<FileSystemEvent | null>(null);
 
+// Added for inline renaming in the explorer
+export const renamingPath = atom<string | null>(null);
+export const renamingOriginalName = atom<string | null>(null);
+
 // Updated atoms for ESLint diagnostics to use CodeMirror's Diagnostic type
 export const lintDiagnostics = atom<Record<string, CodeMirrorDiagnostic[]>>({}); // Stores diagnostics for individually linted files (e.g., active editor file)
-export const directoryLintDiagnostics = atom<
-  Record<string, CodeMirrorDiagnostic[]>
->({}); // Stores diagnostics for all files in a linted directory
+export const directoryLintDiagnostics = atom<Record<string, CodeMirrorDiagnostic[]>>({}); // Stores diagnostics for all files in a linted directory
 
-export const activeFileEntry = computed(
-  [editorActiveFilePath, editorFilesMap],
-  (path, map) => {
-    return path && map?.[path] ? map[path] : null;
-  },
-);
+export const activeFileEntry = computed([editorActiveFilePath, editorFilesMap], (path, map) => {
+  return path && map?.[path] ? map[path] : null;
+});
 
 export const isFileUnsaved = (path: string): boolean => {
   return editorFilesMap.get()?.[path]?.unsaved ?? false;

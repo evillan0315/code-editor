@@ -223,7 +223,7 @@ export default function AppLayout({
               className="h-full overflow-hidden flex-shrink-0 flex flex-col"
             >
               <div className="flex-grow min-h-0 overflow-auto">
-                <AiChatPanel />
+                
                 <EditorRightSidebar />
               </div>
 

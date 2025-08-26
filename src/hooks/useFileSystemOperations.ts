@@ -8,6 +8,8 @@ import {
   editorOpenFiles,
   editorFilesMap,
   editorActiveFilePath,
+  renamingPath,
+  renamingOriginalName,
   type EditorFileEntry,
 } from '@/stores/editorContent';
 import {
@@ -37,7 +39,10 @@ export function useFileSystemOperations({
       setIsLoading(true);
       const dir = folderPath || editorCurrentDirectory.get();
       const fileName = await prompt('Enter new file name:');
-      if (!fileName) return;
+      if (!fileName) {
+        setIsLoading(false);
+        return;
+      }
 
       const filePath = `${dir === '/' ? '' : dir}/${fileName}`;
       try {
@@ -55,7 +60,7 @@ export function useFileSystemOperations({
         editorFileTreeNodes.set(updatedNodes);
 
         await handleFileSelect(filePath);
-        fetchAndSetFileTree();
+        //fetchAndSetFileTree();
       } catch (err) {
         showToast(`Error creating file: ${String(err)}`, 'error');
         await fetchAndSetFileTree();
@@ -71,7 +76,10 @@ export function useFileSystemOperations({
       setIsLoading(true);
       const dir = folderPath || editorCurrentDirectory.get();
       const folderName = await prompt('Enter new folder name:');
-      if (!folderName) return;
+      if (!folderName) {
+        setIsLoading(false);
+        return;
+      }
 
       const fullPath = `${dir === '/' ? '' : dir}/${folderName}`;
       try {
@@ -101,16 +109,18 @@ export function useFileSystemOperations({
   );
 
   const handleRename = useCallback(
-    async (oldPath: string) => {
+    async (oldPath: string, newPath: string) => {
       setIsLoading(true);
-      const parts = oldPath.split('/');
-      const oldName = parts.pop()!;
-      const parentPath = getParentPath(oldPath);
+      const oldName = oldPath.split('/').pop()!;
+      const newName = newPath.split('/').pop()!;
 
-      const newName = await prompt(`Rename '${oldName}' to:`, oldName);
-      if (!newName || newName === oldName) return;
-
-      const newPath = `${parentPath === '/' ? '' : parentPath}/${newName}`;
+      if (!newName || newName === oldName) {
+        // Exit renaming mode if name is empty or unchanged
+        renamingPath.set(null);
+        renamingOriginalName.set(null);
+        setIsLoading(false);
+        return;
+      }
 
       try {
         await fileService.rename(oldPath, newPath);
@@ -172,9 +182,12 @@ export function useFileSystemOperations({
         await fetchAndSetFileTree();
       } finally {
         setIsLoading(false);
+        // Always reset renaming state regardless of success or failure
+        renamingPath.set(null);
+        renamingOriginalName.set(null);
       }
     },
-    [showToast, fetchAndSetFileTree],
+    [showToast, fetchAndSetFileTree, handleFileSelect],
   );
 
   const handleDelete = useCallback(
@@ -182,8 +195,11 @@ export function useFileSystemOperations({
       setIsLoading(true);
       const name = path.split('/').pop()!;
       const confirmed = await confirm(`Delete '${name}'?`);
-      if (!confirmed) return;
-    
+      if (!confirmed) {
+        setIsLoading(false);
+        return;
+      }
+
       try {
         await fileService.delete(path);
         showToast(`'${name}' deleted.`, 'success');
@@ -239,7 +255,10 @@ export function useFileSystemOperations({
 
       const destinationPath = await prompt(`Copy '${sourceName}' to:`, defaultDestination);
 
-      if (!destinationPath || destinationPath === sourcePath) return;
+      if (!destinationPath || destinationPath === sourcePath) {
+        setIsLoading(false);
+        return;
+      }
       showToast(`'${sourceName}' started copying to '${destinationPath}'.`, 'info');
       try {
         await fileService.copy({ sourcePath, destinationPath });

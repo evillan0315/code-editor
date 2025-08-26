@@ -1,12 +1,12 @@
 // src/services/icon.ts
-import { apiFetch } from "@/services/apiFetch";
-import qs from "qs";
+import { apiFetch } from '@/services/apiFetch';
+import qs from 'qs';
 
-import { getCachedIcon, setCachedIcon } from "@/services/iconCache";
+import { getCachedIcon, setCachedIcon } from '@/services/iconCache';
 interface ListIconsParams {
   prefix?: string;
-  sort?: "prefix" | "name";
-  order?: "asc" | "desc";
+  sort?: 'prefix' | 'name';
+  order?: 'asc' | 'desc';
   page?: number;
   limit?: number;
 }
@@ -17,7 +17,7 @@ export async function listIcons(params: ListIconsParams) {
 }
 
 export async function getIconNameSvg(icon: string): Promise<string> {
-  const [prefix, name] = icon.split(":");
+  const [prefix, name] = icon.split(':');
   const cacheKey = `${prefix}:${name}`;
 
   // Try cache first
@@ -27,10 +27,10 @@ export async function getIconNameSvg(icon: string): Promise<string> {
   const endpoint = `/api/icon/${prefix}/${name}`;
   const fetchSvg = async () => {
     const svg = await apiFetch<string>(endpoint, {
-      method: "GET",
-      responseType: "text",
+      method: 'GET',
+      responseType: 'text',
       headers: {
-        Accept: "image/svg+xml",
+        Accept: 'image/svg+xml',
       },
     });
     setCachedIcon(cacheKey, svg);
@@ -57,10 +57,10 @@ export async function getIconSvg(
   name: string,
 ): Promise<string> {
   return await apiFetch<string>(`/api/icon/${prefix}/${name}`, {
-    method: "GET",
-    responseType: "text",
+    method: 'GET',
+    responseType: 'text',
     headers: {
-      Accept: "image/svg+xml",
+      Accept: 'image/svg+xml',
     },
   });
 }
@@ -68,7 +68,7 @@ export async function getIconSvg(
 export async function downloadIcons(names: string[]) {
   const query = qs.stringify(
     { name: names },
-    { arrayFormat: "repeat", addQueryPrefix: true },
+    { arrayFormat: 'repeat', addQueryPrefix: true },
   );
   return await apiFetch(`/api/icon/download${query}`);
 }

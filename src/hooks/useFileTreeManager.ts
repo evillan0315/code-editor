@@ -1,7 +1,14 @@
 import { useCallback } from 'react';
-import { editorCurrentDirectory, editorFileTreeNodes } from '@/stores/editorContent';
+import {
+  editorCurrentDirectory,
+  editorFileTreeNodes,
+} from '@/stores/editorContent';
 import { isLoading, setIsLoading } from '@/stores/ui';
-import { updateFolderStateRecursive, findFileByPath, ensureFolderDefaults } from '@/utils/fileTree';
+import {
+  updateFolderStateRecursive,
+  findFileByPath,
+  ensureFolderDefaults,
+} from '@/utils/fileTree';
 import { fileService } from '@/services/fileService';
 import { useToast } from '@/hooks/useToast';
 import { useExplorerNavigation } from './useExplorerNavigation';
@@ -36,7 +43,9 @@ export function useFileTreeManager() {
       const folderNode = findFileByPath(path, currentTree);
 
       if (!folderNode || folderNode.type !== 'folder') {
-        console.warn(`Attempted to toggle non-folder or non-existent path: ${path}`);
+        console.warn(
+          `Attempted to toggle non-folder or non-existent path: ${path}`,
+        );
         return;
       }
 
@@ -53,27 +62,42 @@ export function useFileTreeManager() {
             const children = await fileService.list(path);
             const processedChildren = ensureFolderDefaults(children);
 
-            updatedTree = updateFolderStateRecursive(path, editorFileTreeNodes.get(), {
-              isOpen: true,
-              isLoadingChildren: false,
-              children: processedChildren,
-            });
+            updatedTree = updateFolderStateRecursive(
+              path,
+              editorFileTreeNodes.get(),
+              {
+                isOpen: true,
+                isLoadingChildren: false,
+                children: processedChildren,
+              },
+            );
             editorFileTreeNodes.set(updatedTree);
           } catch (err) {
-            showToast(`Error fetching children for ${folderNode.name}: ${String(err)}`, 'error');
+            showToast(
+              `Error fetching children for ${folderNode.name}: ${String(err)}`,
+              'error',
+            );
 
-            updatedTree = updateFolderStateRecursive(path, editorFileTreeNodes.get(), {
-              isOpen: false,
-              isLoadingChildren: false,
-            });
+            updatedTree = updateFolderStateRecursive(
+              path,
+              editorFileTreeNodes.get(),
+              {
+                isOpen: false,
+                isLoadingChildren: false,
+              },
+            );
             editorFileTreeNodes.set(updatedTree);
           }
         } else {
-          const updatedTree = updateFolderStateRecursive(path, currentTree, { isOpen: true });
+          const updatedTree = updateFolderStateRecursive(path, currentTree, {
+            isOpen: true,
+          });
           editorFileTreeNodes.set(updatedTree);
         }
       } else {
-        const updatedTree = updateFolderStateRecursive(path, currentTree, { isOpen: false });
+        const updatedTree = updateFolderStateRecursive(path, currentTree, {
+          isOpen: false,
+        });
         editorFileTreeNodes.set(updatedTree);
       }
     },

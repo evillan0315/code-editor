@@ -1,6 +1,6 @@
-import { useTheme } from "@/hooks/useTheme";
-import { Icon } from "@/components/ui/Icon";
-import { Button } from "@/components/ui/Button";
+import { useTheme } from '@/hooks/useTheme';
+import { Icon } from '@/components/ui/Icon';
+import { Button } from '@/components/ui/Button';
 
 type ToggleSwitchProps = {
   checked: boolean;
@@ -12,7 +12,7 @@ export default function ThemeToggleButton(props: ToggleSwitchProps) {
 
   return (
     <Button variant="secondary" onClick={toggleTheme}>
-      {theme === "dark" ? (
+      {theme === 'dark' ? (
         <>
           <Icon icon="mdi:brightness-3" width="2em" height="2em" />
         </>

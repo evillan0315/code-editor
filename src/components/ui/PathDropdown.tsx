@@ -30,10 +30,13 @@ export function PathDropdown({
   const className = '';
   //const width = '200px';
   //const variant = 'secondary';
-  const {  fetchAndSetFileTree, handleGoUpDirectory } =
+  const { fetchAndSetFileTree, handleGoUpDirectory } =
     useEditorExplorerActions();
   const currentDir = useStore(editorCurrentDirectory);
-  const allPathSegments = useMemo(() => getDirectoryPaths(currentDir), [currentDir]);
+  const allPathSegments = useMemo(
+    () => getDirectoryPaths(currentDir),
+    [currentDir],
+  );
 
   const currentDisplay = useMemo(() => {
     if (!currentDir) return 'Select Path';
@@ -48,7 +51,9 @@ export function PathDropdown({
   const filteredPaths = useMemo(() => {
     if (!search.trim()) return displayableParentPaths;
     const lower = search.toLowerCase();
-    return displayableParentPaths.filter((p) => p.name.toLowerCase().includes(lower));
+    return displayableParentPaths.filter((p) =>
+      p.name.toLowerCase().includes(lower),
+    );
   }, [search, displayableParentPaths]);
   const handlePathSelect = useCallback(async () => {
     await handleGoUpDirectory();
@@ -58,26 +63,22 @@ export function PathDropdown({
   return (
     <div className="flex items-center justify-between w-full ">
       <Button onClick={handlePathSelect} title="Go up directory">
-      <div className="flex items-center" >
-        <Icon width="1.6em" height="1.6em" icon="mdi-light:chevron-up" />
+        <div className="flex items-center">
+          <Icon width="1.6em" height="1.6em" icon="mdi-light:chevron-up" />
         </div>
       </Button>
 
-              <div className="flex items-center" onClick={() => setShowSearch((prev) => !prev)}>
-             <SearchToggleInput
-              value={search}
-              onChange={setSearch}
-              show={showSearch}
-              placeholder="Search file and folders..."
-            />
-              </div>
-           
-
-      
-      
-        
-    
+      <div
+        className="flex items-center"
+        onClick={() => setShowSearch((prev) => !prev)}
+      >
+        <SearchToggleInput
+          value={search}
+          onChange={setSearch}
+          show={showSearch}
+          placeholder="Search file and folders..."
+        />
+      </div>
     </div>
-    
   );
 }

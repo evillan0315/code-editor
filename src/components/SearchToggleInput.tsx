@@ -1,7 +1,7 @@
 // src/components/SearchToggleInput.tsx
-import React, { useEffect, useRef } from "react";
-import { Input } from "@/components/ui/Input";
-import { Icon } from "@/components/ui/Icon";
+import React, { useEffect, useRef } from 'react';
+import { Input } from '@/components/ui/Input';
+import { Icon } from '@/components/ui/Icon';
 
 interface SearchToggleInputProps {
   value: string;
@@ -16,7 +16,7 @@ const SearchToggleInput: React.FC<SearchToggleInputProps> = ({
   onChange,
   show,
   onToggle,
-  placeholder = "Search...",
+  placeholder = 'Search...',
 }) => {
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -39,7 +39,7 @@ const SearchToggleInput: React.FC<SearchToggleInputProps> = ({
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
         className={`transition-all duration-300 ease-in-out py-2 border-gray-700 bg-secondary ${
-          show ? "opacity-100 ml-1" : "w-0 opacity-0 pointer-events-none"
+          show ? 'opacity-100 ml-1' : 'w-0 opacity-0 pointer-events-none'
         }`}
       />
     </div>

@@ -1,11 +1,11 @@
 // src/components/motion/MotionDropdown.tsx
 // For dropdown menus and context menus
 
-import React, { useRef, useEffect, useCallback } from "react";
-import { motion, AnimatePresence, HTMLMotionProps } from "framer-motion";
-import { fastTransition } from "./motionConfig";
+import React, { useRef, useEffect, useCallback } from 'react';
+import { motion, AnimatePresence, HTMLMotionProps } from 'framer-motion';
+import { fastTransition } from './motionConfig';
 
-interface MotionDropdownProps extends HTMLMotionProps<"div"> {
+interface MotionDropdownProps extends HTMLMotionProps<'div'> {
   isOpen: boolean;
   onClose: () => void;
   children: React.ReactNode;
@@ -13,11 +13,11 @@ interface MotionDropdownProps extends HTMLMotionProps<"div"> {
   triggerRef?: React.RefObject<HTMLElement>;
   // Positioning strategy
   position?:
-    | "top-left"
-    | "top-right"
-    | "bottom-left"
-    | "bottom-right"
-    | "center";
+    | 'top-left'
+    | 'top-right'
+    | 'bottom-left'
+    | 'bottom-right'
+    | 'center';
   // Allows overriding default variants
   variants?: {
     hidden: { opacity: number; scale: number; transition?: any };
@@ -30,9 +30,9 @@ export const MotionDropdown: React.FC<MotionDropdownProps> = ({
   onClose,
   children,
   triggerRef,
-  position = "bottom-left", // Default position
+  position = 'bottom-left', // Default position
   variants,
-  className = "",
+  className = '',
   ...rest
 }) => {
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -45,18 +45,18 @@ export const MotionDropdown: React.FC<MotionDropdownProps> = ({
   // Determine transform origin for scaling based on position
   const getTransformOrigin = (): string => {
     switch (position) {
-      case "top-left":
-        return "top left";
-      case "top-right":
-        return "top right";
-      case "bottom-left":
-        return "bottom left";
-      case "bottom-right":
-        return "bottom right";
-      case "center":
-        return "center center";
+      case 'top-left':
+        return 'top left';
+      case 'top-right':
+        return 'top right';
+      case 'bottom-left':
+        return 'bottom left';
+      case 'bottom-right':
+        return 'bottom right';
+      case 'center':
+        return 'center center';
       default:
-        return "top left";
+        return 'top left';
     }
   };
 
@@ -76,12 +76,12 @@ export const MotionDropdown: React.FC<MotionDropdownProps> = ({
 
   useEffect(() => {
     if (isOpen) {
-      document.addEventListener("mousedown", handleDocumentClick);
+      document.addEventListener('mousedown', handleDocumentClick);
     } else {
-      document.removeEventListener("mousedown", handleDocumentClick);
+      document.removeEventListener('mousedown', handleDocumentClick);
     }
     return () => {
-      document.removeEventListener("mousedown", handleDocumentClick);
+      document.removeEventListener('mousedown', handleDocumentClick);
     };
   }, [isOpen, handleDocumentClick]);
 
@@ -90,19 +90,19 @@ export const MotionDropdown: React.FC<MotionDropdownProps> = ({
     if (!triggerRef?.current) {
       // Default to basic positioning if no triggerRef
       switch (position) {
-        case "bottom-left":
-          return { top: "100%", left: 0 };
-        case "bottom-right":
-          return { top: "100%", right: 0 };
-        case "top-left":
-          return { bottom: "100%", left: 0 };
-        case "top-right":
-          return { bottom: "100%", right: 0 };
-        case "center":
+        case 'bottom-left':
+          return { top: '100%', left: 0 };
+        case 'bottom-right':
+          return { top: '100%', right: 0 };
+        case 'top-left':
+          return { bottom: '100%', left: 0 };
+        case 'top-right':
+          return { bottom: '100%', right: 0 };
+        case 'center':
           return {
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
           };
       }
       return {};
@@ -114,29 +114,29 @@ export const MotionDropdown: React.FC<MotionDropdownProps> = ({
     // Basic positioning relative to viewport for context menus
     // For general dropdowns relative to trigger, it's often simpler to use CSS like `top: 100%` on a `relative` parent.
     // This example focuses on 'context menu' style positioning if triggerRef is provided.
-    styles.position = "fixed";
+    styles.position = 'fixed';
     styles.zIndex = 1000; // High z-index for dropdowns/context menus
 
     switch (position) {
-      case "bottom-left":
+      case 'bottom-left':
         styles.top = triggerRect.bottom + window.scrollY;
         styles.left = triggerRect.left + window.scrollX;
         break;
-      case "bottom-right":
+      case 'bottom-right':
         styles.top = triggerRect.bottom + window.scrollY;
         styles.left =
           triggerRect.right +
           window.scrollX -
           (dropdownRef.current?.offsetWidth || 0); // Align right
         break;
-      case "top-left":
+      case 'top-left':
         styles.top =
           triggerRect.top +
           window.scrollY -
           (dropdownRef.current?.offsetHeight || 0);
         styles.left = triggerRect.left + window.scrollX;
         break;
-      case "top-right":
+      case 'top-right':
         styles.top =
           triggerRect.top +
           window.scrollY -
@@ -146,7 +146,7 @@ export const MotionDropdown: React.FC<MotionDropdownProps> = ({
           window.scrollX -
           (dropdownRef.current?.offsetWidth || 0);
         break;
-      case "center":
+      case 'center':
         styles.top =
           triggerRect.top +
           window.scrollY +

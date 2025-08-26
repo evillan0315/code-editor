@@ -1,8 +1,8 @@
 // src/components/FileIcon.tsx
 
-import React from "react";
-import { Icon } from "@iconify/react";
-import { getFileIcon } from "@/utils/fileIcon";
+import React from 'react';
+import { Icon } from '@iconify/react';
+import { getFileIcon } from '@/utils/fileIcon';
 
 interface FileIconProps {
   filename: string;
@@ -16,7 +16,7 @@ export const FileIcon: React.FC<FileIconProps> = ({
   filename,
   isDirectory,
   isOpen,
-  language
+  language,
 }) => {
   const icon = getFileIcon({ filename, isDirectory, isOpen, language });
   return <Icon icon={icon} width="1.2em" height="1.2em" />;

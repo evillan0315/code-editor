@@ -20,11 +20,13 @@ const EditorExplorerNode: React.FC<EditorFileExplorerNodeProps> = ({
   activeFilePath,
   onContextMenu,
 }) => {
-  const { handleFileSelect, handleToggleFolder, fetchAndSetFileTree } = useEditorExplorerActions();
+  const { handleFileSelect, handleToggleFolder, fetchAndSetFileTree } =
+    useEditorExplorerActions();
 
   const paddingLeft = level * 16 + 8;
   const isFolder = node.type === 'folder';
-  const hasChildren = isFolder && Array.isArray(node.children) && node.children.length > 0;
+  const hasChildren =
+    isFolder && Array.isArray(node.children) && node.children.length > 0;
   const isActive = activeFilePath === node.path;
   const isLoadingChildren = isFolder && node.isOpen && node.isLoadingChildren;
   const fileIcon = getFileIcon({
@@ -54,7 +56,13 @@ const EditorExplorerNode: React.FC<EditorFileExplorerNodeProps> = ({
       editorCurrentDirectory.set(node.path);
       await fetchAndSetFileTree();
     }
-  }, [isFolder, node.isOpen, node.path, handleToggleFolder, fetchAndSetFileTree]);
+  }, [
+    isFolder,
+    node.isOpen,
+    node.path,
+    handleToggleFolder,
+    fetchAndSetFileTree,
+  ]);
 
   const handleContextMenu = useCallback(
     async (event: React.MouseEvent) => {
@@ -65,7 +73,7 @@ const EditorExplorerNode: React.FC<EditorFileExplorerNodeProps> = ({
   );
 
   return (
-    <div className='explorer-node-container'>
+    <div className="explorer-node-container">
       <div
         className={`flex items-center  gap-1 px-2 py-1 hover:bg-neutral-500/10 cursor-pointer select-none ${
           isActive ? 'active' : ''
@@ -78,25 +86,28 @@ const EditorExplorerNode: React.FC<EditorFileExplorerNodeProps> = ({
       >
         {isFolder ? (
           isLoadingChildren ? (
-            <Icon icon='mdi:loading' className='text-muted-foreground animate-spin' />
+            <Icon
+              icon="mdi:loading"
+              className="text-muted-foreground animate-spin"
+            />
           ) : node.isOpen ? (
-            <MdExpandMore className='text-muted-foreground' />
+            <MdExpandMore className="text-muted-foreground" />
           ) : (
-            <MdChevronRight className='text-muted-foreground' />
+            <MdChevronRight className="text-muted-foreground" />
           )
         ) : (
-          <span className='w-5 inline-block' />
+          <span className="w-5 inline-block" />
         )}
 
-        <Icon icon={fileIcon} className='text-lg min-w-[20px]' />
-        <span className='truncate'>{node.name}</span>
+        <Icon icon={fileIcon} className="text-lg min-w-[20px]" />
+        <span className="truncate">{node.name}</span>
       </div>
 
       {isFolder && node.isOpen && (
-        <div className='folder-children'>
+        <div className="folder-children">
           {isLoadingChildren ? (
             <div
-              className='text-muted-foreground text-sm py-1 px-2'
+              className="text-muted-foreground text-sm py-1 px-2"
               style={{ paddingLeft: paddingLeft + 16 }}
             >
               <LoadingDots />
@@ -113,7 +124,7 @@ const EditorExplorerNode: React.FC<EditorFileExplorerNodeProps> = ({
             ))
           ) : (
             <div
-              className='text-muted-foreground text-sm py-1 px-2'
+              className="text-muted-foreground text-sm py-1 px-2"
               style={{ paddingLeft: paddingLeft + 16 }}
             >
               (empty)

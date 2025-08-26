@@ -1,11 +1,11 @@
-import React from 'react'
-import { CodeBlock } from '@/components/playground/CodeBlock' // Alias
+import React from 'react';
+import { CodeBlock } from '@/components/playground/CodeBlock'; // Alias
 
 interface ComponentPreviewProps {
-  title: string
-  description?: string
-  children: React.ReactNode
-  code: string
+  title: string;
+  description?: string;
+  children: React.ReactNode;
+  code: string;
 }
 
 export const ComponentPreview: React.FC<ComponentPreviewProps> = ({
@@ -30,6 +30,5 @@ export const ComponentPreview: React.FC<ComponentPreviewProps> = ({
         <CodeBlock code={code} language="tsx" />
       </div>
     </div>
-  )
-}
-
+  );
+};

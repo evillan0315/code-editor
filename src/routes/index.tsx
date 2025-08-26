@@ -34,7 +34,7 @@ export function AppRoutes() {
         }
       />
       {/* NEW: Auth Callback Route */}
-      <Route path='/auth/callback' element={<AuthCallback />} />
+      <Route path="/auth/callback" element={<AuthCallback />} />
       {/* Add other public-only routes here (e.g., registration, forgot password) */}
       {/* <Route path='/register' element={<PublicOnlyRoute><RegisterForm /></PublicOnlyRoute>} /> */}
 
@@ -77,7 +77,7 @@ export function AppRoutes() {
       />
 
       {/* Catch-all Route: For any paths that don't match the defined routes above */}
-      <Route path='*' element={<div>404 Not Found</div>} />
+      <Route path="*" element={<div>404 Not Found</div>} />
     </Routes>
   );
 }

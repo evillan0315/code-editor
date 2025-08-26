@@ -1,4 +1,3 @@
-// src/hooks/useFileSystemOperations.ts
 import { useCallback } from 'react';
 import { fileService } from '@/services/fileService';
 import { useToast } from '@/hooks/useToast';
@@ -18,6 +17,7 @@ import {
   removeItemFromTree,
   updatePathsRecursively,
 } from '@/utils/fileTree';
+import { isLoading, setIsLoading } from '@/stores/ui';
 
 interface FileSystemOperationDependencies {
   handleFileSelect: (path: string) => Promise<void>;
@@ -34,6 +34,7 @@ export function useFileSystemOperations({
 
   const handleCreateNewFile = useCallback(
     async (folderPath?: string) => {
+      setIsLoading(true);
       const dir = folderPath || editorCurrentDirectory.get();
       const fileName = await prompt('Enter new file name:');
       if (!fileName) return;
@@ -58,6 +59,8 @@ export function useFileSystemOperations({
       } catch (err) {
         showToast(`Error creating file: ${String(err)}`, 'error');
         await fetchAndSetFileTree();
+      } finally {
+        setIsLoading(false);
       }
     },
     [showToast, handleFileSelect, fetchAndSetFileTree],
@@ -65,6 +68,7 @@ export function useFileSystemOperations({
 
   const handleCreateNewFolder = useCallback(
     async (folderPath?: string) => {
+      setIsLoading(true);
       const dir = folderPath || editorCurrentDirectory.get();
       const folderName = await prompt('Enter new folder name:');
       if (!folderName) return;
@@ -84,18 +88,21 @@ export function useFileSystemOperations({
         );
         editorFileTreeNodes.set(updatedNodes);
 
-        handleSelectedPath(fullPath);
-        fetchAndSetFileTree();
+        //handleSelectedPath(fullPath);
+        //fetchAndSetFileTree();
       } catch (err) {
         showToast(`Error creating folder: ${String(err)}`, 'error');
-        await fetchAndSetFileTree();
+        //await fetchAndSetFileTree();
+      } finally {
+        setIsLoading(false);
       }
     },
-    [prompt, showToast, handleSelectedPath, fetchAndSetFileTree],
+    [showToast],
   );
 
   const handleRename = useCallback(
     async (oldPath: string) => {
+      setIsLoading(true);
       const parts = oldPath.split('/');
       const oldName = parts.pop()!;
       const parentPath = getParentPath(oldPath);
@@ -163,17 +170,20 @@ export function useFileSystemOperations({
       } catch (err) {
         showToast(`Error renaming: ${String(err)}`, 'error');
         await fetchAndSetFileTree();
+      } finally {
+        setIsLoading(false);
       }
     },
-    [prompt, showToast, fetchAndSetFileTree],
+    [showToast, fetchAndSetFileTree],
   );
 
   const handleDelete = useCallback(
     async (path: string) => {
+      setIsLoading(true);
       const name = path.split('/').pop()!;
       const confirmed = await confirm(`Delete '${name}'?`);
       if (!confirmed) return;
-
+    
       try {
         await fileService.delete(path);
         showToast(`'${name}' deleted.`, 'success');
@@ -201,9 +211,11 @@ export function useFileSystemOperations({
       } catch (err) {
         showToast(`Error deleting: ${String(err)}`, 'error');
         await fetchAndSetFileTree();
+      } finally {
+        setIsLoading(false);
       }
     },
-    [confirm, showToast, fetchAndSetFileTree],
+    [showToast, fetchAndSetFileTree],
   );
 
   const handleCopyPath = useCallback(
@@ -218,11 +230,59 @@ export function useFileSystemOperations({
     [showToast],
   );
 
+  const handleCopy = useCallback(
+    async (sourcePath: string) => {
+      setIsLoading(true);
+      const sourceName = sourcePath.split('/').pop()!;
+      const parentPath = getParentPath(sourcePath);
+      const defaultDestination = `${parentPath === '/' ? '' : parentPath}/copy_of_${sourceName}`;
+
+      const destinationPath = await prompt(`Copy '${sourceName}' to:`, defaultDestination);
+
+      if (!destinationPath || destinationPath === sourcePath) return;
+      showToast(`'${sourceName}' started copying to '${destinationPath}'.`, 'info');
+      try {
+        await fileService.copy({ sourcePath, destinationPath });
+        showToast(`'${sourceName}' copied to '${destinationPath}'.`, 'success');
+        await fetchAndSetFileTree(); // Full refresh for simplicity
+      } catch (err) {
+        showToast(`Error copying '${sourceName}': ${String(err)}`, 'error');
+        await fetchAndSetFileTree();
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [showToast, fetchAndSetFileTree],
+  );
+
+  const handleMove = useCallback(
+    async (fromPath: string) => {
+      const fromName = fromPath.split('/').pop()!;
+      const parentPath = getParentPath(fromPath);
+
+      const toPath = await prompt(`Move '${fromName}' to:`, parentPath);
+
+      if (!toPath || toPath === fromPath) return;
+
+      try {
+        await fileService.move({ fromPath, toPath: toPath });
+        showToast(`'${fromName}' moved to '${toPath}'.`, 'success');
+        await fetchAndSetFileTree(); // Full refresh for simplicity
+      } catch (err) {
+        showToast(`Error moving '${fromName}': ${String(err)}`, 'error');
+        await fetchAndSetFileTree();
+      }
+    },
+    [showToast, fetchAndSetFileTree],
+  );
+
   return {
     handleCreateNewFile,
     handleCreateNewFolder,
     handleRename,
     handleDelete,
     handleCopyPath,
+    handleCopy,
+    handleMove,
   };
 }

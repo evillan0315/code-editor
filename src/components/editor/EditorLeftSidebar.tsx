@@ -7,7 +7,7 @@ export function EditorLeftSidebar() {
   if (!isVisible) return null;
 
   return (
-    <aside className='flex flex-col h-full w-full relative'>
+    <aside className="flex flex-col h-full w-full relative">
       <EditorExplorer />
     </aside>
   );

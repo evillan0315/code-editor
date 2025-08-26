@@ -50,7 +50,8 @@ const AppTabs: React.FC<AppTabsProps> = () => {
     if (!tabRef.current) return;
     setCanScrollLeft(tabRef.current.scrollLeft > 0);
     setCanScrollRight(
-      tabRef.current.scrollLeft + tabRef.current.clientWidth < tabRef.current.scrollWidth,
+      tabRef.current.scrollLeft + tabRef.current.clientWidth <
+        tabRef.current.scrollWidth,
     );
   }, []); // No dependencies for ref object itself
 
@@ -74,23 +75,23 @@ const AppTabs: React.FC<AppTabsProps> = () => {
   }, [checkScroll]); // Dependency: checkScroll function
 
   return (
-    <div className='w-full mx-auto mt-2 bg-black rounded-2xl shadow-lg'>
-      <div className='relative flex items-center'>
+    <div className="w-full mx-auto mt-2 bg-black rounded-2xl shadow-lg">
+      <div className="relative flex items-center">
         {canScrollLeft && ( // Access state directly: canScrollLeft() -> canScrollLeft
           <button
-            className='absolute left-0 z-10 h-full p-1 rounded-lg text-center border border-neutral-900 bg-neutral-800'
+            className="absolute left-0 z-10 h-full p-1 rounded-lg text-center border border-neutral-900 bg-neutral-800"
             onClick={() => scrollTabs('left')}
           >
             <Icon
-              width='1.4em'
-              height='1.4em'
-              icon='mdi:chevron-left'
-              className='text-neutral-300'
+              width="1.4em"
+              height="1.4em"
+              icon="mdi:chevron-left"
+              className="text-neutral-300"
             />
           </button>
         )}
         <div
-          className='flex overflow-x-auto no-scrollbar space-x-1 px-4'
+          className="flex overflow-x-auto no-scrollbar space-x-1 px-4"
           ref={tabRef} // Assign ref directly to the element
         >
           {tabs.map((tab, index) => {
@@ -105,15 +106,15 @@ const AppTabs: React.FC<AppTabsProps> = () => {
                 }`}
                 onClick={() => setActiveTab(index)}
               >
-                <Icon icon={tab.icon} width='1.4em' height='1.4em' />
-                <span className='text-sm'>{tab.name}</span>{' '}
-                <span className='p-0 m-0'>
+                <Icon icon={tab.icon} width="1.4em" height="1.4em" />
+                <span className="text-sm">{tab.name}</span>{' '}
+                <span className="p-0 m-0">
                   {' '}
                   <Icon
-                    width='1.2em'
-                    height='1.2em'
-                    icon='mdi:close'
-                    className='px-1 mr-1 mt-1 hover:text-neutral-100'
+                    width="1.2em"
+                    height="1.2em"
+                    icon="mdi:close"
+                    className="px-1 mr-1 mt-1 hover:text-neutral-100"
                   />
                 </span>
               </button>
@@ -122,19 +123,20 @@ const AppTabs: React.FC<AppTabsProps> = () => {
         </div>
         {canScrollRight && ( // Access state directly: canScrollRight() -> canScrollRight
           <button
-            className='absolute right-0 z-10 h-full p-1 rounded-lg text-center border border-neutral-900 bg-neutral-800'
+            className="absolute right-0 z-10 h-full p-1 rounded-lg text-center border border-neutral-900 bg-neutral-800"
             onClick={() => scrollTabs('right')}
           >
             <Icon
-              width='1.4em'
-              height='1.4em'
-              icon='mdi:chevron-right'
-              className='text-neutral-300'
+              width="1.4em"
+              height="1.4em"
+              icon="mdi:chevron-right"
+              className="text-neutral-300"
             />
           </button>
         )}
       </div>
-      <div className='mt-4'>{tabs[activeTab].content}</div> {/* activeTab() -> activeTab */}
+      <div className="mt-4">{tabs[activeTab].content}</div>{' '}
+      {/* activeTab() -> activeTab */}
     </div>
   );
 };

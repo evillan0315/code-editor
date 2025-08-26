@@ -2,6 +2,7 @@
 import { useCallback } from 'react';
 import { editorCurrentDirectory } from '@/stores/editorContent';
 import { useToast } from '@/hooks/useToast';
+
 import { getParentPath } from '@/utils/fileTree';
 
 export function useExplorerNavigation() {
@@ -21,6 +22,8 @@ export function useExplorerNavigation() {
     const dir = editorCurrentDirectory.get();
     const parentPath = getParentPath(dir);
     editorCurrentDirectory.set(parentPath);
+    //fetchAndSetFileTree();
+    //handleSelectedPath(parentPath);
     showToast(`Navigated to: ${parentPath}`, 'info');
   }, [showToast]);
 

@@ -4,9 +4,9 @@ import React, {
   useMemo,
   forwardRef,
   type MouseEvent,
-} from "react";
-import { Icon } from "@/components/ui/Icon";
-import { FileIcon } from "@/components/FileIcon";
+} from 'react';
+import { Icon } from '@/components/ui/Icon';
+import { FileIcon } from '@/components/FileIcon';
 
 export interface EditorFileTabItemProps {
   file: string;
@@ -20,7 +20,7 @@ export interface EditorFileTabItemProps {
 export const EditorFileTabItem = memo(
   forwardRef<HTMLButtonElement, EditorFileTabItemProps>(
     ({ file, isActive, onClick, onClose, language, unSaved }, ref) => {
-      const filename = useMemo(() => file.split("/").pop() || "", [file]);
+      const filename = useMemo(() => file.split('/').pop() || '', [file]);
 
       const handleCloseClick = useCallback(
         (e: MouseEvent): void => {
@@ -38,7 +38,7 @@ export const EditorFileTabItem = memo(
         <div
           ref={ref}
           className={`flex items-center gap-1 cursor-pointer transition-colors duration-100 ease-in-out rounded-none ${
-            unSaved ? "italic" : ""
+            unSaved ? 'italic' : ''
           }`}
           title={file}
           role="tab"
@@ -47,7 +47,7 @@ export const EditorFileTabItem = memo(
         >
           <div
             className={`min-w-[100px] text-base h-full flex items-center gap-2 px-4 border-r ${
-              isActive ? "active border-b-2 bg-dark border-secondary" : ""
+              isActive ? 'active border-b-2 bg-dark border-secondary' : ''
             } relative`}
           >
             <FileIcon
@@ -83,4 +83,4 @@ export const EditorFileTabItem = memo(
   ),
 );
 
-EditorFileTabItem.displayName = "EditorFileTabItem";
+EditorFileTabItem.displayName = 'EditorFileTabItem';

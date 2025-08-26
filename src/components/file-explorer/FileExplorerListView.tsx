@@ -18,9 +18,11 @@ const FileExplorerListView: React.FC<FileExplorerListViewProps> = ({
   onContextMenu,
 }) => {
   return (
-    <div className='file-explorer-list-view flex flex-col min-w-full'>
+    <div className="file-explorer-list-view flex flex-col min-w-full">
       {nodes.length === 0 ? (
-        <div className='text-muted-foreground text-sm py-4 px-2 text-center'>(empty)</div>
+        <div className="text-muted-foreground text-sm py-4 px-2 text-center">
+          (empty)
+        </div>
       ) : (
         nodes.map((node) => (
           <EditorFileExplorerNode

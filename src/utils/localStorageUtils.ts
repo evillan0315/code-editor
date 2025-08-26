@@ -14,17 +14,27 @@ export function clearConversationResponse(id: string) {
   localStorage.setItem(CONVERSATION_RESPONSES_KEY, JSON.stringify(history));
 }
 
-export function loadConversationResponses(): Record<string, GeminiHistoryEntry[]> {
+export function loadConversationResponses(): Record<
+  string,
+  GeminiHistoryEntry[]
+> {
   try {
     const raw = localStorage.getItem(CONVERSATION_RESPONSES_KEY);
     return raw ? JSON.parse(raw) : {};
   } catch (e) {
-    console.error('Failed to parse conversation responses from localStorage:', e);
+    console.error(
+      'Failed to parse conversation responses from localStorage:',
+      e,
+    );
     return {};
   }
 }
 
-export function saveConversationResponse(conversationId: string, prompt: string, response: string) {
+export function saveConversationResponse(
+  conversationId: string,
+  prompt: string,
+  response: string,
+) {
   if (!response?.trim()) return;
   const history = loadConversationResponses();
   if (!history[conversationId]) history[conversationId] = [];
@@ -32,7 +42,9 @@ export function saveConversationResponse(conversationId: string, prompt: string,
   localStorage.setItem(CONVERSATION_RESPONSES_KEY, JSON.stringify(history));
 }
 
-export function getResponsesForConversation(conversationId: string): GeminiHistoryEntry[] {
+export function getResponsesForConversation(
+  conversationId: string,
+): GeminiHistoryEntry[] {
   return loadConversationResponses()[conversationId] ?? [];
 }
 

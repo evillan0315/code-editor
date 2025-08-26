@@ -26,9 +26,11 @@ const FileExplorerThumbnailView: React.FC<FileExplorerThumbnailViewProps> = ({
   };
 
   return (
-    <div className='file-explorer-thumbnail-view grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-2 p-2'>
+    <div className="file-explorer-thumbnail-view grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-2 p-2">
       {nodes.length === 0 ? (
-        <div className='col-span-full text-muted-foreground text-sm py-4 text-center'>(empty)</div>
+        <div className="col-span-full text-muted-foreground text-sm py-4 text-center">
+          (empty)
+        </div>
       ) : (
         nodes.map((node) => (
           <FileExplorerThumbnailItem

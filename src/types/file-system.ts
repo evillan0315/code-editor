@@ -48,10 +48,6 @@ export interface FileReadResponse {
   language?: string;
   blob?: string;
 }
-export interface FileRenameRequest {
-  oldPath: string;
-  newPath: string;
-}
 export interface FileDeleteRequest {
   filePaths: string[];
 }
@@ -60,6 +56,12 @@ export interface FileMoveRequest {
   fromPath: string;
   toPath: string;
 }
+
+export interface FileCopyRequest {
+  sourcePath: string;
+  destinationPath: string;
+}
+
 export interface FileListRequest {
   directory: string;
   recursive?: boolean;

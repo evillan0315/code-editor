@@ -1,12 +1,12 @@
 // src/components/motion/MotionModal.tsx (Provided in the prompt, no changes needed)
-import React, { useCallback, useEffect, useRef } from "react";
-import { motion, AnimatePresence, HTMLMotionProps } from "framer-motion";
+import React, { useCallback, useEffect, useRef } from 'react';
+import { motion, AnimatePresence, HTMLMotionProps } from 'framer-motion';
 import {
   defaultTransition,
   fastTransition,
-} from "@/components/motion/motionConfig";
+} from '@/components/motion/motionConfig';
 
-interface MotionModalProps extends HTMLMotionProps<"div"> {
+interface MotionModalProps extends HTMLMotionProps<'div'> {
   isOpen: boolean;
   onClose?: () => void;
   children: React.ReactNode;
@@ -23,8 +23,8 @@ export const MotionModal: React.FC<MotionModalProps> = ({
   children,
   closeOnOverlayClick = true,
   closeOnEscape = true,
-  overlayClassName = "",
-  contentClassName = "",
+  overlayClassName = '',
+  contentClassName = '',
   zIndex = 1000, // Default high z-index
   ...rest
 }) => {
@@ -49,7 +49,7 @@ export const MotionModal: React.FC<MotionModalProps> = ({
   // Close on Escape key press
   const handleEscape = useCallback(
     (event: KeyboardEvent) => {
-      if (event.key === "Escape" && isOpen && onClose && closeOnEscape) {
+      if (event.key === 'Escape' && isOpen && onClose && closeOnEscape) {
         onClose();
       }
     },
@@ -72,15 +72,15 @@ export const MotionModal: React.FC<MotionModalProps> = ({
 
   useEffect(() => {
     if (isOpen) {
-      document.body.style.overflow = "hidden"; // Prevent body scroll
-      window.addEventListener("keydown", handleEscape);
+      document.body.style.overflow = 'hidden'; // Prevent body scroll
+      window.addEventListener('keydown', handleEscape);
     } else {
-      document.body.style.overflow = ""; // Restore body scroll
+      document.body.style.overflow = ''; // Restore body scroll
     }
 
     return () => {
-      document.body.style.overflow = ""; // Ensure cleanup on unmount
-      window.removeEventListener("keydown", handleEscape);
+      document.body.style.overflow = ''; // Ensure cleanup on unmount
+      window.removeEventListener('keydown', handleEscape);
     };
   }, [isOpen, handleEscape]);
 
@@ -89,7 +89,7 @@ export const MotionModal: React.FC<MotionModalProps> = ({
       {isOpen && (
         <motion.div
           className={`fixed inset-0 flex items-center justify-center p-4 ${overlayClassName}`}
-          style={{ zIndex, backgroundColor: "rgba(0, 0, 0, 0.5)" }} // Default overlay style
+          style={{ zIndex, backgroundColor: 'rgba(0, 0, 0, 0.5)' }} // Default overlay style
           initial="hidden"
           animate="visible"
           exit="hidden"

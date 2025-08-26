@@ -1,42 +1,31 @@
 // src/stores/theme.ts
-import { persistentAtom } from "@nanostores/persistent";
-import { type Theme } from "@/types/theme"; // Assuming @/types/theme maps to src/types/theme.ts
+import { persistentAtom } from '@nanostores/persistent';
+import { type Theme } from '@/types/theme'; // e.g. export type Theme = "light" | "dark" | "system";
 
-// Function to detect system theme preference
-const getSystemTheme = (): Theme =>
-  typeof window !== "undefined" &&
-  window.matchMedia?.("(prefers-color-scheme: dark)").matches
-    ? "dark"
-    : "light";
-
-// Function to determine the initial theme for persistentAtom
-function getInitialTheme(): Theme {
-  try {
-    const stored = localStorage.getItem("theme");
-    // persistentAtom will handle JSON.parse/stringify, but we want to ensure
-    // we only return 'dark' or 'light' for direct localStorage checks.
-    // The `decode` function in persistentAtom will correctly parse "dark" or "light".
-    // This `getInitialTheme` is specifically for when persistentAtom *first* loads.
-    if (stored === '"dark"' || stored === '"light"') {
-      return JSON.parse(stored) as Theme; // Cast to Theme for type safety
-    }
-  } catch (e) {
-    console.error(
-      "Failed to parse stored theme, falling back to system theme:",
-      e,
-    );
+// Detect system theme preference
+function getSystemTheme(): Exclude<Theme, 'system'> {
+  if (typeof window !== 'undefined' && window.matchMedia) {
+    return window.matchMedia('(prefers-color-scheme: dark)').matches
+      ? 'dark'
+      : 'light';
   }
-  return getSystemTheme();
+  return 'light'; // fallback for SSR
 }
 
 // Define the persistent atom for theme
-export const theme = persistentAtom<Theme>("theme", getInitialTheme(), {
-  encode: JSON.stringify, // Store as JSON string
-  decode: JSON.parse, // Parse from JSON string
+export const theme = persistentAtom<Theme>('theme', 'system', {
+  encode: JSON.stringify,
+  decode: JSON.parse,
 });
 
-// Helper function to toggle the theme
+// Derived helper → always resolve actual theme
+export function resolvedTheme(): 'light' | 'dark' {
+  const value = theme.get();
+  return value === 'system' ? getSystemTheme() : value;
+}
+
+// Toggle between light and dark only (ignores "system")
 export function toggleTheme(): void {
-  const current = theme.get();
-  theme.set(current === "dark" ? "light" : "dark");
+  const current = resolvedTheme();
+  theme.set(current === 'dark' ? 'light' : 'dark');
 }

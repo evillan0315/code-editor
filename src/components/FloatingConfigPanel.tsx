@@ -6,7 +6,8 @@ import { Icon } from '@/components/ui/Icon';
 import { Button } from '@/components/ui/Button';
 import { MAX_WIDTH_PERCENT, MAX_HEIGHT_VH, MIN_SIZE_PX } from '@/constants';
 
-const clamp = (value: number, min: number, max: number) => Math.max(min, Math.min(value, max));
+const clamp = (value: number, min: number, max: number) =>
+  Math.max(min, Math.min(value, max));
 interface FloatingConfigPanelProps {
   header?: React.ReactNode | string;
   children?: React.ReactNode;
@@ -47,7 +48,11 @@ export function FloatingConfigPanel({
   const handleDragMouseDown = useCallback(
     (e: React.MouseEvent) => {
       const target = e.target as HTMLElement;
-      if (headerRef.current && headerRef.current.contains(target) && !target.closest('button')) {
+      if (
+        headerRef.current &&
+        headerRef.current.contains(target) &&
+        !target.closest('button')
+      ) {
         isDragging.current = true;
         dragOffset.current = {
           x: e.clientX - position.x,
@@ -102,19 +107,38 @@ export function FloatingConfigPanel({
         const deltaY = e.clientY - initialMousePos.current.y;
 
         if (resizeDirection.current.includes('right')) {
-          newWidth = clamp(initialSize.current.width + deltaX, MIN_SIZE_PX, maxWidth);
+          newWidth = clamp(
+            initialSize.current.width + deltaX,
+            MIN_SIZE_PX,
+            maxWidth,
+          );
         } else if (resizeDirection.current.includes('left')) {
-          newWidth = clamp(initialSize.current.width - deltaX, MIN_SIZE_PX, maxWidth);
+          newWidth = clamp(
+            initialSize.current.width - deltaX,
+            MIN_SIZE_PX,
+            maxWidth,
+          );
 
-          newX = initialPanelPos.current.x + (initialSize.current.width - newWidth);
+          newX =
+            initialPanelPos.current.x + (initialSize.current.width - newWidth);
         }
 
         if (resizeDirection.current.includes('bottom')) {
-          newHeight = clamp(initialSize.current.height + deltaY, MIN_SIZE_PX, maxHeight);
+          newHeight = clamp(
+            initialSize.current.height + deltaY,
+            MIN_SIZE_PX,
+            maxHeight,
+          );
         } else if (resizeDirection.current.includes('top')) {
-          newHeight = clamp(initialSize.current.height - deltaY, MIN_SIZE_PX, maxHeight);
+          newHeight = clamp(
+            initialSize.current.height - deltaY,
+            MIN_SIZE_PX,
+            maxHeight,
+          );
 
-          newY = initialPanelPos.current.y + (initialSize.current.height - newHeight);
+          newY =
+            initialPanelPos.current.y +
+            (initialSize.current.height - newHeight);
         }
 
         setSize({ width: newWidth, height: newHeight });
@@ -198,18 +222,23 @@ export function FloatingConfigPanel({
           maxHeight: `${MAX_HEIGHT_VH}vh`,
         }}
       >
-    
         <div
           ref={headerRef}
           className="p-2 border-b border-gray-200 dark:border-gray-700 cursor-grab flex items-center justify-between"
           onMouseDown={handleDragMouseDown}
         >
-          {header || <h3 className="text-md font-semibold pl-2">Configuration Panel </h3>}
+          {header || (
+            <h3 className="text-md font-semibold pl-2">Configuration Panel </h3>
+          )}
 
           <div className="flex items-center gap-2">
+            <Icon
+              icon="mdi:drag"
+              width="1.4em"
+              height="1.4em"
+              title="Drag to move panel"
+            />
 
-            <Icon icon="mdi:drag" width="1.4em" height="1.4em" title="Drag to move panel" />
-         
             <Button
               onClick={(e) => {
                 e.stopPropagation();
@@ -219,28 +248,36 @@ export function FloatingConfigPanel({
               aria-label="Close configuration panel"
               title="Close"
             >
-              <Icon icon="mdi:close" width="1.4em" height="1.4em" title="Close" />
+              <Icon
+                icon="mdi:close"
+                width="1.4em"
+                height="1.4em"
+                title="Close"
+              />
             </Button>
           </div>
         </div>
 
         <div className="flex-grow p-4 overflow-auto scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-gray-800">
-          {children || <p className="text-gray-400">Your configuration options will go here.</p>}
+          {children || (
+            <p className="text-gray-400">
+              Your configuration options will go here.
+            </p>
+          )}
         </div>
-
 
         <div
           className="absolute w-3 h-3 bg-blue-500 rounded-full cursor-nwse-resize"
           style={{ bottom: -6, right: -6 }}
           onMouseDown={(e) => handleResizeMouseDown(e, 'bottom-right')}
         />
-     
+
         <div
           className="absolute w-3 h-3 bg-blue-500 rounded-full cursor-nesw-resize"
           style={{ bottom: -6, left: -6 }}
           onMouseDown={(e) => handleResizeMouseDown(e, 'bottom-left')}
         />
-     
+
         <div
           className="absolute w-3 h-3 bg-blue-500 rounded-full cursor-nesw-resize"
           style={{ top: -6, right: -6 }}
@@ -252,25 +289,25 @@ export function FloatingConfigPanel({
           style={{ top: -6, left: -6 }}
           onMouseDown={(e) => handleResizeMouseDown(e, 'top-left')}
         />
-    
+
         <div
           className="absolute w-2 h-full bg-blue-500 rounded-r-sm cursor-ew-resize"
           style={{ top: 0, right: -4 }}
           onMouseDown={(e) => handleResizeMouseDown(e, 'right')}
         />
-     
+
         <div
           className="absolute w-2 h-full bg-blue-500 rounded-l-sm cursor-ew-resize"
           style={{ top: 0, left: -4 }}
           onMouseDown={(e) => handleResizeMouseDown(e, 'left')}
         />
-     
+
         <div
           className="absolute w-full h-2 bg-blue-500 rounded-b-sm cursor-ns-resize"
           style={{ bottom: -4, left: 0 }}
           onMouseDown={(e) => handleResizeMouseDown(e, 'bottom')}
         />
-      
+
         <div
           className="absolute w-full h-2 bg-blue-500 rounded-t-sm cursor-ns-resize"
           style={{ top: -4, left: 0 }}

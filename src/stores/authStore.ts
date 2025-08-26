@@ -20,19 +20,21 @@ export const authStore = map<{
 // --- 2. Configure apiFetch to use the token from localStorage ---
 // It's more reliable to configure this once and have it always read from localStorage
 // or from the `token` in the store, but localStorage is generally fine for the getter.
-configureTokenGetter(() => (typeof window !== 'undefined' ? localStorage.getItem('token') : null));
+configureTokenGetter(() =>
+  typeof window !== 'undefined' ? localStorage.getItem('token') : null,
+);
 
 // --- 3. Define Auth Actions (these will modify the authStore) ---
 
 export const login = async (credentials: LoginCredentials) => {
   try {
-    const { accessToken, user: userData } = await apiFetch<LoginResponse, LoginCredentials>(
-      '/api/auth/login',
-      {
-        method: 'POST',
-        body: credentials,
-      },
-    );
+    const { accessToken, user: userData } = await apiFetch<
+      LoginResponse,
+      LoginCredentials
+    >('/api/auth/login', {
+      method: 'POST',
+      body: credentials,
+    });
 
     // Update localStorage
     if (typeof window !== 'undefined') {

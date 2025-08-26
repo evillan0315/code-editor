@@ -1,11 +1,11 @@
 // src/components/motion/MotionFadeScale.tsx
 // For toggles, general show/hide elements, alerts
 
-import React from "react";
-import { motion, AnimatePresence, HTMLMotionProps } from "framer-motion";
-import { defaultTransition } from "./motionConfig";
+import React from 'react';
+import { motion, AnimatePresence, HTMLMotionProps } from 'framer-motion';
+import { defaultTransition } from './motionConfig';
 
-interface MotionFadeScaleProps extends HTMLMotionProps<"div"> {
+interface MotionFadeScaleProps extends HTMLMotionProps<'div'> {
   isVisible: boolean;
   children: React.ReactNode;
   duration?: number;

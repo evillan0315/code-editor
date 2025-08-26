@@ -1,7 +1,7 @@
 // src/components/editor/EditorFileView.tsx
-import { useState, useCallback } from "react";
-import { useStore } from "@nanostores/react";
-import { Icon } from "@iconify/react";
+import { useState, useCallback } from 'react';
+import { useStore } from '@nanostores/react';
+import { Icon } from '@iconify/react';
 // FIX: Import confirm, prompt, alert directly from the Nanostore file
 // Corrected import path for modal Nanostore
 import {
@@ -9,20 +9,19 @@ import {
   editorFilesMap,
   editorActiveFilePath,
   getFileContent,
-} from "@/stores/editorContent";
-import { useEditorExplorerActions } from "@/hooks/useEditorExplorerActions";
+} from '@/stores/editorContent';
+import { useEditorExplorerActions } from '@/hooks/useEditorExplorerActions';
 // REMOVED: No longer need to import useModal
 // import { useModal } from "@/hooks/useModal"; // Removed this line
-import { useEditorTabs } from "@/hooks/useEditorTabs";
+import { useEditorTabs } from '@/hooks/useEditorTabs';
 
-import { Button } from "@/components/ui/Button";
+import { Button } from '@/components/ui/Button';
 
-import { EditorFileTabs } from "@/components/editor/EditorFileTabs";
-import { FilePickerBrowser } from "@/components/file-picker/FilePickerBrowser";
-import EditorCodeMirror from "@/components/editor/EditorCodeMirror";
+import { EditorFileTabs } from '@/components/editor/EditorFileTabs';
+import { FilePickerBrowser } from '@/components/file-picker/FilePickerBrowser';
+import EditorCodeMirror from '@/components/editor/EditorCodeMirror';
 
-import "@/styles/file-manager.css";
-
+import '@/styles/file-manager.css';
 
 export default function EditorPageView(): JSX.Element {
   // REMOVED: No longer need to call useModal hook
@@ -127,8 +126,8 @@ export default function EditorPageView(): JSX.Element {
         <div className="h-full overflow-auto flex-grow">
           <EditorCodeMirror
             activeFilePath={$editorActiveFilePath}
-            value={getFileContent($editorActiveFilePath) || ""}
-            language={$activeFileEntry?.lang || "plaintext"}
+            value={getFileContent($editorActiveFilePath) || ''}
+            language={$activeFileEntry?.lang || 'plaintext'}
             onContentChange={memoizedOnContentChange}
             readOnly={false}
           />

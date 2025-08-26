@@ -1,8 +1,8 @@
 // src/components/routing/PublicOnlyRoute.tsx
-import React from "react";
-import { Navigate } from "react-router-dom";
-import { useAuth } from "@/hooks/useAuth"; // Your custom auth hook
-import { DASHBOARD_PATH } from "@/constants/paths"; // Defined dashboard path
+import React from 'react';
+import { Navigate } from 'react-router-dom';
+import { useAuth } from '@/hooks/useAuth'; // Your custom auth hook
+import { DASHBOARD_PATH } from '@/constants/paths'; // Defined dashboard path
 
 interface PublicOnlyRouteProps {
   children: React.ReactNode;

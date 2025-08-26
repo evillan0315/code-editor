@@ -6,20 +6,20 @@ import React, {
   useRef,
   useCallback,
   CSSProperties,
-} from "react";
+} from 'react';
 
-import "@/styles/sticky-note.css"; // Import the CSS
+import '@/styles/sticky-note.css'; // Import the CSS
 
 // --- Type Definitions ---
 export type ResizeHandle =
-  | "top-left"
-  | "top-right"
-  | "bottom-left"
-  | "bottom-right"
-  | "top"
-  | "bottom"
-  | "left"
-  | "right"
+  | 'top-left'
+  | 'top-right'
+  | 'bottom-left'
+  | 'bottom-right'
+  | 'top'
+  | 'bottom'
+  | 'left'
+  | 'right'
   | null;
 
 interface StickyNoteProps {
@@ -67,7 +67,7 @@ export const StickyNote: React.FC<StickyNoteProps> = ({
   initialY = 50,
   initialWidth = 300,
   initialHeight = 200,
-  initialContent = "New sticky note",
+  initialContent = 'New sticky note',
   onClose,
   onContentChange,
   onPositionChange,
@@ -164,38 +164,38 @@ export const StickyNote: React.FC<StickyNoteProps> = ({
         const dy = e.clientY - state.initialMouseY;
 
         switch (state.resizeHandle) {
-          case "bottom-right":
+          case 'bottom-right':
             width = Math.max(MIN_WIDTH, state.initialWidth + dx);
             height = Math.max(MIN_HEIGHT, state.initialHeight + dy);
             break;
-          case "bottom-left":
+          case 'bottom-left':
             width = Math.max(MIN_WIDTH, state.initialWidth - dx);
             x = state.initialX + (state.initialWidth - width);
             height = Math.max(MIN_HEIGHT, state.initialHeight + dy);
             break;
-          case "top-right":
+          case 'top-right':
             width = Math.max(MIN_WIDTH, state.initialWidth + dx);
             height = Math.max(MIN_HEIGHT, state.initialHeight - dy);
             y = state.initialY + (state.initialHeight - height);
             break;
-          case "top-left":
+          case 'top-left':
             width = Math.max(MIN_WIDTH, state.initialWidth - dx);
             x = state.initialX + (state.initialWidth - width);
             height = Math.max(MIN_HEIGHT, state.initialHeight - dy);
             y = state.initialY + (state.initialHeight - height);
             break;
-          case "top":
+          case 'top':
             height = Math.max(MIN_HEIGHT, state.initialHeight - dy);
             y = state.initialY + (state.initialHeight - height);
             break;
-          case "bottom":
+          case 'bottom':
             height = Math.max(MIN_HEIGHT, state.initialHeight + dy);
             break;
-          case "left":
+          case 'left':
             width = Math.max(MIN_WIDTH, state.initialWidth - dx);
             x = state.initialX + (state.initialWidth - width);
             break;
-          case "right":
+          case 'right':
             width = Math.max(MIN_WIDTH, state.initialWidth + dx);
             break;
         }
@@ -217,13 +217,13 @@ export const StickyNote: React.FC<StickyNoteProps> = ({
     };
 
     if (state.isDragging || state.isResizing) {
-      window.addEventListener("mousemove", handleMouseMove);
-      window.addEventListener("mouseup", handleMouseUp);
+      window.addEventListener('mousemove', handleMouseMove);
+      window.addEventListener('mouseup', handleMouseUp);
     }
 
     return () => {
-      window.removeEventListener("mousemove", handleMouseMove);
-      window.removeEventListener("mouseup", handleMouseUp);
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('mouseup', handleMouseUp);
     };
   }, [
     state.isDragging,
@@ -244,20 +244,20 @@ export const StickyNote: React.FC<StickyNoteProps> = ({
 
   // Styles for the note container
   const noteStyle: CSSProperties = {
-    position: "absolute",
+    position: 'absolute',
     left: state.x,
     top: state.y,
     width: state.width,
     height: state.height,
-    backgroundColor: "#ffc",
-    border: "1px solid #ccc",
-    boxShadow: "2px 2px 8px rgba(0,0,0,0.3)",
-    borderRadius: "5px",
-    display: "flex",
-    flexDirection: "column",
-    overflow: "hidden",
+    backgroundColor: '#ffc',
+    border: '1px solid #ccc',
+    boxShadow: '2px 2px 8px rgba(0,0,0,0.3)',
+    borderRadius: '5px',
+    display: 'flex',
+    flexDirection: 'column',
+    overflow: 'hidden',
     zIndex: zIndex, // Use the zIndex prop
-    cursor: state.isDragging ? "grabbing" : "default",
+    cursor: state.isDragging ? 'grabbing' : 'default',
     minWidth: `${MIN_WIDTH}px`,
     minHeight: `${MIN_HEIGHT}px`,
   };
@@ -274,30 +274,30 @@ export const StickyNote: React.FC<StickyNoteProps> = ({
         className="sticky-note-header"
         onMouseDown={handleDragStart}
         style={{
-          padding: "8px 10px",
-          backgroundColor: "#e0e099",
-          borderBottom: "1px solid #ccc",
-          cursor: state.isDragging ? "grabbing" : "grab",
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          userSelect: "none",
-          borderTopLeftRadius: "5px",
-          borderTopRightRadius: "5px",
+          padding: '8px 10px',
+          backgroundColor: '#e0e099',
+          borderBottom: '1px solid #ccc',
+          cursor: state.isDragging ? 'grabbing' : 'grab',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          userSelect: 'none',
+          borderTopLeftRadius: '5px',
+          borderTopRightRadius: '5px',
         }}
       >
-        <span style={{ fontWeight: "bold" }}>Sticky Note {id}</span>
+        <span style={{ fontWeight: 'bold' }}>Sticky Note {id}</span>
         {onClose && (
           <button
             onClick={() => onClose(id)}
             style={{
-              background: "none",
-              border: "none",
-              fontSize: "1.2em",
-              cursor: "pointer",
-              color: "#666",
-              lineHeight: "1",
-              padding: "0 5px",
+              background: 'none',
+              border: 'none',
+              fontSize: '1.2em',
+              cursor: 'pointer',
+              color: '#666',
+              lineHeight: '1',
+              padding: '0 5px',
             }}
           >
             &times;
@@ -311,48 +311,48 @@ export const StickyNote: React.FC<StickyNoteProps> = ({
         onChange={handleContentChange}
         style={{
           flexGrow: 1,
-          padding: "10px",
-          border: "none",
-          outline: "none",
-          resize: "none", // Disable default textarea resize
-          fontFamily: "inherit",
-          fontSize: "1em",
-          backgroundColor: "transparent",
+          padding: '10px',
+          border: 'none',
+          outline: 'none',
+          resize: 'none', // Disable default textarea resize
+          fontFamily: 'inherit',
+          fontSize: '1em',
+          backgroundColor: 'transparent',
         }}
       />
 
       {/* Resize Handles */}
       <div
         className="resize-handle top-left"
-        onMouseDown={(e) => handleResizeStart(e, "top-left")}
+        onMouseDown={(e) => handleResizeStart(e, 'top-left')}
       />
       <div
         className="resize-handle top-right"
-        onMouseDown={(e) => handleResizeStart(e, "top-right")}
+        onMouseDown={(e) => handleResizeStart(e, 'top-right')}
       />
       <div
         className="resize-handle bottom-left"
-        onMouseDown={(e) => handleResizeStart(e, "bottom-left")}
+        onMouseDown={(e) => handleResizeStart(e, 'bottom-left')}
       />
       <div
         className="resize-handle bottom-right"
-        onMouseDown={(e) => handleResizeStart(e, "bottom-right")}
+        onMouseDown={(e) => handleResizeStart(e, 'bottom-right')}
       />
       <div
         className="resize-handle top"
-        onMouseDown={(e) => handleResizeStart(e, "top")}
+        onMouseDown={(e) => handleResizeStart(e, 'top')}
       />
       <div
         className="resize-handle bottom"
-        onMouseDown={(e) => handleResizeStart(e, "bottom")}
+        onMouseDown={(e) => handleResizeStart(e, 'bottom')}
       />
       <div
         className="resize-handle left"
-        onMouseDown={(e) => handleResizeStart(e, "left")}
+        onMouseDown={(e) => handleResizeStart(e, 'left')}
       />
       <div
         className="resize-handle right"
-        onMouseDown={(e) => handleResizeStart(e, "right")}
+        onMouseDown={(e) => handleResizeStart(e, 'right')}
       />
     </div>
   );
@@ -436,10 +436,10 @@ export function NoteApp() {
   return (
     <div
       style={{
-        height: "100vh",
-        width: "100vw",
-        overflow: "hidden",
-        position: "relative",
+        height: '100vh',
+        width: '100vw',
+        overflow: 'hidden',
+        position: 'relative',
       }}
     >
       <h1>My IDE - Sticky Notes Demo</h1>
@@ -450,15 +450,15 @@ export function NoteApp() {
       <button
         onClick={addNote}
         style={{
-          padding: "10px 20px",
-          fontSize: "16px",
-          cursor: "pointer",
-          backgroundColor: "#007bff",
-          color: "white",
-          border: "none",
-          borderRadius: "5px",
-          marginLeft: "20px",
-          marginTop: "10px",
+          padding: '10px 20px',
+          fontSize: '16px',
+          cursor: 'pointer',
+          backgroundColor: '#007bff',
+          color: 'white',
+          border: 'none',
+          borderRadius: '5px',
+          marginLeft: '20px',
+          marginTop: '10px',
         }}
       >
         Add Note

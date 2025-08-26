@@ -3,7 +3,7 @@ import { FileService } from '@/services/fileWebsocketService';
 // Assuming HttpMethod and ResponseType are defined in '@/types'
 import { HttpMethod, ResponseType } from '@/types';
 // Import the specific APIProps type from socket-interfaces, as FileService uses it
-import { type APIProps } from '@/types'; 
+import { type APIProps } from '@/types';
 
 let _getToken: () => string | null = () => localStorage.getItem('token');
 
@@ -22,7 +22,7 @@ export interface RequestOptions<T = unknown> {
   method?: HttpMethod;
   body?: T | FormData;
   isFormData?: boolean;
-  responseType?: ResponseType; 
+  responseType?: ResponseType;
   headers?: HeadersInit;
   signal?: AbortSignal;
   baseURL?: string;
@@ -78,45 +78,73 @@ export async function apiFetch<Res = unknown, Req = unknown>(
 
   // Define methods supported by the WebSocket service (matching APIProps['method'])
   // This must match the `WebSocketMethod` type in src/types/socket-interfaces.ts
-  const supportedWsMethods: APIProps['method'][] = ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'];
+  const supportedWsMethods: APIProps['method'][] = [
+    'GET',
+    'POST',
+    'PUT',
+    'DELETE',
+    'PATCH',
+  ];
 
   // Crucial fix: Add explicit type check for 'body' compatibility with WebSocket payload
   // A WebSocket body must be undefined or a non-null object
-  const isBodyCompatibleWithWs = !(body instanceof FormData) && (body === undefined || (typeof body === 'object' && body !== null));
-  
+  const isBodyCompatibleWithWs =
+    !(body instanceof FormData) &&
+    (body === undefined || (typeof body === 'object' && body !== null));
+
   // Check if delegation to WebSocket is requested AND if the method/body are compatible
   // We explicitly check if 'method' is one of the supported WS methods
-  const isWsDelegatedMethod = supportedWsMethods.includes(method as APIProps['method']);
+  const isWsDelegatedMethod = supportedWsMethods.includes(
+    method as APIProps['method'],
+  );
 
   let wsEvent: string | undefined = explicitWsEvent; // Start with explicit event hint
 
   // Map HTTP endpoint to a specific WebSocket event if no explicit wsEvent is given
-  if (!wsEvent) { // Only try to infer if no explicit event was provided
-    const normalizedEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
+  if (!wsEvent) {
+    // Only try to infer if no explicit event was provided
+    const normalizedEndpoint = endpoint.startsWith('/')
+      ? endpoint
+      : `/${endpoint}`;
 
     if (normalizedEndpoint.includes(API_ENDPOINTS._FILE.GET_FILES)) {
       wsEvent = EVENT_PREFIX.GET_FILES; // Use LIST_DIRECTORY_CHILDREN as per FileService
-    } else if (normalizedEndpoint.includes(API_ENDPOINTS._FILE.READ_FILE)) { // Use specific constant
+    } else if (normalizedEndpoint.includes(API_ENDPOINTS._FILE.READ_FILE)) {
+      // Use specific constant
       wsEvent = EVENT_PREFIX.READ_FILE;
-    } else if (normalizedEndpoint.includes(API_ENDPOINTS._FILE.WRITE_FILE)) { // Use specific constant
+    } else if (normalizedEndpoint.includes(API_ENDPOINTS._FILE.WRITE_FILE)) {
+      // Use specific constant
       wsEvent = EVENT_PREFIX.WRITE_FILE; // Use SAVE_FILE as per FileService
-    } else if (normalizedEndpoint.includes(API_ENDPOINTS._FILE.DELETE_FILE)) { // Use specific constant
+    } else if (normalizedEndpoint.includes(API_ENDPOINTS._FILE.DELETE_FILE)) {
+      // Use specific constant
       wsEvent = EVENT_PREFIX.DELETE_FILE; // Use DELETE_FILES as per FileService
-    } else if (normalizedEndpoint.includes(API_ENDPOINTS._FILE.UPLOAD_FILE)) { // Use specific constant
+    } else if (normalizedEndpoint.includes(API_ENDPOINTS._FILE.UPLOAD_FILE)) {
+      // Use specific constant
       wsEvent = EVENT_PREFIX.UPLOAD_FILE;
     } else if (normalizedEndpoint.includes(API_ENDPOINTS._UTILS.FORMAT_CODE)) {
       wsEvent = EVENT_PREFIX.FORMAT_CODE;
-    } else if (normalizedEndpoint.includes(API_ENDPOINTS._GOOGLE_GEMINI.OPTIMIZE_CODE)) {
+    } else if (
+      normalizedEndpoint.includes(API_ENDPOINTS._GOOGLE_GEMINI.OPTIMIZE_CODE)
+    ) {
       wsEvent = EVENT_PREFIX.OPTIMIZE_CODE;
-    } else if (normalizedEndpoint.includes(API_ENDPOINTS._UTILS.STRIP_CODE_BLOCK)) {
+    } else if (
+      normalizedEndpoint.includes(API_ENDPOINTS._UTILS.STRIP_CODE_BLOCK)
+    ) {
       wsEvent = EVENT_PREFIX.STRIP_CODE_BLOCK;
-    } else if (normalizedEndpoint.includes(API_ENDPOINTS._UTILS.REMOVE_CODE_COMMENT)) {
+    } else if (
+      normalizedEndpoint.includes(API_ENDPOINTS._UTILS.REMOVE_CODE_COMMENT)
+    ) {
       wsEvent = EVENT_PREFIX.REMOVE_CODE_COMMENT;
     }
   }
 
   // Delegate to FileService (WebSocket) ONLY IF all conditions are met
-  if (_fileServiceInstance && wsEvent && isWsDelegatedMethod && isBodyCompatibleWithWs) {
+  if (
+    _fileServiceInstance &&
+    wsEvent &&
+    isWsDelegatedMethod &&
+    isBodyCompatibleWithWs
+  ) {
     console.log(
       `[apiFetch] Delegating ${method} ${endpoint} to FileService (WebSocket) with event: ${wsEvent}.`,
     );
@@ -130,10 +158,16 @@ export async function apiFetch<Res = unknown, Req = unknown>(
       })) as Res;
       // The console.log below this return statement will never be reached, consider removing it
       // console.log(normalizedEndpoint, wsEvent);
-    } catch (error: unknown) { // Use unknown for caught errors
+    } catch (error: unknown) {
+      // Use unknown for caught errors
       console.error(`Error delegating to FileService for ${endpoint}:`, error);
-      const errorMessage = error instanceof Error ? error.message : String(error);
-      throw new ApiError(errorMessage || `WebSocket error for ${endpoint}`, 500, error);
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
+      throw new ApiError(
+        errorMessage || `WebSocket error for ${endpoint}`,
+        500,
+        error,
+      );
     }
   }
 
@@ -192,7 +226,8 @@ export async function apiFetch<Res = unknown, Req = unknown>(
           errorMessage = text;
         }
       }
-    } catch (e: unknown) { // Use unknown for caught errors
+    } catch (e: unknown) {
+      // Use unknown for caught errors
       // Ignore parsing errors for error payloads
     }
 

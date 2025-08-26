@@ -1,7 +1,7 @@
-import React, { memo } from "react";
-import { Loader2, MessageSquareText } from "lucide-react";
-import ChatPartContent from "./ChatPartContent"; // Relative import
-import type { ConversationHistoryItem, ConversationPart } from "@/types/chat";
+import React, { memo } from 'react';
+import { Loader2, MessageSquareText } from 'lucide-react';
+import ChatPartContent from './ChatPartContent'; // Relative import
+import type { ConversationHistoryItem, ConversationPart } from '@/types/chat';
 
 interface ChatMessagesProps {
   chatHistory: ConversationHistoryItem[];
@@ -45,22 +45,23 @@ const ChatMessages = memo(
     return (
       <div className="ai-chaat-messages-wrapper flex-1 overflow-y-auto py-3 space-y-4 text-sm scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 dark:scrollbar-thumb-gray-700 dark:scrollbar-track-gray-800">
         {chatHistory.map((msg, index) => {
-          const isUser = msg.role === "user";
+          const isUser = msg.role === 'user';
           const isLastMessage = index === chatHistory.length - 1;
 
           return (
-            <React.Fragment key={msg.id}> {/* MODIFIED: Rely directly on msg.id as it's now guaranteed unique */}
-              {" "}
+            <React.Fragment key={msg.id}>
+              {' '}
+              {/* MODIFIED: Rely directly on msg.id as it's now guaranteed unique */}{' '}
               <div
-                className={`flex ${isUser ? "justify-end py-6" : "justify-start"} px-4`}
+                className={`flex ${isUser ? 'justify-end py-6' : 'justify-start'} px-4`}
               >
                 <div
                   className={`
                             max-w-[100%] p-3 rounded-lg flex flex-col gap-2
                             ${
                               isUser
-                                ? "user-message-wrapper"
-                                : "ai-model-message-wrapper"
+                                ? 'user-message-wrapper'
+                                : 'ai-model-message-wrapper'
                             }
                         `}
                 >
@@ -80,9 +81,9 @@ const ChatMessages = memo(
               </div>
               {/* Timestamp below the message bubble */}
               <div
-                className={`px-4 pb-10 border-b text-xs italic ${isUser ? "text-right text-primary" : "text-left text-accent"}`}
+                className={`px-4 pb-10 border-b text-xs italic ${isUser ? 'text-right text-primary' : 'text-left text-accent'}`}
               >
-                {`Sent by ${isUser ? "You" : "AI"} on ${new Date(msg.createdAt).toLocaleTimeString()} ${new Date(msg.createdAt).toLocaleDateString()}`}
+                {`Sent by ${isUser ? 'You' : 'AI'} on ${new Date(msg.createdAt).toLocaleTimeString()} ${new Date(msg.createdAt).toLocaleDateString()}`}
               </div>
               {/* Optional: Separator line (only if desired, consider if it clutters) */}
               {/* {isLastMessage ? null : <div className="px-4 py-3 border-b border-gray-200 dark:border-gray-700 w-full"></div>} */}
@@ -92,7 +93,7 @@ const ChatMessages = memo(
         {/* AI thinking indicator for initial processing before content appears */}
         {isSendingMessage &&
           chatHistory.length > 0 &&
-          chatHistory[chatHistory.length - 1].role === "user" && (
+          chatHistory[chatHistory.length - 1].role === 'user' && (
             <div className="flex justify-start px-4 mt-2">
               <div className="max-w-[80%] p-3 rounded-lg flex items-center">
                 <Loader2 className="h-4 w-4 animate-spin mr-2" />
@@ -106,5 +107,5 @@ const ChatMessages = memo(
   },
 );
 
-ChatMessages.displayName = "ChatMessages";
+ChatMessages.displayName = 'ChatMessages';
 export default ChatMessages;

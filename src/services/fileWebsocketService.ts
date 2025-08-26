@@ -1,9 +1,9 @@
-import { io } from "socket.io-client";
+import { io } from 'socket.io-client';
 import {
   type ISocket,
   type IFileService,
   type SocketFactory,
-} from "@/types/socket-interfaces";
+} from '@/types/socket-interfaces';
 import {
   API_ENDPOINTS,
   SOCKET_EVENTS,
@@ -11,12 +11,9 @@ import {
   EVENT_PREFIX,
   FILE_NAMESPACE,
   BASE_URL_API,
-} from "@/constants";
-import { showToast } from "@/stores/toast";
-import {
-  editorLanguage,
-  editorFileTreeNodes,
-} from "@/stores/editorContent";
+} from '@/constants';
+import { showToast } from '@/stores/toast';
+import { editorLanguage, editorFileTreeNodes } from '@/stores/editorContent';
 import {
   FileItem,
   FileReadResponse,
@@ -25,11 +22,9 @@ import {
   FileDeleteRequest,
   FileUploadRequest,
   APIProps,
-} from "@/types";
+} from '@/types';
 
-import {
-  updateFileContent as updateFileContentInTree,
-} from "@/utils/fileTree";
+import { updateFileContent as updateFileContentInTree } from '@/utils/fileTree';
 
 /**
  * Service for interacting with file-related operations via WebSockets.
@@ -46,7 +41,7 @@ export class FileService implements IFileService {
   constructor(
     socketFactory: SocketFactory = (uri, opts) => io(uri, opts) as ISocket,
   ) {
-    this.base = BASE_URL_API.replace(/\/$/, "");
+    this.base = BASE_URL_API.replace(/\/$/, '');
     //this.eventPrefix = EVENT_PREFIX;
     //this.socketEvents = SOCKET_EVENTS;
     //this.apiEndpoints = SOCKET_EVENTS_MERGED;
@@ -64,7 +59,7 @@ export class FileService implements IFileService {
       return this.socket;
     }
 
-    const token = localStorage.getItem("token");
+    const token = localStorage.getItem('token');
     const uri = `${BASE_URL_API}${this.namespace}`;
     const opts = {
       auth: { token: `Bearer ${token}` },
@@ -93,7 +88,7 @@ export class FileService implements IFileService {
     this.socket.on(
       SOCKET_EVENTS_MERGED.DYNAMIC_FILE_EVENT_RESPONSE,
       (data: any) => {
-        console.log(data, "SOCKET_EVENTS_MERGED.DYNAMIC_FILE_EVENT_RESPONSE");
+        console.log(data, 'SOCKET_EVENTS_MERGED.DYNAMIC_FILE_EVENT_RESPONSE');
       },
     );
     this.socket.on(
@@ -103,19 +98,19 @@ export class FileService implements IFileService {
       },
     );
     this.socket.on(SOCKET_EVENTS_MERGED.FILE_UPLOAD_RESPONSE, (data: any) => {
-      console.log("Upload complete:", data);
+      console.log('Upload complete:', data);
     });
     this.socket.on(SOCKET_EVENTS_MERGED.GET_FILES_RESPONSE, (data: any) => {
-      console.log(data, "SOCKET_EVENTS_MERGED.GET_FILES_RESPONSE");
+      console.log(data, 'SOCKET_EVENTS_MERGED.GET_FILES_RESPONSE');
     });
     this.socket.on(SOCKET_EVENTS_MERGED.READ_FILE_RESPONSE, (data: any) => {
-      console.log(data, "SOCKET_EVENTS_MERGED.READ_FILE_RESPONSE");
+      console.log(data, 'SOCKET_EVENTS_MERGED.READ_FILE_RESPONSE');
     });
     this.socket.on(SOCKET_EVENTS_MERGED.READ_FILE_PROGRESS, (data: any) => {
-      console.log(data, "SOCKET_EVENTS_MERGED.READ_FILE_PROGRESS");
+      console.log(data, 'SOCKET_EVENTS_MERGED.READ_FILE_PROGRESS');
     });
     this.socket.on(SOCKET_EVENTS_MERGED.WRITE_FILE_RESPONSE, (data: any) => {
-      console.log(data, "SOCKET_EVENTS_MERGED.WRITE_FILE_RESPONSE");
+      console.log(data, 'SOCKET_EVENTS_MERGED.WRITE_FILE_RESPONSE');
     });
     this.socket.on(SOCKET_EVENTS_MERGED.RENAME_FILE_RESPONSE, (data: any) => {
       /* ... */
@@ -126,18 +121,21 @@ export class FileService implements IFileService {
     this.socket.on(SOCKET_EVENTS_MERGED.OPTIMIZE_CODE_RESPONSE, (data: any) => {
       /* ... */
     });
-    this.socket.on(SOCKET_EVENTS_MERGED.REMOVE_CODE_COMMENT_RESPONSE, (data: any) => {
-      /* ... */
-    });
+    this.socket.on(
+      SOCKET_EVENTS_MERGED.REMOVE_CODE_COMMENT_RESPONSE,
+      (data: any) => {
+        /* ... */
+      },
+    );
     // New handlers for delete, move, upload responses (these typically trigger FS_CHANGE events from server)
     this.socket.on(SOCKET_EVENTS_MERGED.DELETE_FILES_RESPONSE, (data: any) => {
-      console.log("Delete files response:", data);
+      console.log('Delete files response:', data);
     });
     this.socket.on(SOCKET_EVENTS_MERGED.MOVE_FILE_RESPONSE, (data: any) => {
-      console.log("Move file response:", data);
+      console.log('Move file response:', data);
     });
     this.socket.on(SOCKET_EVENTS_MERGED.UPLOAD_FILE_RESPONSE, (data: any) => {
-      console.log("Upload file response:", data);
+      console.log('Upload file response:', data);
     });
 
     this.socket.on(SOCKET_EVENTS_MERGED.DISCONNECT, () => {
@@ -145,7 +143,7 @@ export class FileService implements IFileService {
     });
     this.socket.on(SOCKET_EVENTS_MERGED.CONNECT_ERROR, (err: Error) => {
       console.error(`FileService connection error: ${err.message}`);
-      showToast(`Connection Error: ${err.message}`, "error");
+      showToast(`Connection Error: ${err.message}`, 'error');
     });
 
     return this.socket;
@@ -172,7 +170,7 @@ export class FileService implements IFileService {
       this.connect();
       if (!this.socket?.connected) {
         return Promise.reject(
-          new Error("Socket not connected for emitting event."),
+          new Error('Socket not connected for emitting event.'),
         );
       }
     }
@@ -180,7 +178,7 @@ export class FileService implements IFileService {
     return new Promise((resolve, reject) => {
       if (!this.socket) {
         // Should be connected now, but a final check
-        return reject(new Error("Socket not available for emitting event."));
+        return reject(new Error('Socket not available for emitting event.'));
       }
 
       this.socket.emit(SOCKET_EVENTS_MERGED.DYNAMIC_FILE_EVENT, data);
@@ -222,13 +220,11 @@ export class FileService implements IFileService {
   ): Promise<FileItem[]> {
     const response = await this.emitDynamicFileEvent<FileItem[]>({
       endpoint: `${API_ENDPOINTS._FILE.GET_FILES}?directory=${encodeURIComponent(directoryPath)}&recursive=false`,
-      method: "GET",
+      method: 'GET',
       event: EVENT_PREFIX.GET_FILES,
     });
     return response;
   }
-
-  
 
   /**
    * Reads file content from the backend.
@@ -240,21 +236,21 @@ export class FileService implements IFileService {
     try {
       const response = await this.emitDynamicFileEvent<FileReadResponse>({
         endpoint: API_ENDPOINTS._FILE.READ_FILE,
-        method: "POST",
+        method: 'POST',
         body: { filePath },
         event: EVENT_PREFIX.READ_FILE,
       });
 
-      if (!response || typeof response.content !== "string") {
-        showToast(`${filePath} does not exist or invalid content.`, "error");
+      if (!response || typeof response.content !== 'string') {
+        showToast(`${filePath} does not exist or invalid content.`, 'error');
         throw new Error(
-          "Invalid response from readFile: missing content or not a string.",
+          'Invalid response from readFile: missing content or not a string.',
         );
       }
       if (response.language) {
         editorLanguage.set(response.language);
       } else {
-        editorLanguage.set("plain");
+        editorLanguage.set('plain');
       }
       return response;
     } catch (error) {
@@ -275,7 +271,7 @@ export class FileService implements IFileService {
     try {
       await this.emitDynamicFileEvent({
         endpoint: API_ENDPOINTS._FILE.WRITE_FILE,
-        method: "POST",
+        method: 'POST',
         body: writeRequest,
         event: EVENT_PREFIX.WRITE_FILE,
       });
@@ -289,14 +285,13 @@ export class FileService implements IFileService {
       );
       editorFileTreeNodes.set(updatedTree);
 
-      showToast(`File ${filePath} saved successfully.`, "success");
+      showToast(`File ${filePath} saved successfully.`, 'success');
     } catch (error: any) {
       console.error(`Error saving file ${filePath}:`, error);
-      showToast(`Error saving file ${filePath}: ${error.message}`, "error");
+      showToast(`Error saving file ${filePath}: ${error.message}`, 'error');
       throw error;
     }
   }
-
 
   /**
    * Uploads a file to the backend.
@@ -307,15 +302,15 @@ export class FileService implements IFileService {
     try {
       await this.emitDynamicFileEvent({
         endpoint: `/files/upload`, // Example endpoint (adjust to your backend)
-        method: "POST",
+        method: 'POST',
         body: request,
         event: EVENT_PREFIX.UPLOAD_FILE,
       });
       // Backend should emit FS_CHANGE_CREATED event if new file, or FS_CHANGE_MODIFIED if existing
-      showToast(`Uploaded ${request.filePath.split("/").pop()}.`, "success");
+      showToast(`Uploaded ${request.filePath.split('/').pop()}.`, 'success');
     } catch (error: any) {
       console.error(`Error uploading file ${request.filePath}:`, error);
-      showToast(`Error uploading: ${error.message}`, "error");
+      showToast(`Error uploading: ${error.message}`, 'error');
       throw error;
     }
   }
@@ -324,20 +319,20 @@ export class FileService implements IFileService {
     try {
       const response = await this.emitDynamicFileEvent<{ content: string }>({
         endpoint: API_ENDPOINTS._UTILS.FORMAT_CODE,
-        method: "POST",
+        method: 'POST',
         body: { content, language },
         event: EVENT_PREFIX.FORMAT_CODE,
       });
-      if (response && typeof response.content === "string") {
-        showToast(`Code formatted successfully.`, "success");
+      if (response && typeof response.content === 'string') {
+        showToast(`Code formatted successfully.`, 'success');
         return response.content;
       }
       throw new Error(
-        "Invalid response from formatCode: missing content or not a string.",
+        'Invalid response from formatCode: missing content or not a string.',
       );
     } catch (error: any) {
       console.error(`Error formatting code:`, error);
-      showToast(`Error formatting code: ${error.message}`, "error");
+      showToast(`Error formatting code: ${error.message}`, 'error');
       throw error;
     }
   }
@@ -350,24 +345,24 @@ export class FileService implements IFileService {
         content: string;
       }>({
         endpoint: API_ENDPOINTS._GOOGLE_GEMINI.OPTIMIZE_CODE,
-        method: "POST",
+        method: 'POST',
         body: { content, language },
         event: EVENT_PREFIX.OPTIMIZE_CODE,
       });
 
-      if (optimizedResponse && typeof optimizedResponse.content === "string") {
+      if (optimizedResponse && typeof optimizedResponse.content === 'string') {
         const strippedContent = await this.stripCodeBlock(
           optimizedResponse.content,
         );
-        showToast(`Code optimized successfully.`, "success");
+        showToast(`Code optimized successfully.`, 'success');
         return strippedContent;
       }
       throw new Error(
-        "Invalid response from optimizeCode: missing content or not a string.",
+        'Invalid response from optimizeCode: missing content or not a string.',
       );
     } catch (error: any) {
       console.error(`Error optimizing code:`, error);
-      showToast(`Error optimizing code: ${error.message}`, "error");
+      showToast(`Error optimizing code: ${error.message}`, 'error');
       throw error;
     }
   }
@@ -375,19 +370,19 @@ export class FileService implements IFileService {
     try {
       const response = await this.emitDynamicFileEvent<{ content: string }>({
         endpoint: API_ENDPOINTS._UTILS.STRIP_CODE_BLOCK,
-        method: "POST",
+        method: 'POST',
         body: { content },
         event: EVENT_PREFIX.STRIP_CODE_BLOCK,
       });
-      if (response && typeof response.content === "string") {
+      if (response && typeof response.content === 'string') {
         return response.content;
       }
       throw new Error(
-        "Invalid response from stripCodeBlock: missing content or not a string.",
+        'Invalid response from stripCodeBlock: missing content or not a string.',
       );
     } catch (error: any) {
       console.error(`Error stripping code blocks:`, error);
-      showToast(`Error stripping code blocks: ${error.message}`, "error");
+      showToast(`Error stripping code blocks: ${error.message}`, 'error');
       throw error;
     }
   }
@@ -398,22 +393,22 @@ export class FileService implements IFileService {
     try {
       const response = await this.emitDynamicFileEvent<{ content: string }>({
         endpoint: API_ENDPOINTS._UTILS.REMOVE_CODE_COMMENT,
-        method: "POST",
+        method: 'POST',
         body: { content, language },
         event: EVENT_PREFIX.REMOVE_CODE_COMMENT,
       });
 
-      if (!response || typeof response.content !== "string") {
-        showToast(`Failed to remove comments. Invalid response.`, "error");
+      if (!response || typeof response.content !== 'string') {
+        showToast(`Failed to remove comments. Invalid response.`, 'error');
         throw new Error(
-          "Invalid response from removeCodeComment: missing content or not a string.",
+          'Invalid response from removeCodeComment: missing content or not a string.',
         );
       }
-      showToast(`Comments removed successfully.`, "success");
+      showToast(`Comments removed successfully.`, 'success');
       return response.content;
     } catch (error: any) {
       console.error(`Error removing code comments:`, error);
-      showToast(`Error removing comments: ${error.message}`, "error");
+      showToast(`Error removing comments: ${error.message}`, 'error');
       throw error;
     }
   }

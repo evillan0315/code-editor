@@ -12,24 +12,32 @@ const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 export const MarkdownConverter = () => {
   const [contentInput, setContentInput] = useState<string>('');
 
-  const [selectedFormat, setSelectedFormat] = useState<OutputFormat>(OutputFormat.HTML);
+  const [selectedFormat, setSelectedFormat] = useState<OutputFormat>(
+    OutputFormat.HTML,
+  );
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
-  const handleFormatChange = useCallback((event: ChangeEvent<HTMLInputElement>) => {
-    setSelectedFormat(event.target.value as OutputFormat);
+  const handleFormatChange = useCallback(
+    (event: ChangeEvent<HTMLInputElement>) => {
+      setSelectedFormat(event.target.value as OutputFormat);
 
-    setErrorMessage(null);
-    setSuccessMessage(null);
-  }, []);
+      setErrorMessage(null);
+      setSuccessMessage(null);
+    },
+    [],
+  );
 
-  const handleContentChange = useCallback((event: ChangeEvent<HTMLTextAreaElement>) => {
-    setContentInput(event.target.value);
+  const handleContentChange = useCallback(
+    (event: ChangeEvent<HTMLTextAreaElement>) => {
+      setContentInput(event.target.value);
 
-    setErrorMessage(null);
-    setSuccessMessage(null);
-  }, []);
+      setErrorMessage(null);
+      setSuccessMessage(null);
+    },
+    [],
+  );
 
   const handleSubmit = useCallback(
     async (event: FormEvent) => {
@@ -60,9 +68,13 @@ export const MarkdownConverter = () => {
             requestBody = { markdown: contentInput };
             responseType = 'text';
             outputExtension = 'html';
-            response = await axios.post(apiUrl + `?filename=${outputFilenameBase}`, requestBody, {
-              responseType,
-            });
+            response = await axios.post(
+              apiUrl + `?filename=${outputFilenameBase}`,
+              requestBody,
+              {
+                responseType,
+              },
+            );
             break;
 
           case OutputFormat.DOCX:
@@ -70,9 +82,13 @@ export const MarkdownConverter = () => {
             requestBody = { content: contentInput };
             responseType = 'blob';
             outputExtension = 'docx';
-            response = await axios.post(apiUrl + `?filename=${outputFilenameBase}`, requestBody, {
-              responseType,
-            });
+            response = await axios.post(
+              apiUrl + `?filename=${outputFilenameBase}`,
+              requestBody,
+              {
+                responseType,
+              },
+            );
             break;
 
           case OutputFormat.DOCX_FROM_HTML:
@@ -80,17 +96,25 @@ export const MarkdownConverter = () => {
             requestBody = { markdown: contentInput };
             responseType = 'text';
             outputExtension = 'html';
-            response = await axios.post(apiUrl + `?filename=${outputFilenameBase}`, requestBody, {
-              responseType,
-            });
+            response = await axios.post(
+              apiUrl + `?filename=${outputFilenameBase}`,
+              requestBody,
+              {
+                responseType,
+              },
+            );
 
             apiUrl = `${API_BASE_URL}/api/utils/html-to-docx`;
             requestBody = { html: response.data };
             responseType = 'blob';
             outputExtension = 'docx';
-            response = await axios.post(apiUrl + `?filename=${outputFilenameBase}`, requestBody, {
-              responseType,
-            });
+            response = await axios.post(
+              apiUrl + `?filename=${outputFilenameBase}`,
+              requestBody,
+              {
+                responseType,
+              },
+            );
             break;
 
           case OutputFormat.PLAIN_TEXT:
@@ -98,9 +122,13 @@ export const MarkdownConverter = () => {
             requestBody = { content: contentInput };
             responseType = 'json';
             outputExtension = 'txt';
-            response = await axios.post(apiUrl + `?filename=${outputFilenameBase}`, requestBody, {
-              responseType,
-            });
+            response = await axios.post(
+              apiUrl + `?filename=${outputFilenameBase}`,
+              requestBody,
+              {
+                responseType,
+              },
+            );
             break;
 
           case OutputFormat.JSON_AST:
@@ -108,9 +136,13 @@ export const MarkdownConverter = () => {
             requestBody = { markdown: contentInput };
             responseType = 'json';
             outputExtension = 'json';
-            response = await axios.post(apiUrl + `?filename=${outputFilenameBase}`, requestBody, {
-              responseType,
-            });
+            response = await axios.post(
+              apiUrl + `?filename=${outputFilenameBase}`,
+              requestBody,
+              {
+                responseType,
+              },
+            );
             break;
 
           default:
@@ -125,10 +157,14 @@ export const MarkdownConverter = () => {
           finalData = response.data;
           const contentDisposition = response.headers['content-disposition'];
           if (contentDisposition) {
-            const filenameMatch = contentDisposition.match(/filename\*?=(?:UTF-8'')?([^;]+)/i);
+            const filenameMatch = contentDisposition.match(
+              /filename\*?=(?:UTF-8'')?([^;]+)/i,
+            );
             if (filenameMatch && filenameMatch[1]) {
               try {
-                filename = decodeURIComponent(filenameMatch[1].replace(/^"|"$/g, ''));
+                filename = decodeURIComponent(
+                  filenameMatch[1].replace(/^"|"$/g, ''),
+                );
               } catch (e) {
                 console.warn(
                   'Failed to decode filename from Content-Disposition, using raw:',
@@ -213,11 +249,16 @@ export const MarkdownConverter = () => {
                 setErrorMessage(
                   `Conversion failed: ${error.response.statusText || 'Server error (non-JSON Blob response)'}`,
                 );
-                console.error('Failed to parse error response Blob as JSON:', jsonParseError);
+                console.error(
+                  'Failed to parse error response Blob as JSON:',
+                  jsonParseError,
+                );
               }
             };
             reader.onerror = () => {
-              setErrorMessage(`Conversion failed: Error reading error response Blob.`);
+              setErrorMessage(
+                `Conversion failed: Error reading error response Blob.`,
+              );
               console.error('FileReader error:', reader.error);
             };
             reader.readAsText(error.response.data);
@@ -248,7 +289,10 @@ export const MarkdownConverter = () => {
         className="bg-gray-800 p-6 rounded-lg shadow-lg w-full max-w-4xl mb-8"
       >
         <div className="mb-6">
-          <label htmlFor="contentInput" className="block text-sm font-bold mb-2">
+          <label
+            htmlFor="contentInput"
+            className="block text-sm font-bold mb-2"
+          >
             Enter Content:
             {}
             {selectedFormat === OutputFormat.DOCX_FROM_HTML
@@ -270,10 +314,15 @@ export const MarkdownConverter = () => {
         </div>
 
         <div className="mb-6">
-          <label className="block text-sm font-bold mb-2">Choose Output Format:</label>
+          <label className="block text-sm font-bold mb-2">
+            Choose Output Format:
+          </label>
           <div className="flex gap-4 flex-wrap">
             {Object.values(OutputFormat).map((format) => (
-              <label key={format} className="inline-flex items-center cursor-pointer">
+              <label
+                key={format}
+                className="inline-flex items-center cursor-pointer"
+              >
                 <input
                   type="radio"
                   className="form-radio text-blue-500 h-5 w-5 border-gray-600 bg-gray-700"
@@ -300,13 +349,21 @@ export const MarkdownConverter = () => {
         </button>
 
         {errorMessage && (
-          <p className="mt-4 text-red-500 text-sm font-medium" role="alert" aria-live="polite">
+          <p
+            className="mt-4 text-red-500 text-sm font-medium"
+            role="alert"
+            aria-live="polite"
+          >
             Error: {errorMessage}
           </p>
         )}
 
         {successMessage && (
-          <p className="mt-4 text-green-500 text-sm font-medium" role="status" aria-live="polite">
+          <p
+            className="mt-4 text-green-500 text-sm font-medium"
+            role="status"
+            aria-live="polite"
+          >
             {successMessage}
           </p>
         )}
@@ -320,9 +377,13 @@ export const MarkdownConverter = () => {
         <h2 className="text-2xl font-semibold mb-4">Markdown Preview</h2>
         <div className="prose max-w-none p-4 border border-gray-600 rounded overflow-auto min-h-[150px] max-h-[400px] bg-gray-700 text-gray-200">
           {contentInput ? (
-            <ReactMarkdown remarkPlugins={[remarkGfm]}>{contentInput}</ReactMarkdown>
+            <ReactMarkdown remarkPlugins={[remarkGfm]}>
+              {contentInput}
+            </ReactMarkdown>
           ) : (
-            <p className="text-gray-400 italic">Your Markdown preview will appear here.</p>
+            <p className="text-gray-400 italic">
+              Your Markdown preview will appear here.
+            </p>
           )}
         </div>
       </div>

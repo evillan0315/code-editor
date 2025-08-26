@@ -1,6 +1,6 @@
 // src/services/apiService.ts
-import { apiFetch } from "@/services/apiFetch";
-import { base64ToBlob } from "@/utils/fileTree"; // Assuming this utility exists and works
+import { apiFetch } from '@/services/apiFetch';
+import { base64ToBlob } from '@/utils/fileTree'; // Assuming this utility exists and works
 
 // --- Import all necessary types from src/types/chat.ts ---
 import type {
@@ -12,7 +12,7 @@ import type {
   FileData,
   ChatRequestPayload,
   ConversationPart, // Also import ConversationPart as it's used within ModelResponse
-} from "@/types/chat";
+} from '@/types/chat';
 
 /**
  * Calls the Gemini API to generate text from a simple text prompt.
@@ -26,7 +26,7 @@ export async function generateGeminiText(
   systemInstruction?: string,
   conversationId?: string,
 ): Promise<string> {
-  const endpoint = "/api/gemini/file/generate-text";
+  const endpoint = '/api/gemini/file/generate-text';
 
   try {
     const payload: {
@@ -44,11 +44,11 @@ export async function generateGeminiText(
     }
 
     const response = await apiFetch<string>(endpoint, {
-      method: "POST",
+      method: 'POST',
       body: payload,
-      responseType: "text", // Expecting a plain text string response
+      responseType: 'text', // Expecting a plain text string response
       headers: {
-        "Content-Type": "application/json", // Specify content type for JSON body
+        'Content-Type': 'application/json', // Specify content type for JSON body
       },
     });
     return response; // apiFetch will return the plain text string directly
@@ -73,7 +73,7 @@ export async function generateGeminiImageBase64(
   systemInstruction?: string,
   conversationId?: string,
 ): Promise<string> {
-  const endpoint = "/api/gemini/file/generate-image-base64";
+  const endpoint = '/api/gemini/file/generate-image-base64';
 
   try {
     const payload: {
@@ -92,11 +92,11 @@ export async function generateGeminiImageBase64(
     }
 
     const response = await apiFetch<string>(endpoint, {
-      method: "POST",
+      method: 'POST',
       body: payload,
-      responseType: "text", // Expecting a plain text string response
+      responseType: 'text', // Expecting a plain text string response
       headers: {
-        "Content-Type": "application/json", // Specify content type for JSON body
+        'Content-Type': 'application/json', // Specify content type for JSON body
       },
     });
     return response; // apiFetch will return the plain text string directly
@@ -124,29 +124,29 @@ export async function generateGeminiFile(
   systemInstruction?: string,
   conversationId?: string,
 ): Promise<string> {
-  const endpoint = "/api/gemini/file/generate-file";
+  const endpoint = '/api/gemini/file/generate-file';
 
   try {
     const formData = new FormData();
-    formData.append("prompt", prompt);
+    formData.append('prompt', prompt);
 
     // Convert base64 file data to Blob and append to FormData
     // The 'file' field name must match the @UploadedFile() decorator in the NestJS controller.
     const blob = base64ToBlob(fileData.data, fileData.type);
-    formData.append("file", blob, fileData.name);
+    formData.append('file', blob, fileData.name);
 
     // Conditionally append optional parameters
     if (systemInstruction !== undefined) {
-      formData.append("systemInstruction", systemInstruction);
+      formData.append('systemInstruction', systemInstruction);
     }
     if (conversationId !== undefined) {
-      formData.append("conversationId", conversationId);
+      formData.append('conversationId', conversationId);
     }
 
     const response = await apiFetch<string>(endpoint, {
-      method: "POST",
+      method: 'POST',
       body: formData,
-      responseType: "text", // Expecting a plain text string response
+      responseType: 'text', // Expecting a plain text string response
       // Do NOT manually set 'Content-Type': 'multipart/form-data' header;
       // the browser handles it automatically with the correct boundary when FormData is used.
     });
@@ -160,18 +160,28 @@ export async function generateGeminiFile(
 export const apiService = {
   conversation: {
     /**
-     * Fetches a paginated list of conversation summaries.
-     * @param params Pagination parameters (page, limit).
+     * Fetches a paginated list of conversation summaries, with optional search and request type filters.
+     * @param params Pagination and filter parameters (page, limit, search, requestType).
      * @returns A promise resolving to a paginated response of conversation summaries.
      */
     list(
       params: PaginationParams, // Using imported PaginationParams
     ): Promise<PaginatedResponse<ConversationSummary>> {
-      // Using imported PaginatedResponse and ConversationSummary
+      // Build query parameters dynamically
+      const queryParams = new URLSearchParams();
+      if (params.page !== undefined)
+        queryParams.append('page', params.page.toString());
+      if (params.limit !== undefined)
+        queryParams.append('limit', params.limit.toString());
+      if (params.search)
+        queryParams.append('search', params.search); // Add search query
+      if (params.requestType)
+        queryParams.append('requestType', params.requestType); // Add request type filter
+
       return apiFetch(
-        `/api/conversations?page=${params.page}&limit=${params.limit}`,
+        `/api/conversations?${queryParams.toString()}`, // Use constructed query string
         {
-          method: "GET",
+          method: 'GET',
         },
       );
     },
@@ -186,11 +196,18 @@ export const apiService = {
       conversationId: string,
       params: PaginationParams, // Using imported PaginationParams
     ): Promise<PaginatedResponse<ConversationHistoryItem>> {
-      // Using imported PaginatedResponse and ConversationHistoryItem
+      // Build query parameters dynamically for history as well (though currently only page/limit)
+      const queryParams = new URLSearchParams();
+      if (params.page !== undefined)
+        queryParams.append('page', params.page.toString());
+      if (params.limit !== undefined)
+        queryParams.append('limit', params.limit.toString());
+      // If you decide to add search/filters to history later, they would go here.
+
       return apiFetch(
-        `/api/conversations/${conversationId}/history?page=${params.page}&limit=${params.limit}`,
+        `/api/conversations/${conversationId}/history?${queryParams.toString()}`,
         {
-          method: "GET",
+          method: 'GET',
         },
       );
     },
@@ -239,7 +256,7 @@ export const apiService = {
       const res: SendMessageResponse = {
         modelResponse: {
           parts: [{ text: modelContent } as ConversationPart], // Ensure parts adhere to ConversationPart structure
-          role: "model",
+          role: 'model',
           createdAt: new Date().toISOString(), // Timestamp for client-side display
         },
         conversationId: payload.conversationId, // Pass through the conversation ID
@@ -248,3 +265,4 @@ export const apiService = {
     },
   },
 };
+

@@ -28,7 +28,9 @@ import { eslintService } from '@/services/eslintService';
 import { Debouncer } from '@/utils/debouncer';
 import { getParentPath } from '@/utils/fileTree';
 
-const mapSeverity = (severity: ESLintBackendSeverity): CodeMirrorDiagnostic['severity'] => {
+const mapSeverity = (
+  severity: ESLintBackendSeverity,
+): CodeMirrorDiagnostic['severity'] => {
   switch (severity) {
     case 'error':
       return 'error';
@@ -71,7 +73,11 @@ function transformBackendDiagnosticToCodeMirror(
               userEvent: 'lint.fix',
             });
           } catch (e) {
-            console.error('Failed to apply lint fix from backend payload:', e, action.apply);
+            console.error(
+              'Failed to apply lint fix from backend payload:',
+              e,
+              action.apply,
+            );
           }
         },
       }),
@@ -101,17 +107,16 @@ async function lintCodeWithESLintServer(
   signal: AbortSignal,
 ): Promise<CodeMirrorDiagnostic[]> {
   try {
-    const backendDiagnostics: ESLintBackendDiagnostic[] = await eslintService.lintCode(
-      code,
-      filePath,
-      cwd,
-    );
+    const backendDiagnostics: ESLintBackendDiagnostic[] =
+      await eslintService.lintCode(code, filePath, cwd);
 
     const processedDiagnostics: CodeMirrorDiagnostic[] = backendDiagnostics.map(
       transformBackendDiagnosticToCodeMirror,
     );
 
-    console.log(`[ESLint Backend] Received ${processedDiagnostics.length} diagnostics.`);
+    console.log(
+      `[ESLint Backend] Received ${processedDiagnostics.length} diagnostics.`,
+    );
     return processedDiagnostics;
   } catch (error: any) {
     if (signal.aborted) {
@@ -142,7 +147,11 @@ async function lintCodeWithESLintServer(
   }
 }
 
-export const triggerFileLinting = (view: EditorView, code: string, filePath?: string) => {
+export const triggerFileLinting = (
+  view: EditorView,
+  code: string,
+  filePath?: string,
+) => {
   const cwd = editorCurrentDirectory.get();
 
   fileLintDebouncer.debounce(async () => {
@@ -207,6 +216,7 @@ export const triggerDirectoryLinting = (directoryPath: string) => {
           );
         }
       }
+      console.log(transformedDiagnostics, 'transformedDiagnostics');
       directoryLintDiagnostics.set(transformedDiagnostics);
     } catch (error) {
       console.error('ESLint directory linting error:', error);

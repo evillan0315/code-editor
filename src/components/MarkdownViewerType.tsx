@@ -48,8 +48,8 @@ const CopyButton: React.FC<{ text: string }> = ({ text }) => {
   return (
     <Button
       onClick={handleCopy}
-      className='flex items-center gap-1.5 px-2 py-1 hover:text-blue-600 rounded-md transition-colors duration-150'
-      title='Copy code'
+      className="flex items-center gap-1.5 px-2 py-1 hover:text-blue-600 rounded-md transition-colors duration-150"
+      title="Copy code"
     >
       <span>{copied ? <Check size={16} /> : <Copy size={16} />}</span>
       <span>Copy to clipboard</span>
@@ -61,11 +61,11 @@ const PreviewButton: React.FC<{ onClick: () => void }> = ({ onClick }) => {
   return (
     <Button
       onClick={onClick}
-      className='flex items-center gap-1.5 px-2 py-1 hover:text-blue-600 rounded-md transition-colors duration-150'
-      title='Preview React Component'
+      className="flex items-center gap-1.5 px-2 py-1 hover:text-blue-600 rounded-md transition-colors duration-150"
+      title="Preview React Component"
     >
       <PlaySquare size={14} />
-      <span className='sr-only'>Preview React Component</span> {}
+      <span className="sr-only">Preview React Component</span> {}
     </Button>
   );
 };
@@ -111,18 +111,22 @@ const MarkdownViewer: React.FC<MarkdownViewerProps> = ({ markdown }) => {
           console.log('React code to preview:', codeContent);
         };
         return (
-          <div className='relative group markdown-code-wrapper'>
-            <div className='absolute -top-8 inset-x-0 flex items-center justify-between px-4 py-1 bg-dark rounded-t-md border-t border-l border-r text-sm font-light z-10'>
-              <div className='flex'>
+          <div className="relative group markdown-code-wrapper">
+            <div className="absolute -top-8 inset-x-0 flex items-center justify-between px-4 py-1 bg-dark rounded-t-md border-t border-l border-r text-sm font-light z-10">
+              <div className="flex">
                 {displayLanguage} {}
               </div>
               {}
-              <div className='flex items-center gap-1.5'>
+              <div className="flex items-center gap-1.5">
                 {isReactCode && <PreviewButton onClick={handlePreviewClick} />}
                 <CopyButton text={codeContent} />
               </div>
             </div>
-            <MarkdownCodeMirror value={codeContent} language={language} readOnly={true} />
+            <MarkdownCodeMirror
+              value={codeContent}
+              language={language}
+              readOnly={true}
+            />
           </div>
         );
       }

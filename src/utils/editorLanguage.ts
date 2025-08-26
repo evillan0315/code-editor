@@ -1,13 +1,13 @@
-import { javascript } from "@codemirror/lang-javascript";
-import { markdown } from "@codemirror/lang-markdown";
-import { sql } from "@codemirror/lang-sql";
-import { python } from "@codemirror/lang-python";
-import { yaml } from "@codemirror/lang-yaml";
-import { xml } from "@codemirror/lang-xml";
-import { json } from "@codemirror/lang-json";
-import { html } from "@codemirror/lang-html";
-import { css } from "@codemirror/lang-css";
-import { type Extension } from "@codemirror/state";
+import { javascript } from '@codemirror/lang-javascript';
+import { markdown } from '@codemirror/lang-markdown';
+import { sql } from '@codemirror/lang-sql';
+import { python } from '@codemirror/lang-python';
+import { yaml } from '@codemirror/lang-yaml';
+import { xml } from '@codemirror/lang-xml';
+import { json } from '@codemirror/lang-json';
+import { html } from '@codemirror/lang-html';
+import { css } from '@codemirror/lang-css';
+import { type Extension } from '@codemirror/state';
 
 // If you have specific CodeMirror language extensions for these, uncomment and import them:
 // import { go } from "@codemirror/lang-go";
@@ -32,7 +32,7 @@ import { type Extension } from "@codemirror/state";
 export function getLanguageExtensionByLangString(
   languageName?: string,
 ): Extension {
-  if (!languageName || typeof languageName !== "string") {
+  if (!languageName || typeof languageName !== 'string') {
     return []; // No language name provided, return no specific highlighting
   }
 
@@ -41,56 +41,56 @@ export function getLanguageExtensionByLangString(
 
   switch (lowerCaseLanguageName) {
     // JavaScript/TypeScript and related
-    case "javascript":
-    case "js": // Added common extension
-    case "typescript":
-    case "ts": // Added common extension
-    case "jsx":
-    case "tsx":
-    case "cjs": // CommonJS module extension
-    case "mjs": // ES module extension
-    case "ejs": // Embedded JavaScript extension
-    case "prisma": // Prisma schema files often use JS-like syntax highlighting
+    case 'javascript':
+    case 'js': // Added common extension
+    case 'typescript':
+    case 'ts': // Added common extension
+    case 'jsx':
+    case 'tsx':
+    case 'cjs': // CommonJS module extension
+    case 'mjs': // ES module extension
+    case 'ejs': // Embedded JavaScript extension
+    case 'prisma': // Prisma schema files often use JS-like syntax highlighting
       return javascript();
 
     // HTML and related
-    case "html":
-    case "htm": // Common abbreviation
-    case "hbs": // Handlebars extension
-    case "handlebars": // If full name is used
+    case 'html':
+    case 'htm': // Common abbreviation
+    case 'hbs': // Handlebars extension
+    case 'handlebars': // If full name is used
       return html();
     // If you have a dedicated handlebars language extension:
     // return handlebarsLanguage();
 
     // CSS
-    case "css":
+    case 'css':
       return css();
 
     // JSON
-    case "json":
+    case 'json':
       return json();
 
     // Markdown
-    case "markdown":
-    case "md": // Added common extension
+    case 'markdown':
+    case 'md': // Added common extension
       return markdown();
 
     // Python
-    case "python":
-    case "py": // Added common extension
+    case 'python':
+    case 'py': // Added common extension
       return python();
 
     // SQL
-    case "sql":
+    case 'sql':
       return sql();
 
     // YAML
-    case "yaml":
-    case "yml": // Added common extension
+    case 'yaml':
+    case 'yml': // Added common extension
       return yaml();
 
     // XML
-    case "xml":
+    case 'xml':
       return xml();
 
     // Add cases for other languages if you have their CodeMirror extensions imported:
@@ -136,7 +136,7 @@ export function getLanguageExtensionByLangString(
  *                      if no specific extension is found.
  */
 export function getLanguageExtensionByFilename(filePath?: string): Extension {
-  if (!filePath || typeof filePath !== "string") {
+  if (!filePath || typeof filePath !== 'string') {
     return [];
   }
   // console.log(filePath, 'filePath for filename detection'); // Uncomment for debugging
@@ -149,19 +149,19 @@ export function getLanguageExtensionByFilename(filePath?: string): Extension {
   const lowerCaseFileName = fileName.toLowerCase();
   // Handle common files that might not have traditional extensions (e.g., "Dockerfile")
   switch (lowerCaseFileName) {
-    case "dockerfile":
+    case 'dockerfile':
       // If you had `@codemirror/lang-docker`, you'd return it here.
       return [];
-    case "makefile":
+    case 'makefile':
       // If you had `@codemirror/lang-makefile`, you'd return it here.
       return [];
-    case "license":
-    case "readme":
+    case 'license':
+    case 'readme':
       return []; // Often plain text
   }
 
   // Extract the file extension
-  const parts = fileName.split(".");
+  const parts = fileName.split('.');
   const ext = parts.length > 1 ? parts.pop()?.toLowerCase() : undefined;
 
   if (!ext) {
@@ -171,52 +171,52 @@ export function getLanguageExtensionByFilename(filePath?: string): Extension {
   // Map file extensions to CodeMirror language extensions
   switch (ext) {
     // JavaScript/TypeScript and related
-    case "js":
-    case "jsx":
-    case "ts":
-    case "tsx":
-    case "cjs": // CommonJS module
-    case "mjs": // ES module
-    case "ejs": // Embedded JavaScript
-    case "prisma": // Prisma schema files often use JS-like syntax highlighting
+    case 'js':
+    case 'jsx':
+    case 'ts':
+    case 'tsx':
+    case 'cjs': // CommonJS module
+    case 'mjs': // ES module
+    case 'ejs': // Embedded JavaScript
+    case 'prisma': // Prisma schema files often use JS-like syntax highlighting
       return javascript();
 
     // HTML and related
-    case "html":
-    case "htm":
-    case "hbs": // Handlebars, often highlighted as HTML
+    case 'html':
+    case 'htm':
+    case 'hbs': // Handlebars, often highlighted as HTML
       return html();
     // If you have a dedicated handlebars language extension:
     // return handlebarsLanguage();
 
     // CSS
-    case "css":
+    case 'css':
       return css();
 
     // JSON
-    case "json":
+    case 'json':
       return json();
 
     // Markdown
-    case "md":
-    case "markdown":
+    case 'md':
+    case 'markdown':
       return markdown();
 
     // Python
-    case "py":
+    case 'py':
       return python();
 
     // SQL
-    case "sql":
+    case 'sql':
       return sql();
 
     // YAML
-    case "yaml":
-    case "yml":
+    case 'yaml':
+    case 'yml':
       return yaml();
 
     // XML
-    case "xml":
+    case 'xml':
       return xml();
 
     // Add cases for other languages whose extensions you want to support for inference:

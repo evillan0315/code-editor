@@ -1,5 +1,5 @@
 // src/components/Typewriter.tsx
-import React, { useState, useEffect, useRef, memo } from "react";
+import React, { useState, useEffect, useRef, memo } from 'react';
 
 /**
  * Props for the Typewriter component.
@@ -40,7 +40,7 @@ interface TypewriterProps {
  */
 const Typewriter: React.FC<TypewriterProps> = memo(
   ({ text, speed = 50, delay = 0, onComplete, cursor = false, className }) => {
-    const [displayedText, setDisplayedText] = useState<string>("");
+    const [displayedText, setDisplayedText] = useState<string>('');
     const [isTyping, setIsTyping] = useState<boolean>(true);
     const currentIndexRef = useRef<number>(0);
     // Use NodeJS.Timeout for timer types, as they are returned by setInterval/setTimeout
@@ -58,7 +58,7 @@ const Typewriter: React.FC<TypewriterProps> = memo(
         timeoutRef.current = null; // Clear ref after clearing timeout
       }
 
-      setDisplayedText(""); // Reset displayed text for new animation
+      setDisplayedText(''); // Reset displayed text for new animation
       currentIndexRef.current = 0; // Reset typing progress
       setIsTyping(true); // Start as typing
 
@@ -120,5 +120,5 @@ const Typewriter: React.FC<TypewriterProps> = memo(
   },
 );
 
-Typewriter.displayName = "Typewriter";
+Typewriter.displayName = 'Typewriter';
 export default Typewriter;

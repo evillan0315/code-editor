@@ -99,9 +99,7 @@
 .cursor-ns-resize {
   cursor: ns-resize;
 }
-.cm-editor {
-  background-color: var(--color-bg);
-}
+
 .bg-primary {
   background-color: var(--color-primary-bg);
 }

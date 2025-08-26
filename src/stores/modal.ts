@@ -19,7 +19,7 @@ export const modalState = map<{
 // CHANGE THIS LINE: Make the 'value' parameter optional with '?'
 let resolveFn: ((value?: any) => void) | null = null;
 
-export const openModal = <T,>(
+export const openModal = <T>(
   modalType: ModalType,
   msg: string,
   defaultValue: string = '',
@@ -40,7 +40,10 @@ export const confirm = (msg: string): Promise<boolean> => {
   return openModal<boolean>('confirm', msg);
 };
 
-export const prompt = (msg: string, defaultValue = ''): Promise<string | null> => {
+export const prompt = (
+  msg: string,
+  defaultValue = '',
+): Promise<string | null> => {
   return openModal<string | null>('prompt', msg, defaultValue);
 };
 

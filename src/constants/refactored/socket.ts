@@ -26,7 +26,7 @@ export const EVENT_PREFIX = {
   ANALYZE_CODE: 'analyzeCode',
   LINT_CODE: 'lintCode',
   LINT_FILES: 'lintFiles',
-  LINT_DIRECTORY: 'lintDirectory'
+  LINT_DIRECTORY: 'lintDirectory',
 } as const;
 
 export const SOCKET_EVENTS = {

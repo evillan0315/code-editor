@@ -6,7 +6,10 @@ import { useEditorExplorerActions } from '@/hooks/useEditorExplorerActions';
 import EditorFileExplorerNode from '@/components/editor/EditorFileExplorerNode';
 import { Icon } from '@/components/ui/Icon';
 
-import { hideFileExplorerContextMenu, showFileExplorerContextMenu } from '@/stores/contextMenu';
+import {
+  hideFileExplorerContextMenu,
+  showFileExplorerContextMenu,
+} from '@/stores/contextMenu';
 
 import '@/styles/file-manager.css';
 
@@ -28,14 +31,48 @@ const EditorFileExplorer: React.FC<EditorFileExplorerProps> = ({
   // These actions are now typically handled by the parent `FileExplorer` or `FilePickerBrowser`
   // and passed down via props, rather than directly using the hooks here.
   // However, `useEditorExplorerActions` provides the underlying logic that the parent will use.
-  const { handleOpenFile, handleCopyPath, handleDelete, handleRename, handleCreateNewFile, handleCreateNewFolder, handleSelectedPath } = useEditorExplorerActions();
+  const {
+    handleOpenFile,
+    handleCopyPath,
+    handleDelete,
+    handleRename,
+    handleCreateNewFile,
+    handleCreateNewFolder,
+    handleSelectedPath,
+  } = useEditorExplorerActions();
 
-  const OpenIcon = useMemo(() => <Icon icon="ion:open-outline" width="1.5em" height="1.5em" />, []);
-  const RenameIcon = useMemo(() => <Icon icon="mdi:file-edit-outline" width="1.5em" height="1.5em" />, []);
-  const CopyPathIcon = useMemo(() => <Icon icon="mdi:content-copy" width="1.5em" height="1.5em" />, []);
-  const NewFileIcon = useMemo(() => <Icon icon="qlementine-icons:add-file-16" width="1.5em" height="1.5em" />, []);
-  const NewFolderIcon = useMemo(() => <Icon icon="mdi:folder-add-outline" width="1.5em" height="1.5em" />, []);
-  const DeleteIcon = useMemo(() => <Icon icon="streamline:file-delete-alternate" width="1.5em" height="1.5em" />, []);
+  const OpenIcon = useMemo(
+    () => <Icon icon="ion:open-outline" width="1.5em" height="1.5em" />,
+    [],
+  );
+  const RenameIcon = useMemo(
+    () => <Icon icon="mdi:file-edit-outline" width="1.5em" height="1.5em" />,
+    [],
+  );
+  const CopyPathIcon = useMemo(
+    () => <Icon icon="mdi:content-copy" width="1.5em" height="1.5em" />,
+    [],
+  );
+  const NewFileIcon = useMemo(
+    () => (
+      <Icon icon="qlementine-icons:add-file-16" width="1.5em" height="1.5em" />
+    ),
+    [],
+  );
+  const NewFolderIcon = useMemo(
+    () => <Icon icon="mdi:folder-add-outline" width="1.5em" height="1.5em" />,
+    [],
+  );
+  const DeleteIcon = useMemo(
+    () => (
+      <Icon
+        icon="streamline:file-delete-alternate"
+        width="1.5em"
+        height="1.5em"
+      />
+    ),
+    [],
+  );
 
   // This context menu logic remains here because it's specific to how THIS component's nodes are interacted with
   const renderContextMenuItems = useCallback(
@@ -107,7 +144,21 @@ const EditorFileExplorer: React.FC<EditorFileExplorerProps> = ({
 
       return items;
     },
-    [OpenIcon, RenameIcon, CopyPathIcon, NewFileIcon, NewFolderIcon, DeleteIcon, handleOpenFile, handleCopyPath, handleDelete, handleRename, handleCreateNewFile, handleCreateNewFolder, handleSelectedPath],
+    [
+      OpenIcon,
+      RenameIcon,
+      CopyPathIcon,
+      NewFileIcon,
+      NewFolderIcon,
+      DeleteIcon,
+      handleOpenFile,
+      handleCopyPath,
+      handleDelete,
+      handleRename,
+      handleCreateNewFile,
+      handleCreateNewFolder,
+      handleSelectedPath,
+    ],
   );
 
   const handleNodeContextMenu = useCallback(

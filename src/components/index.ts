@@ -1,7 +1,6 @@
 // Re-export UI components
-export * from './ui/Button'
+export * from './ui/Button';
 
 // Re-export Playground components
-export * from './playground/ComponentPreview'
-export * from './playground/CodeBlock'
-
+export * from './playground/ComponentPreview';
+export * from './playground/CodeBlock';

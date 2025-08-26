@@ -1,7 +1,7 @@
 // src/components/ui/IconButtonGroup.tsx
-import React from "react";
-import { Icon } from "@iconify/react";
-import { Button } from "./Button";
+import React from 'react';
+import { Icon } from '@iconify/react';
+import { Button } from './Button';
 
 export interface IconButtonAction {
   id: string;
@@ -12,22 +12,22 @@ export interface IconButtonAction {
   disabled?: boolean;
   hidden?: boolean;
   showLabel?: boolean;
-  iconPosition?: "left" | "right";
+  iconPosition?: 'left' | 'right';
 }
 
-type ButtonSize = "sm" | "md" | "lg" | "xl";
+type ButtonSize = 'sm' | 'md' | 'lg' | 'xl';
 type ButtonVariant =
-  | "primary"
-  | "secondary"
-  | "outline"
-  | "ghost"
-  | "error"
-  | "info"
-  | "success"
-  | "warning";
+  | 'primary'
+  | 'secondary'
+  | 'outline'
+  | 'ghost'
+  | 'error'
+  | 'info'
+  | 'success'
+  | 'warning';
 
-type IconButtonGroupSize = ButtonSize | "icon";
-type IconButtonGroupVariant = ButtonVariant | "ghost";
+type IconButtonGroupSize = ButtonSize | 'icon';
+type IconButtonGroupVariant = ButtonVariant | 'ghost';
 
 interface IconButtonGroupProps {
   actions?: IconButtonAction[] | [] | nulll;
@@ -38,12 +38,12 @@ interface IconButtonGroupProps {
 
 export const IconButtonGroup: React.FC<IconButtonGroupProps> = ({
   actions = [],
-  size = "icon",
-  variant = "ghost",
-  className = "",
+  size = 'icon',
+  variant = 'ghost',
+  className = '',
 }) => {
   // Map "icon" to real size
-  const actualSize: ButtonSize = size === "icon" ? "sm" : size;
+  const actualSize: ButtonSize = size === 'icon' ? 'sm' : size;
 
   // Map "ghost-icon" to actual variant
 
@@ -60,7 +60,7 @@ export const IconButtonGroup: React.FC<IconButtonGroupProps> = ({
             onClick,
             disabled,
             showLabel = false,
-            iconPosition = "left",
+            iconPosition = 'left',
           }) => (
             <Button
               key={id}
@@ -72,13 +72,13 @@ export const IconButtonGroup: React.FC<IconButtonGroupProps> = ({
               title={title || label}
               className="flex items-center gap-1"
             >
-              {showLabel && iconPosition === "left" && (
+              {showLabel && iconPosition === 'left' && (
                 <span className="truncate">{label}</span>
               )}
 
               <Icon icon={icon} className="w-6 h-6" />
 
-              {showLabel && iconPosition === "right" && (
+              {showLabel && iconPosition === 'right' && (
                 <span className="truncate">{label}</span>
               )}
             </Button>

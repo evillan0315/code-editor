@@ -2,19 +2,7 @@
 .cm-editor {
   height: 100%;
   font-family: monospace;
-  font-size: 12px;
-  margin-bottom: 1.4em;
-  background-color: var(--color-pre-bg);
+  background-color: var(--color-bg);
+  overflow-wrap: anywhere;
 }
-.cm-scroller {
-  overflow: auto;
-}
-.cm-content {
-  padding: 1em;
-}
-.cm-editor .cm-activeLine {
-  background-color: var(--color-pre-bg);
-}
-.cm-editor .cm-selectionMatch {
-  background-color: var(--color-resizer-hover);
-}
+

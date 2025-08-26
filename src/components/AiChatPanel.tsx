@@ -29,6 +29,7 @@ import type {
   ChatRequestPayload as ApiChatRequestPayload,
   FileData,
   ModelResponse,
+  RequestType, // Import RequestType from types
 } from '@/types/chat';
 
 import '@/styles/chat.css';
@@ -45,7 +46,9 @@ export function AiChatPanel() {
 
   const { showToast } = useToast();
 
-  const [activeConversationId, setActiveConversationId] = useState<string | null>(null);
+  const [activeConversationId, setActiveConversationId] = useState<
+    string | null
+  >(null);
   const [chatHistory, setChatHistory] = useState<ConversationHistoryItem[]>([]);
   const [newMessage, setNewMessage] = useState('');
   const [isSendingMessage, setIsSendingMessage] = useState(false);
@@ -57,9 +60,13 @@ export function AiChatPanel() {
   const [loadingHistory, setLoadingHistory] = useState(false);
 
   const [conversationListPage, setConversationListPage] = useState(1);
-  const [conversationListTotalPages, setConversationListTotalPages] = useState(1);
+  const [conversationListTotalPages, setConversationListTotalPages] =
+    useState(1);
 
   const [searchQuery, setSearchQuery] = useState<string>('');
+  const [selectedRequestType, setSelectedRequestType] = useState<
+    RequestType | null
+  >(null); // NEW: State for request type filter
 
   const [systemInstructions, setSystemInstructions] = useState<string>(
     PERSONAS[$persona] || SYSTEM_INSTRUCTIONS_REACT_EXPERT,
@@ -86,16 +93,24 @@ export function AiChatPanel() {
     setConversationListPage(page);
   }, []);
 
+  // UPDATED: fetchConversations now accepts search and requestType filters
   const fetchConversations = useCallback(
-    async (pageToFetch: number) => {
+    async (
+      pageToFetch: number,
+      currentSearchQuery: string,
+      currentRequestType: RequestType | null,
+    ) => {
       setLoadingConversations(true);
       try {
-        const response: PaginatedResponse<ConversationSummary> = await apiService.conversation.list(
-          {
-            page: pageToFetch,
-            limit: CONVERSATION_LIST_LIMIT,
-          } as PaginationParams,
-        );
+        const params: PaginationParams = {
+          page: pageToFetch,
+          limit: CONVERSATION_LIST_LIMIT,
+          search: currentSearchQuery, // Pass search query
+          requestType: currentRequestType, // Pass request type filter
+        };
+
+        const response: PaginatedResponse<ConversationSummary> =
+          await apiService.conversation.list(params);
         setConversations(response.data);
         setConversationListPage(pageToFetch);
         setConversationListTotalPages(response.totalPages);
@@ -106,7 +121,6 @@ export function AiChatPanel() {
           'error',
         );
         setConversations([]);
-
         setConversationListPage(1);
         setConversationListTotalPages(1);
       } finally {
@@ -119,29 +133,41 @@ export function AiChatPanel() {
   useEffect(() => {
     if (!showConversationList) return;
 
-    fetchConversations(conversationListPage);
-  }, [showConversationList, conversationListPage, fetchConversations]);
+    // Call fetchConversations with current filters
+    fetchConversations(
+      conversationListPage,
+      searchQuery,
+      selectedRequestType,
+    );
+  }, [
+    showConversationList,
+    conversationListPage,
+    searchQuery, // Add searchQuery to dependencies
+    selectedRequestType, // Add selectedRequestType to dependencies
+    fetchConversations,
+  ]);
 
   const fetchHistory = useCallback(
     async (convId: string) => {
       setLoadingHistory(true);
       try {
-        const response: PaginatedResponse<ModelResponse> = await apiService.conversation.getHistory(
-          convId,
-          {
+        const response: PaginatedResponse<ModelResponse> =
+          await apiService.conversation.getHistory(convId, {
             page: 1,
             limit: CONVERSATION_HISTORY_LIMIT,
-          } as PaginationParams,
-        );
+          } as PaginationParams);
 
         // Convert ModelResponse to ConversationHistoryItem by adding an ID
-        const historyWithIds: ConversationHistoryItem[] = response.data.map((item) => ({
-          ...item,
-          id: uuidv4(), // Assign a unique ID for React keys
-        }));
+        const historyWithIds: ConversationHistoryItem[] = response.data.map(
+          (item) => ({
+            ...item,
+            id: uuidv4(), // Assign a unique ID for React keys
+          }),
+        );
 
         const sortedHistory = historyWithIds.sort(
-          (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
+          (a, b) =>
+            new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
         );
         setChatHistory(sortedHistory);
       } catch (err: any) {
@@ -192,7 +218,10 @@ export function AiChatPanel() {
     const trimmedMessage = newMessage.trim();
 
     if (!trimmedMessage && selectedFiles.length === 0) {
-      showToast('Please enter a message or select at least one file.', 'warning');
+      showToast(
+        'Please enter a message or select at least one file.',
+        'warning',
+      );
       return;
     }
     if (isSendingMessage) return;
@@ -201,10 +230,12 @@ export function AiChatPanel() {
 
     const isNewConversation = !activeConversationId;
 
-    const conversationToUseId = isNewConversation ? uuidv4() : activeConversationId;
+    const conversationToUseId = isNewConversation
+      ? uuidv4()
+      : activeConversationId;
 
     const userMessage: ConversationHistoryItem = {
-      id: uuidv4() /* ADDED: Generate ID for user message */,
+      id: uuidv4(),
       role: 'user',
       parts: [],
       createdAt: new Date().toISOString(),
@@ -242,31 +273,33 @@ export function AiChatPanel() {
       const payload: ApiChatRequestPayload = {
         conversationId: conversationToUseId as string,
         prompt: trimmedMessage,
-
         systemInstruction: isNewConversation
           ? systemInstructions || SYSTEM_INSTRUCTIONS_REACT_EXPERT
           : undefined,
+        // The `requestType` for the user message is typically determined by the content
+        // e.g., TEXT_ONLY, TEXT_WITH_IMAGE. The backend determines this.
       };
 
       if (filesDataPayload.length > 0) {
         payload.filesData = filesDataPayload;
       }
 
-      const response: SendMessageResponse = await apiService.conversation.sendMessage(payload);
+      const response: SendMessageResponse =
+        await apiService.conversation.sendMessage(payload);
 
       if (isNewConversation && response.conversationId) {
         setActiveConversationId(response.conversationId);
         aiConversationIdStore.set(response.conversationId);
 
+        // Reset page and re-fetch conversations to include the new one, with current filters
         setConversationListPage(1);
-        await fetchConversations(1);
+        await fetchConversations(1, searchQuery, selectedRequestType);
       }
 
       if (response.modelResponse) {
-        // Clone the modelResponse and add a unique ID to make it a ConversationHistoryItem
         const modelHistoryItem: ConversationHistoryItem = {
           ...response.modelResponse,
-          id: uuidv4() /* ADDED: Generate ID for model message */,
+          id: uuidv4(),
         };
         setChatHistory((prev) => [...prev, modelHistoryItem]);
       } else {
@@ -274,7 +307,10 @@ export function AiChatPanel() {
       }
     } catch (err: any) {
       console.error('Error sending message:', err);
-      showToast(`Error sending message: ${err.message || 'Failed to send message.'}`, 'error');
+      showToast(
+        `Error sending message: ${err.message || 'Failed to send message.'}`,
+        'error',
+      );
 
       setChatHistory((prev) => prev.filter((msg) => msg !== userMessage));
 
@@ -292,6 +328,8 @@ export function AiChatPanel() {
     showToast,
     fetchConversations,
     systemInstructions,
+    searchQuery, // Add searchQuery dependency
+    selectedRequestType, // Add selectedRequestType dependency
   ]);
 
   const handleNewChat = useCallback(async () => {
@@ -304,37 +342,41 @@ export function AiChatPanel() {
     if (fileInputRef.current) fileInputRef.current.value = '';
     textareaRef.current?.focus();
 
-    const currentSystemInstructions = PERSONAS[$persona] || SYSTEM_INSTRUCTIONS_REACT_EXPERT;
+    const currentSystemInstructions =
+      PERSONAS[$persona] || SYSTEM_INSTRUCTIONS_REACT_EXPERT;
     setSystemInstructions(currentSystemInstructions);
 
+    // Generate a new temporary ID for the new conversation
     const newConvoId = uuidv4();
     setActiveConversationId(newConvoId);
     aiConversationIdStore.set(newConvoId);
 
     setIsSendingMessage(true);
     try {
-      const initialPrompt = 'Hello! Please introduce yourself and your capabilities.';
+      const initialPrompt =
+        'Hello! Please introduce yourself and your capabilities.';
 
       const payload: ApiChatRequestPayload = {
         conversationId: newConvoId,
         prompt: initialPrompt,
         systemInstruction: currentSystemInstructions,
+        // The `requestType` for initial prompt will likely be TEXT_ONLY
       };
 
       const response = await apiService.conversation.sendMessage(payload);
 
       if (response.modelResponse) {
-        // Clone the initial modelResponse and add a unique ID
         const initialModelHistoryItem: ConversationHistoryItem = {
           ...response.modelResponse,
-          id: uuidv4() /* ADDED: Generate ID for initial model message */,
+          id: uuidv4(),
         };
         setChatHistory([initialModelHistoryItem]);
       } else {
         console.warn('Initial API response missing modelResponse:', response);
       }
 
-      await fetchConversations(1);
+      // Re-fetch conversations to include the new one, with current filters
+      await fetchConversations(1, searchQuery, selectedRequestType);
     } catch (err: any) {
       console.error('Error sending initial message:', err);
       showToast(
@@ -348,7 +390,13 @@ export function AiChatPanel() {
     } finally {
       setIsSendingMessage(false);
     }
-  }, [$persona, showToast, fetchConversations]);
+  }, [
+    $persona,
+    showToast,
+    fetchConversations,
+    searchQuery, // Add searchQuery dependency
+    selectedRequestType, // Add selectedRequestType dependency
+  ]);
 
   const handleSelectConversation = useCallback((convId: string) => {
     setActiveConversationId(convId);
@@ -390,7 +438,10 @@ export function AiChatPanel() {
           const { base64, mimeType } = await readFileAsDataURL(file);
           newFiles.push({ file, base64, mimeType });
         } catch (error: any) {
-          showToast(`Could not read file '${file.name}': ${error.message}`, 'error');
+          showToast(
+            `Could not read file '${file.name}': ${error.message}`,
+            'error',
+          );
         }
       }
 
@@ -403,7 +454,9 @@ export function AiChatPanel() {
   );
 
   const handleRemoveFile = useCallback((indexToRemove: number) => {
-    setSelectedFiles((prevFiles) => prevFiles.filter((_, index) => index !== indexToRemove));
+    setSelectedFiles((prevFiles) =>
+      prevFiles.filter((_, index) => index !== indexToRemove),
+    );
   }, []);
 
   const handleKeyDown = useCallback(
@@ -433,10 +486,11 @@ export function AiChatPanel() {
     try {
       await apiService.conversation.delete(activeConversationId);
       showToast('Conversation deleted successfully.', 'success');
-      handleNewChat();
+      handleNewChat(); // Start a new chat after deletion
 
+      // Re-fetch conversations list after deletion, with current filters
       setConversationListPage(1);
-      await fetchConversations(1);
+      await fetchConversations(1, searchQuery, selectedRequestType);
     } catch (err: any) {
       console.error('Error deleting conversation:', err);
       showToast(
@@ -444,7 +498,14 @@ export function AiChatPanel() {
         'error',
       );
     }
-  }, [activeConversationId, showToast, handleNewChat, fetchConversations]);
+  }, [
+    activeConversationId,
+    showToast,
+    handleNewChat,
+    fetchConversations,
+    searchQuery, // Add searchQuery dependency
+    selectedRequestType, // Add selectedRequestType dependency
+  ]);
 
   useEffect(() => {
     const storedConvoId = aiConversationIdStore.get();
@@ -455,26 +516,46 @@ export function AiChatPanel() {
       setChatHistory([]);
     }
 
-    setSystemInstructions(PERSONAS[$persona] || SYSTEM_INSTRUCTIONS_REACT_EXPERT);
+    setSystemInstructions(
+      PERSONAS[$persona] || SYSTEM_INSTRUCTIONS_REACT_EXPERT,
+    );
   }, [$persona]);
 
-  const handleSearchChange = useCallback((query: string) => {
-    setSearchQuery(query);
-  }, []);
+  // NEW: Handler for search query change
+  const handleSearchChange = useCallback(
+    (query: string) => {
+      setSearchQuery(query);
+      setConversationListPage(1); // Reset to first page when search query changes
+    },
+    [],
+  );
 
-  const filteredConversations = React.useMemo(() => {
-    if (!searchQuery) {
-      return conversations;
-    }
-    const lowerCaseQuery = searchQuery.toLowerCase();
-    return conversations.filter((conv) =>
-      (conv.firstPrompt || 'Untitled Chat').toLowerCase().includes(lowerCaseQuery),
-    );
-  }, [conversations, searchQuery]);
+  // NEW: Handler for request type filter change
+  const handleRequestTypeFilterChange = useCallback(
+    (type: RequestType | null) => {
+      setSelectedRequestType(type);
+      setConversationListPage(1); // Reset to first page when filter changes
+    },
+    [],
+  );
+
+  // REMOVED: Client-side filtering is no longer needed as the backend will handle it
+  // const filteredConversations = React.useMemo(() => {
+  //   if (!searchQuery) {
+  //     return conversations;
+  //   }
+  //   const lowerCaseQuery = searchQuery.toLowerCase();
+  //   return conversations.filter((conv) =>
+  //     (conv.firstPrompt || 'Untitled Chat')
+  //       .toLowerCase()
+  //       .includes(lowerCaseQuery),
+  //   );
+  // }, [conversations, searchQuery]);
+
   if (!$visible) return null;
 
   return (
-    <aside className='ai-chat-wrapper h-full w-full bg-dark overflow-hidden flex flex-col relative'>
+    <aside className="ai-chat-wrapper h-full w-full bg-dark overflow-hidden flex flex-col relative">
       <ChatHeader
         showConversationList={showConversationList}
         onToggleChatList={() => setShowConversationList(!showConversationList)}
@@ -484,13 +565,12 @@ export function AiChatPanel() {
         isSendingMessage={isSendingMessage}
       />
 
-      {}
-      <div className='flex-1 flex overflow-hidden'>
+      <div className="flex-1 flex overflow-hidden">
         <AnimatePresence>
           {showConversationList && (
             <ConversationListView
-              key='conversation-list-view'
-              conversations={filteredConversations}
+              key="conversation-list-view"
+              conversations={conversations} 
               loadingConversations={loadingConversations}
               onSelectConversation={handleSelectConversation}
               currentPage={conversationListPage}
@@ -498,13 +578,14 @@ export function AiChatPanel() {
               onPageChange={handleConversationPageChange}
               searchQuery={searchQuery}
               onSearchChange={handleSearchChange}
+              selectedRequestType={selectedRequestType} // NEW: Pass selected request type
+              onFilterChange={handleRequestTypeFilterChange} // NEW: Pass filter handler
             />
           )}
         </AnimatePresence>
 
-        {}
         <div
-          className='flex-1 flex flex-col min-w-0'
+          className="flex-1 flex flex-col min-w-0"
           onClick={() => setShowConversationList(false)}
         >
           <ChatMessages
@@ -533,3 +614,4 @@ export function AiChatPanel() {
     </aside>
   );
 }
+

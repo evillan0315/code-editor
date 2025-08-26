@@ -2,11 +2,17 @@ import { useState, type ReactNode } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { apiFetch, configureTokenGetter } from '@/services/apiFetch';
 import { AuthContext } from '@/contexts/AuthContext';
-import { type User, type LoginCredentials, type LoginResponse } from '@/types/auth';
+import {
+  type User,
+  type LoginCredentials,
+  type LoginResponse,
+} from '@/types/auth';
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const queryClient = useQueryClient();
-  const [token, setToken] = useState<string | null>(() => localStorage.getItem('token'));
+  const [token, setToken] = useState<string | null>(() =>
+    localStorage.getItem('token'),
+  );
 
   configureTokenGetter(() => token || localStorage.getItem('token'));
 
@@ -26,13 +32,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   });
 
   const login = async (credentials: LoginCredentials) => {
-    const { accessToken, user: userData } = await apiFetch<LoginResponse, LoginCredentials>(
-      '/api/auth/login',
-      {
-        method: 'POST',
-        body: credentials,
-      },
-    );
+    const { accessToken, user: userData } = await apiFetch<
+      LoginResponse,
+      LoginCredentials
+    >('/api/auth/login', {
+      method: 'POST',
+      body: credentials,
+    });
     setToken(accessToken);
     localStorage.setItem('token', accessToken);
     localStorage.setItem('user', JSON.stringify(userData));

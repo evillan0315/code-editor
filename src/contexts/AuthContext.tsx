@@ -1,9 +1,9 @@
 // src/contexts/AuthContext.ts
 
-import { createContext } from "react";
-import type { User, LoginCredentials } from "@/types/auth";
+import { createContext } from 'react';
+import type { User, LoginCredentials } from '@/types/auth';
 
-import type { QueryObserverResult } from "@tanstack/react-query";
+import type { QueryObserverResult } from '@tanstack/react-query';
 
 export interface AuthContextValue {
   user: User | null;

@@ -46,9 +46,12 @@ export const projectService = {
     if (query.name) params.append('name', query.name);
     if (query.description) params.append('description', query.description);
 
-    return apiFetch<PaginationProjectResultDto>(`${BASE_API_PATH}/paginated?${params.toString()}`, {
-      method: 'GET',
-    });
+    return apiFetch<PaginationProjectResultDto>(
+      `${BASE_API_PATH}/paginated?${params.toString()}`,
+      {
+        method: 'GET',
+      },
+    );
   },
 
   /**

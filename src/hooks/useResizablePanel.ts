@@ -2,7 +2,12 @@ import { useState, useRef, useCallback } from 'react';
 
 type ResizeOrientation = 'horizontal' | 'vertical';
 
-type ResizeAnchor = 'left' | 'right' | 'bottom' | 'bottom-to-top' | 'top-to-bottom';
+type ResizeAnchor =
+  | 'left'
+  | 'right'
+  | 'bottom'
+  | 'bottom-to-top'
+  | 'top-to-bottom';
 
 interface UseResizablePanelOptions {
   localStorageKey: string;
@@ -29,7 +34,11 @@ const getInitialOrStoredDimension = (
   const stored = localStorage.getItem(key);
 
   const currentWindowDimension =
-    typeof window !== 'undefined' ? (isHeight ? window.innerHeight : window.innerWidth) : 0;
+    typeof window !== 'undefined'
+      ? isHeight
+        ? window.innerHeight
+        : window.innerWidth
+      : 0;
 
   if (stored) {
     return Math.max(parseInt(stored, 10), minPx);
@@ -51,7 +60,12 @@ export function useResizablePanel({
   const isHeight = orientation === 'vertical';
 
   const [dimension, setDimension] = useState<number>(() =>
-    getInitialOrStoredDimension(localStorageKey, initialTargetPercentage, minPx, isHeight),
+    getInitialOrStoredDimension(
+      localStorageKey,
+      initialTargetPercentage,
+      minPx,
+      isHeight,
+    ),
   );
 
   const isResizing = useRef(false);
@@ -91,7 +105,9 @@ export function useResizablePanel({
           : window.innerWidth * maxDynamicConstraintPercentage;
       } else if (parentRef?.current) {
         const parentRect = parentRef.current.getBoundingClientRect();
-        const totalParentDimension = isHeight ? parentRect.height : parentRect.width;
+        const totalParentDimension = isHeight
+          ? parentRect.height
+          : parentRect.width;
 
         if (totalParentDimension > 0) {
           maxDimensionConstraint = totalParentDimension - minPx;
@@ -118,8 +134,6 @@ export function useResizablePanel({
       dimension,
     ],
   );
-
-  
 
   const stopResize = useCallback(() => {
     isResizing.current = false;

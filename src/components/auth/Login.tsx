@@ -1,20 +1,21 @@
 // src/components/LoginForm.tsx
 
-import React, { useState, FormEvent, ChangeEvent } from "react";
-import { useNavigate } from "react-router-dom";
-import { useAuth } from "@/hooks/useAuth"; // Ensure this imports your Nanostore-based useAuth hook
-import Loading from "@/components/Loading";
-import SignInWithGoogle from "@/components/SignInWithGoogle";
-import SignInWithGithub from "@/components/SignInWithGithub";
-import { Button } from "@/components/ui/Button";
-import { EDITOR_PATH } from "@/constants/paths"; // Import your dashboard path
+import React, { useState, FormEvent, ChangeEvent } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '@/hooks/useAuth'; // Ensure this imports your Nanostore-based useAuth hook
+import Loading from '@/components/Loading';
+import SignInWithGoogle from '@/components/SignInWithGoogle';
+import SignInWithGithub from '@/components/SignInWithGithub';
+import { Button } from '@/components/ui/Button';
+import  Logo  from '@/components/ui/Logo';
+import { EDITOR_PATH } from '@/constants/paths'; // Import your dashboard path
 
 const LoginForm: React.FC = () => {
   const { login } = useAuth(); // Accessing the login function from your Nanostore auth system
   const navigate = useNavigate();
 
-  const [email, setEmail] = useState<string>("");
-  const [password, setPassword] = useState<string>("");
+  const [email, setEmail] = useState<string>('');
+  const [password, setPassword] = useState<string>('');
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false); // This `loading` is for the form submission itself
 
@@ -33,7 +34,7 @@ const LoginForm: React.FC = () => {
       // Catch any errors during login and display them
       setError(
         (err as Error).message ||
-          "Login failed. Please check your credentials.",
+          'Login failed. Please check your credentials.',
       );
     } finally {
       setLoading(false); // End local form loading indicator
@@ -49,10 +50,11 @@ const LoginForm: React.FC = () => {
       <div className="login-wrapper py-16">
         <div className="flex items-center justify-center">
           <div className="w-full max-w-md rounded-lg p-8 border shadow-lg">
-            <h2 className="text-center text-2xl font-bold">
-              Welcome to ProBoard
-            </h2>
-            <p>Please Sign In below</p>
+            <div className="flex flex-col items-center text-center py-4">
+              <Logo />
+              <p className="text-sm mt-2">Please Sign In below</p>
+            </div>
+            
 
             {error && (
               <p className="text-center text-sm text-red-400">{error}</p>
@@ -93,10 +95,11 @@ const LoginForm: React.FC = () => {
               <Button
                 variant="primary"
                 type="submit"
+                size="lg"
                 disabled={loading} // Disable button while login is in progress
                 className="w-full rounded-md bg-sky-500 p-3 hover:bg-sky-600 focus:outline-none focus:ring-2 focus:ring-sky-400"
               >
-                {loading ? "Signing In..." : "Sign In"}
+                {loading ? 'Signing In...' : 'Sign In'}
               </Button>
             </form>
             {/* Social sign-in components */}

@@ -4,7 +4,12 @@ import type { ToastType, ToastPosition } from '@/types/toast';
 
 export function useToast() {
   const showToast = useCallback(
-    (message: string, type?: ToastType, duration?: number, position?: ToastPosition) => {
+    (
+      message: string,
+      type?: ToastType,
+      duration?: number,
+      position?: ToastPosition,
+    ) => {
       showToastAction(message, type, duration, position);
     },
     [],

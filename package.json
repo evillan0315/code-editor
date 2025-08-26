@@ -33,6 +33,7 @@
     "@codemirror/view": "^6.38.1",
     "@eslint/eslintrc": "^3.3.1",
     "@google/genai": "^1.10.0",
+    "@google/generative-ai": "^0.24.1",
     "@hookform/resolvers": "^5.2.1",
     "@iconify-icon/react": "^3.0.0",
     "@iconify/react": "^6.0.0",

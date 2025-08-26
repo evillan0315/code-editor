@@ -19,7 +19,7 @@
   margin-bottom: 2.4em;
 }
 .markdown-code-wrapper .cm-scroller {
-  background-color: var(--color-bg/0.5);
+
   @apply overflow-auto max-h-[400px];
   @apply border rounded-b-md;
   border-color: var(--color-border);
@@ -235,7 +235,7 @@
   margin-top: 2em;
   margin-bottom: 2em;
   overflow: auto;
-  background-color: var(--color-pre-bg);
+
   @apply shadow-lg;
   @apply space-y-0;
   overflow-wrap: anywhere;

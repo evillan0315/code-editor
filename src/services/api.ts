@@ -24,13 +24,19 @@ export const fetchEndpointsByController = async (
   controllerName: string,
 ): Promise<EndpointInfo[]> => {
   try {
-    const data = await apiFetch<EndpointInfo[]>(`/endpoints/${controllerName}`, {
-      method: 'GET',
-      baseURL: BASE_URL_API,
-    });
+    const data = await apiFetch<EndpointInfo[]>(
+      `/endpoints/${controllerName}`,
+      {
+        method: 'GET',
+        baseURL: BASE_URL_API,
+      },
+    );
     return data;
   } catch (error) {
-    console.error(`Error fetching endpoints for controller ${controllerName}:`, error);
+    console.error(
+      `Error fetching endpoints for controller ${controllerName}:`,
+      error,
+    );
 
     if (error instanceof ApiError && error.status === 404) {
       return [];

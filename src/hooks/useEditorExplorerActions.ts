@@ -11,12 +11,19 @@ export function useEditorExplorerActions() {
 
   const { handleFileSelect, handleCodeMirrorChange } = useEditorFileContent();
 
-  const { handleCreateNewFile, handleCreateNewFolder, handleRename, handleDelete, handleCopyPath } =
-    useFileSystemOperations({
-      handleFileSelect,
-      handleSelectedPath,
-      fetchAndSetFileTree,
-    });
+  const {
+    handleCreateNewFile,
+    handleCreateNewFolder,
+    handleRename,
+    handleDelete,
+    handleCopyPath,
+    handleCopy,
+    handleMove,
+  } = useFileSystemOperations({
+    handleFileSelect,
+    handleSelectedPath,
+    fetchAndSetFileTree,
+  });
 
   const handleOpenFile = handleFileSelect;
   return {
@@ -29,6 +36,8 @@ export function useEditorExplorerActions() {
     handleRename,
     handleDelete,
     handleCopyPath,
+    handleCopy,
+    handleMove,
     handleOpenFile,
     fetchAndSetFileTree,
     handleCodeMirrorChange,

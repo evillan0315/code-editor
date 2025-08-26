@@ -79,7 +79,9 @@ showLeftSidebar.subscribe((value) => writeBool(STORAGE_KEYS.left, value));
 showRightSidebar.subscribe((value) => writeBool(STORAGE_KEYS.right, value));
 showBottomLeft.subscribe((value) => writeBool(STORAGE_KEYS.bottomLeft, value));
 showTerminal.subscribe((value) => writeBool(STORAGE_KEYS.showTerminal, value));
-showBottomRight.subscribe((value) => writeBool(STORAGE_KEYS.bottomRight, value));
+showBottomRight.subscribe((value) =>
+  writeBool(STORAGE_KEYS.bottomRight, value),
+);
 activeTerminal.subscribe((value) => {
   try {
     localStorage.setItem(STORAGE_KEYS.terminal, value);
@@ -122,5 +124,7 @@ export const toggleTerminal = () => {
 };
 
 export const toggleFileExplorerViewMode = () => {
-  fileExplorerViewMode.set(fileExplorerViewMode.get() === 'list' ? 'thumbnail' : 'list');
+  fileExplorerViewMode.set(
+    fileExplorerViewMode.get() === 'list' ? 'thumbnail' : 'list',
+  );
 };

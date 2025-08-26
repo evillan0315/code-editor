@@ -1,67 +1,62 @@
-import React, { useEffect } from "react";
-import type { ButtonHTMLAttributes, ReactNode } from "react";
+import React, { useEffect } from 'react';
+import type { ButtonHTMLAttributes, ReactNode } from 'react';
 
 import {
   resolveVariantClasses,
   resolveSizeClasses,
   resolveStateClasses,
-} from "@/utils/classResolver";
-import { Icon } from "./Icon";
+} from '@/utils/classResolver';
+import { Icon } from './Icon';
 
 export type ButtonVariant =
-  | "primary"
-  | "secondary"
-  | "outline"
-  | "error"
-  | "info"
-  | "warning"
-  | "success"
-  | "ghost";
-
+  | 'primary'
+  | 'secondary'
+  | 'outline'
+  | 'error'
+  | 'info'
+  | 'warning'
+  | 'success'
+  | 'ghost';
 
 type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
-  variant?: ButtonVariants; 
+  variant?: ButtonVariants;
   active?: boolean;
   selected?: boolean;
-  size?: "sm" | "md" | "lg" | "xl";
+  size?: 'sm' | 'md' | 'lg' | 'xl';
   icon?: string | ReactNode;
   loading?: boolean;
-  
 };
 
 export const Button: React.FC<ButtonProps> = ({
-  className = "", 
+  className = '',
   disabled,
   children,
-  
+
   variant,
   active,
   selected,
   size,
   icon,
   loading,
-  "aria-label": ariaLabel,
-  ...rest 
+  'aria-label': ariaLabel,
+  ...rest
 }) => {
   const hasLabel = !!children;
   const isIconOnly = !!icon && !hasLabel;
 
-  
   useEffect(() => {
     if (isIconOnly && !ariaLabel) {
       console.warn(
-        "Accessibility warning: Icon-only button should have an aria-label for screen readers.",
+        'Accessibility warning: Icon-only button should have an aria-label for screen readers.',
       );
     }
   }, [isIconOnly, ariaLabel]);
 
-  
-  const baseClass = isIconOnly ? "btn-icon" : "btn";
+  const baseClass = isIconOnly ? 'btn-icon' : 'btn';
 
-  
   const variantClasses = resolveVariantClasses(variant, isIconOnly);
   const sizeClasses = resolveSizeClasses(size);
-  
+
   const stateClasses = resolveStateClasses({
     active,
     selected,
@@ -69,33 +64,31 @@ export const Button: React.FC<ButtonProps> = ({
     loading,
   });
 
-  
   const allClasses = [
     baseClass,
     variantClasses,
     sizeClasses,
     stateClasses,
-    
-    "flex",
-    "items-center",
-    "gap-1",
-    "transition",
-    
-    loading && "pointer-events-none", 
-    className, 
+
+    'flex',
+    'items-center',
+    'gap-1',
+    'transition',
+
+    loading && 'pointer-events-none',
+    className,
   ]
-    .filter(Boolean) 
-    .join(" "); 
+    .filter(Boolean)
+    .join(' ');
 
   return (
     <button
       className={`text-base focus:ring-2 focus:ring-sky-500 focus:ring-offset-2 focus:outline-none dark:focus:ring-offset-gray-800 ${allClasses}`}
-      disabled={disabled || loading} 
-      aria-label={ariaLabel} 
-      {...rest} 
+      disabled={disabled || loading}
+      aria-label={ariaLabel}
+      {...rest}
     >
       {loading && (
-        
         <Icon
           icon="svg-spinners:180-ring-with-bg"
           className="animate-spin h-4 w-4"
@@ -103,8 +96,7 @@ export const Button: React.FC<ButtonProps> = ({
       )}
       {!loading &&
         icon &&
-        
-        (typeof icon === "string" ? (
+        (typeof icon === 'string' ? (
           <Icon icon={icon} className="inline-block" />
         ) : (
           icon

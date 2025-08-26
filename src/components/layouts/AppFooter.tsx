@@ -1,7 +1,7 @@
 import React, { useCallback, useState } from 'react';
 import { Icon } from '@/components/ui/Icon';
 import Logo from '@/components/ui/Logo';
-import { CodeMirrorStatus } from '@/components/editor/CodeMirrorStatus';
+
 import { useStore } from '@nanostores/react';
 import { recordingAtom } from '@/stores/recording';
 import { Button } from '@/components/ui/Button';
@@ -10,7 +10,11 @@ import { useToast } from '@/hooks/useToast';
 
 export function AppFooter() {
   const { showToast } = useToast();
-  const { isRecording, id: currentRecordingId, lastStoppedRecording } = useStore(recordingAtom);
+  const {
+    isRecording,
+    id: currentRecordingId,
+    lastStoppedRecording,
+  } = useStore(recordingAtom);
 
   const [isCapturing, setIsCapturing] = useState(false);
   const [isStartingRecording, setIsStartingRecording] = useState(false);
@@ -81,7 +85,10 @@ export function AppFooter() {
 
   const handlePlayLastRecording = useCallback(() => {
     if (lastStoppedRecording) {
-      if (lastStoppedRecording.status === 'ready' || lastStoppedRecording.status === 'finished') {
+      if (
+        lastStoppedRecording.status === 'ready' ||
+        lastStoppedRecording.status === 'finished'
+      ) {
         recordingAtom.setKey('mediaToOpen', lastStoppedRecording);
       } else {
         showToast(
@@ -96,77 +103,85 @@ export function AppFooter() {
 
   return (
     <footer
-      className='
+      className="
         flex             
         items-center     
         justify-between
         px-2 py-2        
         border-t         
         text-sm          
-        bg-secondary
-      '
+    
+      "
     >
-      <div className='flex-shrink-0 pr-4 min-w-[20%] '>
-        <div className='flex items-center gap-3'>
-          <Icon icon='vscode-icons:file-type-reactjs' width='1.2em' height='1.2em' />{' '}
+      <div className="flex-shrink-0 pr-4 min-w-[20%] ">
+        <div className="flex items-center gap-3">
+          <Icon
+            icon="vscode-icons:file-type-reactjs"
+            width="1.2em"
+            height="1.2em"
+          />{' '}
           <span>© {new Date().getFullYear()} CODEGen · Smart IDE</span>
         </div>
       </div>
-      <div className='flex-grow text-center mx-4 min-w-[50%-100px]'>
-        <CodeMirrorStatus />
-      </div>
-      <div className='flex-shrink-1 flex items-center justify-between  min-w-[calc(30%)] px-3'>
-        <div className='flex items-center justify-between gap-3 w-full'>
-          <div className='flex items-center gap-2'>
+      <div className="flex-grow text-center mx-4 min-w-[50%-100px]"></div>
+      <div className="flex-shrink-1 flex items-center justify-between  min-w-[calc(30%)] px-3">
+        <div className="flex items-center justify-between gap-3 w-full">
+          <div className="flex items-center gap-2">
             <Button
               onClick={handleCaptureScreen}
-              disabled={isCapturing || isStartingRecording || isStoppingRecording}
+              disabled={
+                isCapturing || isStartingRecording || isStoppingRecording
+              }
               loading={isCapturing}
-              variant='secondary'
-              size='sm'
-              title='Capture Screenshot'
-              className='flex items-center px-2 py-1'
+              variant="secondary"
+              size="sm"
+              title="Capture Screenshot"
+              className="flex items-center px-2 py-1"
             >
-              <Icon icon='mdi:camera-outline' className='mr-1' />
+              <Icon icon="mdi:camera-outline" className="mr-1" />
               Capture
             </Button>
 
             {isRecording ? (
               <Button
                 onClick={handleStopRecording}
-                disabled={isCapturing || isStartingRecording || isStoppingRecording}
+                disabled={
+                  isCapturing || isStartingRecording || isStoppingRecording
+                }
                 loading={isStoppingRecording}
-                variant='error'
-                size='sm'
-                title='Stop Recording'
-                className='flex items-center px-2 py-1'
+                variant="error"
+                size="sm"
+                title="Stop Recording"
+                className="flex items-center px-2 py-1"
               >
-                <Icon icon='mdi:stop' className='mr-1' />
+                <Icon icon="mdi:stop" className="mr-1" />
                 Stop
               </Button>
             ) : (
               <Button
                 onClick={handleStartRecording}
-                disabled={isCapturing || isStartingRecording || isStoppingRecording}
+                disabled={
+                  isCapturing || isStartingRecording || isStoppingRecording
+                }
                 loading={isStartingRecording}
-                variant='success'
-                size='sm'
-                title='Start Recording'
-                className='flex items-center px-2 py-1'
+                variant="success"
+                size="sm"
+                title="Start Recording"
+                className="flex items-center px-2 py-1"
               >
-                <Icon icon='mdi:record' className='mr-1' />
+                <Icon icon="mdi:record" className="mr-1" />
                 Record
               </Button>
             )}
             {lastStoppedRecording && !isRecording && (
               <Button
                 onClick={handlePlayLastRecording}
-                variant='primary'
-                size='sm'
+                variant="primary"
+                size="sm"
                 title={`Play Last Recording: ${lastStoppedRecording.path.split('/').pop()}`}
-                className='flex items-center px-2 py-1'
+                className="flex items-center px-2 py-1"
               >
-                <Icon icon='mdi:play' className='mr-1' />
+                <Icon icon="mdi:play" className="mr-1" />
                 Play Last
               </Button>
             )}

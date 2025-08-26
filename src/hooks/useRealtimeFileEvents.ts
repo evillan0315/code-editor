@@ -11,13 +11,19 @@ import {
   type EditorFileEntry,
 } from '@/stores/editorContent';
 import { useToast } from '@/hooks/useToast';
-import { getParentPath, removeItemFromTree, updateTreeWithNewItem } from '@/utils/fileTree';
+import {
+  getParentPath,
+  removeItemFromTree,
+  updateTreeWithNewItem,
+} from '@/utils/fileTree';
 
 interface RealtimeFileEventsDependencies {
   fetchAndSetFileTree: () => Promise<void>;
 }
 
-export function useRealtimeFileEvents({ fetchAndSetFileTree }: RealtimeFileEventsDependencies) {
+export function useRealtimeFileEvents({
+  fetchAndSetFileTree,
+}: RealtimeFileEventsDependencies) {
   const { showToast } = useToast();
   const latestFsEvent = useStore(fileSystemEvents);
 
@@ -47,11 +53,19 @@ export function useRealtimeFileEvents({ fetchAndSetFileTree }: RealtimeFileEvent
           break;
 
         case 'deleted':
-          const { updatedNodes: nodesAfterDeletion } = removeItemFromTree(currentNodes, event.path);
+          const { updatedNodes: nodesAfterDeletion } = removeItemFromTree(
+            currentNodes,
+            event.path,
+          );
           editorFileTreeNodes.set(nodesAfterDeletion);
-          showToast(`Real-time: '${event.path.split('/').pop()}' deleted.`, 'info');
+          showToast(
+            `Real-time: '${event.path.split('/').pop()}' deleted.`,
+            'info',
+          );
 
-          editorOpenFiles.set(editorOpenFiles.get().filter((p) => !p.startsWith(event.path)));
+          editorOpenFiles.set(
+            editorOpenFiles.get().filter((p) => !p.startsWith(event.path)),
+          );
 
           const editorMapAfterDelete: Record<string, EditorFileEntry> = {};
           for (const [key, value] of Object.entries(editorFilesMap.get())) {
@@ -114,7 +128,9 @@ export function useRealtimeFileEvents({ fetchAndSetFileTree }: RealtimeFileEvent
             if (currentActivePath === event.oldPath) {
               editorActiveFilePath.set(event.newPath);
             } else if (currentActivePath.startsWith(event.oldPath + '/')) {
-              editorActiveFilePath.set(currentActivePath.replace(event.oldPath, event.newPath));
+              editorActiveFilePath.set(
+                currentActivePath.replace(event.oldPath, event.newPath),
+              );
             }
           } else {
             console.warn(
@@ -125,7 +141,10 @@ export function useRealtimeFileEvents({ fetchAndSetFileTree }: RealtimeFileEvent
           break;
 
         case 'modified':
-          showToast(`Real-time: '${event.path.split('/').pop()}' modified.`, 'info');
+          showToast(
+            `Real-time: '${event.path.split('/').pop()}' modified.`,
+            'info',
+          );
 
           break;
 

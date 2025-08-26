@@ -1,6 +1,6 @@
-import React, { useCallback, useState } from "react";
-import { useStore } from "@nanostores/react";
-import { toggleConfigPanel } from "@/stores/ui";
+import React, { useCallback, useState } from 'react';
+import { useStore } from '@nanostores/react';
+import { toggleConfigPanel } from '@/stores/ui';
 
 import {
   toggleLeftSidebar,
@@ -9,17 +9,17 @@ import {
   showLeftSidebar,
   showRightSidebar,
   showTerminal,
-} from "@/stores/layout";
-import { editorActiveFilePath } from "@/stores/editorContent";
-import { Icon } from "@/components/ui/Icon";
-import { Button } from "@/components/ui/Button";
-import { FilePickerBrowser } from "@/components/file-picker/FilePickerBrowser";
-import { truncateFilePath } from "@/utils/pathUtils";
-import Logo from "@/components/ui/Logo";
+} from '@/stores/layout';
+import { editorActiveFilePath } from '@/stores/editorContent';
+import { Icon } from '@/components/ui/Icon';
+import { Button } from '@/components/ui/Button';
+import { FilePickerBrowser } from '@/components/file-picker/FilePickerBrowser';
+import { truncateFilePath } from '@/utils/pathUtils';
+import Logo from '@/components/ui/Logo';
 
-import { useEditorTabs } from "@/hooks/useEditorTabs";
-import ThemeToggleButton from "@/components/ThemeToggleButton";
-import { ProjectModal } from "@/components/projects/ProjectModal"; // Import the new ProjectModal
+import { useEditorTabs } from '@/hooks/useEditorTabs';
+import ThemeToggleButton from '@/components/ThemeToggleButton';
+import { ProjectModal } from '@/components/projects/ProjectModal'; // Import the new ProjectModal
 
 interface AppHeaderProps {
   logo?: React.ReactNode | string;
@@ -66,7 +66,7 @@ export function AppHeader({ logo, childrean }: AppHeaderProps) {
   }, []);
 
   const handlePathSelected = (selectedPath: string) => {
-    console.log("Selected directory path:", selectedPath);
+    console.log('Selected directory path:', selectedPath);
   };
 
   return (
@@ -93,7 +93,7 @@ export function AppHeader({ logo, childrean }: AppHeaderProps) {
               <div className="flex items-center text-sm font-light">
                 <Button
                   variant="secondary"
-                  className={`${showLeftSidebar.get() ? "active" : ""}`}
+                  className={`${showLeftSidebar.get() ? 'active' : ''}`}
                   title="Toggle Left Sidebar"
                   onClick={toggleLeftSidebar}
                 >
@@ -166,7 +166,7 @@ export function AppHeader({ logo, childrean }: AppHeaderProps) {
                 <ThemeToggleButton />
                 <Button
                   variant="secondary"
-                  className={`${showTerminal.get() ? "active" : ""}`}
+                  className={`${showTerminal.get() ? 'active' : ''}`}
                   title="Toggle Terminal"
                   onClick={toggleTerminal}
                 >
@@ -174,7 +174,7 @@ export function AppHeader({ logo, childrean }: AppHeaderProps) {
                 </Button>
                 <Button
                   variant="secondary"
-                  className={`${showRightSidebar.get() ? "active" : ""}`}
+                  className={`${showRightSidebar.get() ? 'active' : ''}`}
                   title="Toggle right sidebar"
                   onClick={toggleRightSidebar}
                 >
@@ -195,7 +195,7 @@ export function AppHeader({ logo, childrean }: AppHeaderProps) {
       <ProjectModal
         isOpen={isProjectModalOpen}
         onClose={handleCloseProjectModal}
-        size='md'
+        size="md"
       />
     </>
   );

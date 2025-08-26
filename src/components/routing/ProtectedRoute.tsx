@@ -1,8 +1,8 @@
 // src/components/routing/ProtectedRoute.tsx
-import React from "react";
-import { Navigate } from "react-router-dom";
-import { useAuth } from "@/hooks/useAuth"; // Your custom auth hook
-import { LOGIN_PATH } from "@/constants/paths"; // Defined login path
+import React from 'react';
+import { Navigate } from 'react-router-dom';
+import { useAuth } from '@/hooks/useAuth'; // Your custom auth hook
+import { LOGIN_PATH } from '@/constants/paths'; // Defined login path
 
 interface ProtectedRouteProps {
   children: React.ReactNode;

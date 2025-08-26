@@ -1,11 +1,11 @@
 // frontend/src/components/ResumeOptimizerForm.tsx
-import React, { useState, useCallback } from "react"; // Import useCallback
-import { apiFetch, ApiError } from "@/services/apiFetch";
-import { v4 as uuidv4 } from "uuid";
-import { Icon } from "@/components/ui/Icon";
-import { Button } from "@/components/ui/Button";
-import { useStore } from "@nanostores/react";
-import { resumeConversationId } from "@/stores/resumeStore";
+import React, { useState, useCallback } from 'react'; // Import useCallback
+import { apiFetch, ApiError } from '@/services/apiFetch';
+import { v4 as uuidv4 } from 'uuid';
+import { Icon } from '@/components/ui/Icon';
+import { Button } from '@/components/ui/Button';
+import { useStore } from '@nanostores/react';
+import { resumeConversationId } from '@/stores/resumeStore';
 
 // --- DTO Interfaces for Frontend ---
 interface OptimizationResultDto {
@@ -47,29 +47,29 @@ const ResumeOptimizerForm: React.FC<ResumeOptimizerFormProps> = () => {
   const [parsingFile, setParsingFile] = useState<boolean>(false); // New state for file parsing
   const [error, setError] = useState<string | null>(null);
   const [currentMode, setCurrentMode] = useState<
-    "optimize" | "generate" | "enhance"
-  >("optimize");
+    'optimize' | 'generate' | 'enhance'
+  >('optimize');
 
   // Optimize Resume States
   const [resumeFile, setResumeFile] = useState<File | null>(null);
-  const [resumeText, setResumeText] = useState<string>("");
-  const [jobDescription, setJobDescription] = useState<string>("");
+  const [resumeText, setResumeText] = useState<string>('');
+  const [jobDescription, setJobDescription] = useState<string>('');
   const [optimizationResult, setOptimizationResult] =
     useState<OptimizationResultDto | null>(null);
 
   // Generate Resume States
-  const [generatePrompt, setGeneratePrompt] = useState<string>("");
+  const [generatePrompt, setGeneratePrompt] = useState<string>('');
   const [generateSystemInstruction, setGenerateSystemInstruction] =
-    useState<string>("");
+    useState<string>('');
   const [generatedResume, setGeneratedResume] = useState<string | null>(null);
 
   // Enhance Resume States
-  const [enhanceResumeContent, setEnhanceResumeContent] = useState<string>("");
+  const [enhanceResumeContent, setEnhanceResumeContent] = useState<string>('');
   const [enhanceSectionToEnhance, setEnhanceSectionToEnhance] =
-    useState<string>("");
-  const [enhanceGoal, setEnhanceGoal] = useState<string>("");
+    useState<string>('');
+  const [enhanceGoal, setEnhanceGoal] = useState<string>('');
   const [enhanceSystemInstruction, setEnhanceSystemInstruction] =
-    useState<string>("");
+    useState<string>('');
   const [enhancedResume, setEnhancedResume] = useState<string | null>(null);
 
   const $resumeConversationId = useStore(resumeConversationId);
@@ -81,18 +81,18 @@ const ResumeOptimizerForm: React.FC<ResumeOptimizerFormProps> = () => {
     setParsingFile(false); // Reset parsing state
     // Optimization states
     setResumeFile(null);
-    setResumeText("");
-    setJobDescription("");
+    setResumeText('');
+    setJobDescription('');
     setOptimizationResult(null);
     // Generation states
-    setGeneratePrompt("");
-    setGenerateSystemInstruction("");
+    setGeneratePrompt('');
+    setGenerateSystemInstruction('');
     setGeneratedResume(null);
     // Enhancement states
-    setEnhanceResumeContent("");
-    setEnhanceSectionToEnhance("");
-    setEnhanceGoal("");
-    setEnhanceSystemInstruction("");
+    setEnhanceResumeContent('');
+    setEnhanceSectionToEnhance('');
+    setEnhanceGoal('');
+    setEnhanceSystemInstruction('');
     setEnhancedResume(null);
   };
 
@@ -102,7 +102,7 @@ const ResumeOptimizerForm: React.FC<ResumeOptimizerFormProps> = () => {
       const selectedFile = e.target.files ? e.target.files[0] : null;
 
       setResumeFile(selectedFile);
-      setResumeText(""); // Clear text area immediately
+      setResumeText(''); // Clear text area immediately
       setError(null); // Clear previous errors
       setOptimizationResult(null); // Clear previous optimization results
 
@@ -113,24 +113,24 @@ const ResumeOptimizerForm: React.FC<ResumeOptimizerFormProps> = () => {
       setParsingFile(true); // Indicate that file parsing is in progress
 
       const formData = new FormData();
-      formData.append("file", selectedFile);
+      formData.append('file', selectedFile);
 
       try {
-        const parsedText = await apiFetch<string>("/api/resume/parse", {
-          method: "POST",
+        const parsedText = await apiFetch<string>('/api/resume/parse', {
+          method: 'POST',
           body: formData,
-          responseType: "text",
+          responseType: 'text',
           isFormData: true,
         });
-        console.log(parsedText, "parsedText");
+        console.log(parsedText, 'parsedText');
         setResumeText(parsedText);
       } catch (err: unknown) {
-        console.error("Error parsing resume file:", err);
-        let errorMessage = "Failed to extract text from file.";
+        console.error('Error parsing resume file:', err);
+        let errorMessage = 'Failed to extract text from file.';
         if (err instanceof ApiError) {
           errorMessage =
             err.details &&
-            typeof err.details === "object" &&
+            typeof err.details === 'object' &&
             (err.details as any).message
               ? (err.details as any).message
               : err.message || `API Error: Status ${err.status}`;
@@ -141,9 +141,9 @@ const ResumeOptimizerForm: React.FC<ResumeOptimizerFormProps> = () => {
         setResumeFile(null); // Clear file state if parsing fails
         // Also clear the file input's value for proper re-selection
         const fileInput = document.getElementById(
-          "optimize-resume-file-upload",
+          'optimize-resume-file-upload',
         ) as HTMLInputElement;
-        if (fileInput) fileInput.value = "";
+        if (fileInput) fileInput.value = '';
       } finally {
         setParsingFile(false); // Parsing finished
       }
@@ -162,14 +162,14 @@ const ResumeOptimizerForm: React.FC<ResumeOptimizerFormProps> = () => {
     // Prioritize resumeText, which will be populated from file parsing or direct paste
     if (!resumeText.trim()) {
       setError(
-        "Resume content is required for optimization (either upload a file or paste text).",
+        'Resume content is required for optimization (either upload a file or paste text).',
       );
       setLoading(false);
       return;
     }
 
     if (!jobDescription.trim()) {
-      setError("Please provide a job description.");
+      setError('Please provide a job description.');
       setLoading(false);
       return;
     }
@@ -181,15 +181,15 @@ const ResumeOptimizerForm: React.FC<ResumeOptimizerFormProps> = () => {
     }
 
     const formData = new FormData();
-    formData.append("jobDescription", jobDescription);
-    formData.append("resumeContent", resumeText.trim()); // Always send resumeText now
+    formData.append('jobDescription', jobDescription);
+    formData.append('resumeContent', resumeText.trim()); // Always send resumeText now
 
-    formData.append("conversationId", resumeConversationIdToUse);
+    formData.append('conversationId', resumeConversationIdToUse);
     try {
       const result = await apiFetch<OptimizationResultDto>(
-        "/api/resume/optimize-from-file",
+        '/api/resume/optimize-from-file',
         {
-          method: "POST",
+          method: 'POST',
           body: formData,
           isFormData: true,
         },
@@ -200,12 +200,12 @@ const ResumeOptimizerForm: React.FC<ResumeOptimizerFormProps> = () => {
         resumeConversationId.set(result.conversationId);
       }
     } catch (err: unknown) {
-      console.error("Error optimizing resume:", err);
+      console.error('Error optimizing resume:', err);
       if (err instanceof ApiError) {
         let errorMessage = err.message || `API Error: Status ${err.status}`;
         if (
           err.details &&
-          typeof err.details === "object" &&
+          typeof err.details === 'object' &&
           (err.details as any).message
         ) {
           errorMessage = (err.details as any).message;
@@ -214,7 +214,7 @@ const ResumeOptimizerForm: React.FC<ResumeOptimizerFormProps> = () => {
       } else if (err instanceof Error) {
         setError(err.message);
       } else {
-        setError("An unexpected error occurred during optimization.");
+        setError('An unexpected error occurred during optimization.');
       }
     } finally {
       setLoading(false);
@@ -254,27 +254,27 @@ const ResumeOptimizerForm: React.FC<ResumeOptimizerFormProps> = () => {
 
       <div className="flex border-b border-gray-700 bg-white dark:bg-gray-800">
         <button
-          className={`py-2 px-4 text-sm font-medium ${currentMode === "optimize" ? "text-blue-400 border-b-2 border-blue-400" : "text-gray-400 hover:text-gray-300"}`}
+          className={`py-2 px-4 text-sm font-medium ${currentMode === 'optimize' ? 'text-blue-400 border-b-2 border-blue-400' : 'text-gray-400 hover:text-gray-300'}`}
           onClick={() => {
-            setCurrentMode("optimize");
+            setCurrentMode('optimize');
             resetFormStates();
           }}
         >
           Optimize Resume
         </button>
         <button
-          className={`py-2 px-4 text-sm font-medium ${currentMode === "generate" ? "text-blue-400 border-b-2 border-blue-400" : "text-gray-400 hover:text-gray-300"}`}
+          className={`py-2 px-4 text-sm font-medium ${currentMode === 'generate' ? 'text-blue-400 border-b-2 border-blue-400' : 'text-gray-400 hover:text-gray-300'}`}
           onClick={() => {
-            setCurrentMode("generate");
+            setCurrentMode('generate');
             resetFormStates();
           }}
         >
           Generate Resume
         </button>
         <button
-          className={`py-2 px-4 text-sm font-medium ${currentMode === "enhance" ? "text-blue-400 border-b-2 border-blue-400" : "text-gray-400 hover:text-gray-300"}`}
+          className={`py-2 px-4 text-sm font-medium ${currentMode === 'enhance' ? 'text-blue-400 border-b-2 border-blue-400' : 'text-gray-400 hover:text-gray-300'}`}
           onClick={() => {
-            setCurrentMode("enhance");
+            setCurrentMode('enhance');
             resetFormStates();
           }}
         >
@@ -285,21 +285,21 @@ const ResumeOptimizerForm: React.FC<ResumeOptimizerFormProps> = () => {
       <div className="overflow-auto scroll-smooth flex-1 p-4">
         {(error || parsingFile) && (
           <p
-            className={`text-sm mb-4 p-3 rounded-md ${error ? "text-red-400 bg-red-900/20 border border-red-700" : "text-blue-400 bg-blue-900/20 border border-blue-700"}`}
+            className={`text-sm mb-4 p-3 rounded-md ${error ? 'text-red-400 bg-red-900/20 border border-red-700' : 'text-blue-400 bg-blue-900/20 border border-blue-700'}`}
           >
-            {parsingFile ? "Parsing resume file, please wait..." : error}
+            {parsingFile ? 'Parsing resume file, please wait...' : error}
           </p>
         )}
         {$resumeConversationId && (
           <p className="text-gray-400 text-sm mb-4">
-            Current Session ID:{" "}
+            Current Session ID:{' '}
             <span className="font-mono text-xs dark:bg-gray-800 p-1 rounded break-all">
               {$resumeConversationId}
             </span>
           </p>
         )}
 
-        {currentMode === "optimize" && (
+        {currentMode === 'optimize' && (
           <form
             onSubmit={handleOptimizeSubmit}
             className="max-w-3xl mx-auto border border-gray-700 shadow-md bg-secondary py-4 px-4 font-mono rounded-md"
@@ -355,11 +355,11 @@ const ResumeOptimizerForm: React.FC<ResumeOptimizerFormProps> = () => {
                     type="button"
                     onClick={() => {
                       setResumeFile(null);
-                      setResumeText(""); // Also clear text area
+                      setResumeText(''); // Also clear text area
                       const fileInput = document.getElementById(
-                        "optimize-resume-file-upload",
+                        'optimize-resume-file-upload',
                       ) as HTMLInputElement;
-                      if (fileInput) fileInput.value = "";
+                      if (fileInput) fileInput.value = '';
                     }}
                     variant="secondary"
                     size="sm"
@@ -399,10 +399,10 @@ const ResumeOptimizerForm: React.FC<ResumeOptimizerFormProps> = () => {
               className="w-full"
             >
               {loading
-                ? "Optimizing..."
+                ? 'Optimizing...'
                 : parsingFile
-                  ? "Parsing File..."
-                  : "Get Optimization Suggestions"}
+                  ? 'Parsing File...'
+                  : 'Get Optimization Suggestions'}
             </Button>
 
             {optimizationResult && (
@@ -411,13 +411,13 @@ const ResumeOptimizerForm: React.FC<ResumeOptimizerFormProps> = () => {
                   Optimization Results:
                 </h3>
                 <p className="text-gray-200 text-base mb-2">
-                  <strong>Optimization Score:</strong>{" "}
+                  <strong>Optimization Score:</strong>{' '}
                   <span className="font-semibold text-blue-400">
                     {optimizationResult.optimizationScore}%
                   </span>
                 </p>
                 <p className="text-gray-200 text-base mb-4">
-                  <strong>Tailored Summary:</strong>{" "}
+                  <strong>Tailored Summary:</strong>{' '}
                   {optimizationResult.tailoredSummary}
                 </p>
 
@@ -428,7 +428,7 @@ const ResumeOptimizerForm: React.FC<ResumeOptimizerFormProps> = () => {
                   <ul className="list-disc ml-5 space-y-2 text-gray-200 text-base">
                     {optimizationResult.suggestions.map((sug, index) => (
                       <li key={index}>
-                        <strong className="font-medium">{sug.type}:</strong>{" "}
+                        <strong className="font-medium">{sug.type}:</strong>{' '}
                         {sug.recommendation}
                         {sug.details && sug.details.length > 0 && (
                           <div className="bg-dark p-4 rounded-md overflow-x-auto text-sm font-mono mt-2 ">
@@ -466,7 +466,7 @@ const ResumeOptimizerForm: React.FC<ResumeOptimizerFormProps> = () => {
           </form>
         )}
 
-        {currentMode === "generate" && (
+        {currentMode === 'generate' && (
           <form
             onSubmit={handleGenerateSubmit}
             className="max-w-3xl mx-auto border border-gray-700 shadow-md bg-secondary py-4 px-4 font-mono rounded-md"
@@ -522,7 +522,7 @@ const ResumeOptimizerForm: React.FC<ResumeOptimizerFormProps> = () => {
               size="lg"
               className="w-full"
             >
-              {loading ? "Generating..." : "Generate Resume"}
+              {loading ? 'Generating...' : 'Generate Resume'}
             </Button>
 
             {generatedResume && (
@@ -538,7 +538,7 @@ const ResumeOptimizerForm: React.FC<ResumeOptimizerFormProps> = () => {
           </form>
         )}
 
-        {currentMode === "enhance" && (
+        {currentMode === 'enhance' && (
           <form
             onSubmit={handleEnhanceSubmit}
             className="max-w-3xl mx-auto border border-gray-700 shadow-md bg-secondary py-4 px-4 font-mono rounded-md"
@@ -636,7 +636,7 @@ const ResumeOptimizerForm: React.FC<ResumeOptimizerFormProps> = () => {
               size="lg"
               className="w-full"
             >
-              {loading ? "Enhancing..." : "Enhance Resume"}
+              {loading ? 'Enhancing...' : 'Enhance Resume'}
             </Button>
 
             {enhancedResume && (

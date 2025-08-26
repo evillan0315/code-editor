@@ -1,10 +1,10 @@
- // src/components/editor/EditorFileExplorer.tsx
 import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import { useStore } from '@nanostores/react';
 import { isLoading } from '@/stores/ui';
 import {
   editorActiveFilePath,
   editorFileTreeNodes,
+  editorCurrentDirectory,
 } from '@/stores/editorContent';
 import { type FileItem, type ContextMenuItem } from '@/types/file-system';
 import { useEditorExplorerActions } from '@/hooks/useEditorExplorerActions';
@@ -13,17 +13,18 @@ import EditorExplorerNode from '@/components/editor/EditorExplorerNode';
 import EditorExplorerHeader from '@/components/editor/EditorExplorerHeader';
 import { Icon } from '@/components/ui/Icon';
 
-import { FileExplorerContextMenuRenderer } from '@/components/editor/FileExplorerContextMenuRenderer';
 import {
   fileExplorerContextMenu,
   hideFileExplorerContextMenu,
   showFileExplorerContextMenu,
 } from '@/stores/contextMenu';
+import { FileExplorerContextMenuRenderer } from '@/components/editor/FileExplorerContextMenuRenderer';
+import { showTerminal, activeTerminal } from '@/stores/layout'; // Import terminal stores
 
 import '@/styles/file-manager.css';
 
 const EditorExplorer: React.FC = () => {
-  //const openFiles = useStore(editorOpenFiles);
+  const editorCurrentDir = useStore(editorCurrentDirectory);
   //const filesMap = useStore(editorFilesMap);
   const activeFilePath = useStore(editorActiveFilePath);
   const fileTreeValue = useStore(editorFileTreeNodes);
@@ -39,6 +40,8 @@ const EditorExplorer: React.FC = () => {
     handleRename,
     handleDelete,
     handleCopyPath,
+    handleCopy,
+    handleMove,
     handleOpenFile,
     fetchAndSetFileTree,
     handleSelectedPath,
@@ -68,11 +71,20 @@ const EditorExplorer: React.FC = () => {
     () => <Icon icon="streamline:file-delete-alternate" width="1.5em" height="1.5em" />,
     [],
   );
+  const CopyIcon = useMemo(() => <Icon icon="mdi:content-copy" width="1.5em" height="1.5em" />, []);
+  const MoveIcon = useMemo(
+    () => <Icon icon="mdi:file-move-outline" width="1.5em" height="1.5em" />,
+    [],
+  );
+  const OpenTerminalIcon = useMemo(
+    () => <Icon icon="mdi:console" width="1.5em" height="1.5em" />,
+    [],
+  );
 
   useEffect(() => {
     fetchAndSetFileTree();
   }, [fetchAndSetFileTree]);
- /*
+  /*
   const fileItems: FileItem[] = useMemo(() => {
     return openFiles
       .filter((path) => path in filesMap)
@@ -126,15 +138,7 @@ const EditorExplorer: React.FC = () => {
             hideFileExplorerContextMenu();
           },
         },
-        {
-          icon: DeleteIcon,
-          label: `Delete ${isFile ? 'File' : 'Folder'}`,
-          className: 'text-red-500 hover:bg-red-900/50',
-          action: (file) => {
-            handleDelete?.(file.path);
-            hideFileExplorerContextMenu();
-          },
-        },
+        { type: 'divider' },
         {
           icon: RenameIcon,
           label: 'Rename',
@@ -143,6 +147,33 @@ const EditorExplorer: React.FC = () => {
             hideFileExplorerContextMenu();
           },
         },
+        {
+          icon: CopyIcon,
+          label: `Copy ${isFile ? 'File' : 'Folder'}`,
+          action: (file) => {
+            handleCopy?.(file.path);
+            hideFileExplorerContextMenu();
+          },
+        },
+        {
+          icon: MoveIcon,
+          label: `Move ${isFile ? 'File' : 'Folder'}`,
+          action: (file) => {
+            handleMove?.(file.path);
+            hideFileExplorerContextMenu();
+          },
+        },
+        { type: 'divider' },
+        {
+          icon: DeleteIcon,
+          label: `Delete ${isFile ? 'File' : 'Folder'}`, // Keep Delete option
+          className: 'text-red-500 hover:bg-red-900/50',
+          action: (file) => {
+            handleDelete?.(file.path);
+            hideFileExplorerContextMenu();
+          },
+        },
+
         ...(!isFile
           ? [
               { type: 'divider' },
@@ -162,6 +193,17 @@ const EditorExplorer: React.FC = () => {
                   hideFileExplorerContextMenu();
                 },
               },
+              { type: 'divider' }, // Add divider before terminal options
+              {
+                icon: OpenTerminalIcon,
+                label: 'Open Terminal Here',
+                action: (file) => {
+                  showTerminal.set(true); // Open the terminal panel
+                  activeTerminal.set('local'); // Ensure local terminal is active
+                  editorCurrentDirectory.set(file.path); // Set terminal CWD to folder path
+                  hideFileExplorerContextMenu();
+                },
+              },
             ]
           : []),
       ];
@@ -175,13 +217,18 @@ const EditorExplorer: React.FC = () => {
       NewFileIcon,
       NewFolderIcon,
       DeleteIcon,
+      CopyIcon,
+      MoveIcon,
+      OpenTerminalIcon, // Add OpenTerminalIcon to dependency array
       handleOpenFile,
       handleCopyPath,
       handleDelete,
       handleRename,
+      handleCopy,
+      handleMove,
       handleCreateNewFile,
       handleCreateNewFolder,
-      handleSelectedPath
+      handleSelectedPath,
     ],
   );
 
@@ -231,6 +278,7 @@ const EditorExplorer: React.FC = () => {
         setSearch={setSearch}
         showSearch={showSearch}
         setShowSearch={setShowSearch}
+        onPathSelect={handleSelectedPath}
       />
       <div className="flex items-center px-1 gap-4 mt-2 h-4">
         {loading && <LoadingDots color="text-sky-500" />}

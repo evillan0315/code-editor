@@ -1,6 +1,6 @@
-import type { ITheme } from "@xterm/xterm";
+import type { ITheme } from '@xterm/xterm';
 
-export type Theme = "light" | "dark";
+export type Theme = 'light' | 'dark';
 
 export interface XtermTheme extends ITheme {
   background: string;

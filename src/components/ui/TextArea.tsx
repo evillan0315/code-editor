@@ -1,6 +1,6 @@
 // src/components/ui/textarea.tsx
-import * as React from "react";
-import { cn } from "@/utils/classNames"; // Assuming you have a utility for conditionally joining class names
+import * as React from 'react';
+import { cn } from '@/utils/classNames'; // Assuming you have a utility for conditionally joining class names
 
 export interface TextareaProps
   extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
@@ -19,7 +19,7 @@ const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
     // Auto-resizing logic
     React.useEffect(() => {
       if (textAreaRef.current) {
-        textAreaRef.current.style.height = "auto"; // Reset height
+        textAreaRef.current.style.height = 'auto'; // Reset height
         let newHeight = textAreaRef.current.scrollHeight;
 
         // Apply maxRows if provided
@@ -33,7 +33,7 @@ const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
 
         textAreaRef.current.style.height = `${newHeight}px`;
       }
-    }, [value, maxRows]); // Re-run when value or maxRows changes
+    }, [value, maxRows, textAreaRef]); // Re-run when value or maxRows changes
 
     const handleChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
       if (onChange) {
@@ -45,8 +45,8 @@ const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
     return (
       <textarea
         className={cn(
-          "flex w-full rounded-md p-4 bg-background text-md placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-ring focus-visible:ring-offset-0 disabled:cursor-not-allowed disabled:opacity-50",
-          "min-h-[100px] resize ", // Enforce min-height, disable manual resize, hide scrollbar initially
+          'flex w-full rounded-md p-4 bg-background text-md placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-ring focus-visible:ring-offset-0 disabled:cursor-not-allowed disabled:opacity-50',
+          'min-h-[100px] resize ', // Enforce min-height, disable manual resize, hide scrollbar initially
           className,
         )}
         value={value}
@@ -57,6 +57,6 @@ const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
     );
   },
 );
-Textarea.displayName = "Textarea";
+Textarea.displayName = 'Textarea';
 
 export { Textarea };

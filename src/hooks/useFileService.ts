@@ -19,7 +19,9 @@ interface UseFileServiceOptions {
   isMockMode?: boolean;
 }
 
-export function useFileServiceInstance(options?: UseFileServiceOptions): IFileService {
+export function useFileServiceInstance(
+  options?: UseFileServiceOptions,
+): IFileService {
   const { isMockMode = false } = options || {};
   const fileServiceRef = useRef<IFileService | null>(null);
 
@@ -48,7 +50,10 @@ export function useFileServiceInstance(options?: UseFileServiceOptions): IFileSe
   return fileServiceRef.current;
 }
 
-export function useReadFile(fileServiceInstance: IFileService, filePath: string) {
+export function useReadFile(
+  fileServiceInstance: IFileService,
+  filePath: string,
+) {
   return useQuery<FileReadResponse, Error>({
     queryKey: ['file', filePath],
     queryFn: () => fileServiceInstance.loadFile(filePath),

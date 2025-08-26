@@ -16,7 +16,11 @@ export const eslintService = {
    * @param cwd Optional current working directory.
    * @returns A promise resolving to an array of Diagnostic objects.
    */
-  async lintCode(code: string, filePath?: string, cwd?: string): Promise<Diagnostic[]> {
+  async lintCode(
+    code: string,
+    filePath?: string,
+    cwd?: string,
+  ): Promise<Diagnostic[]> {
     return apiFetch<Diagnostic[]>(API_ENDPOINTS._ESLINT.LINT_CODE, {
       method: 'POST',
       body: { code, filePath, cwd: VITE_BASE_DIR },
@@ -30,12 +34,18 @@ export const eslintService = {
    * @param cwd Optional current working directory.
    * @returns A promise resolving to a record mapping file paths to their diagnostics.
    */
-  async lintFiles(files: LintFile[], cwd?: string): Promise<Record<string, Diagnostic[]>> {
-    return apiFetch<Record<string, Diagnostic[]>>(API_ENDPOINTS._ESLINT.LINT_FILES, {
-      method: 'POST',
-      body: { files, cwd: VITE_BASE_DIR },
-      event: EVENT_PREFIX.LINT_FILES,
-    });
+  async lintFiles(
+    files: LintFile[],
+    cwd?: string,
+  ): Promise<Record<string, Diagnostic[]>> {
+    return apiFetch<Record<string, Diagnostic[]>>(
+      API_ENDPOINTS._ESLINT.LINT_FILES,
+      {
+        method: 'POST',
+        body: { files, cwd: VITE_BASE_DIR },
+        event: EVENT_PREFIX.LINT_FILES,
+      },
+    );
   },
 
   /**
@@ -44,11 +54,17 @@ export const eslintService = {
    * @param cwd Optional current working directory.
    * @returns A promise resolving to a record mapping file paths to their diagnostics.
    */
-  async lintDirectory(directoryPath: string, cwd?: string): Promise<Record<string, Diagnostic[]>> {
-    return apiFetch<Record<string, Diagnostic[]>>(API_ENDPOINTS._ESLINT.LINT_DIRECTORY, {
-      method: 'POST',
-      body: { directoryPath, cwd: VITE_BASE_DIR },
-      event: EVENT_PREFIX.LINT_DIRECTORY,
-    });
+  async lintDirectory(
+    directoryPath: string,
+    cwd?: string,
+  ): Promise<Record<string, Diagnostic[]>> {
+    return apiFetch<Record<string, Diagnostic[]>>(
+      API_ENDPOINTS._ESLINT.LINT_DIRECTORY,
+      {
+        method: 'POST',
+        body: { directoryPath, cwd: VITE_BASE_DIR },
+        event: EVENT_PREFIX.LINT_DIRECTORY,
+      },
+    );
   },
 };

@@ -1,17 +1,18 @@
 // src/components/SignInWithGoogle.tsx
 
-import React, { useState, useEffect } from "react";
-import { Icon } from "@iconify-icon/react"; // Changed to React version
-import { Button } from "@/components/ui/Button"; // Assuming this is a React component
-import { useAuth } from "@/hooks/useAuth"; // Assuming you want to integrate with your AuthContext on success
-import { useNavigate } from "react-router-dom"; // For navigation after success
+import React, { useState, useEffect } from 'react';
+import { Icon } from '@iconify-icon/react'; // Changed to React version
+import { Button } from '@/components/ui/Button'; // Assuming this is a React component
+import { useAuth } from '@/hooks/useAuth'; // Assuming you want to integrate with your AuthContext on success
+import { useNavigate } from 'react-router-dom'; // For navigation after success
 
 // Environment variable setup (adjust based on your build tool, e.g., Vite or Create React App)
 // If using Vite:
 const GOOGLE_AUTH_URL = import.meta.env.VITE_GOOGLE_CALLBACK_URL; // Renamed for clarity and common Vite pattern
 // If using Create React App:
 // const GOOGLE_AUTH_URL = process.env.REACT_APP_GOOGLE_CALLBACK_URL;
-
+const GOOGLE_AUTH_INIT_URL = '/api/auth/google'; // Backend endpoint to initiate Google OAuth
+const GITHUB_AUTH_INIT_URL = '/api/auth/github'; // Backend endpoint to initiate GitHub OAuth
 /**
  * Represents the payload returned after a successful sign-in with Google.
  * This structure assumes your backend redirects with these parameters.
@@ -61,7 +62,7 @@ const SignInWithGoogle: React.FC<SignInWithGoogleProps> = ({
   const navigate = useNavigate(); // To navigate after successful login
 
   // State to hold the URL to initiate the Google OAuth flow on the backend.
-  const [loginUrl, setLoginUrl] = useState<string>("");
+  const [loginUrl, setLoginUrl] = useState<string>('');
 
   useEffect(() => {
     // Set the login URL when the component mounts.
@@ -69,7 +70,7 @@ const SignInWithGoogle: React.FC<SignInWithGoogleProps> = ({
       setLoginUrl(GOOGLE_AUTH_URL);
     } else {
       console.warn(
-        "VITE_GOOGLE_CALLBACK_URL (or equivalent) is not configured. Google login will not work.",
+        'VITE_GOOGLE_CALLBACK_URL (or equivalent) is not configured. Google login will not work.',
       );
     }
 
@@ -77,18 +78,18 @@ const SignInWithGoogle: React.FC<SignInWithGoogleProps> = ({
     // It runs only once when the component mounts to check for URL parameters.
     const handleGoogleCallback = async () => {
       const params = new URLSearchParams(window.location.search);
-      const token = params.get("accessToken"); // Assuming your backend sends 'accessToken'
-      const userId = params.get("userId");
-      const userEmail = params.get("userEmail");
-      const userName = params.get("userName");
-      const userRole = params.get("userRole");
-      const userImage = params.get("userImage");
-      const errorParam = params.get("error");
-      const errorDescription = params.get("error_description");
+      const token = params.get('accessToken'); // Assuming your backend sends 'accessToken'
+      const userId = params.get('userId');
+      const userEmail = params.get('userEmail');
+      const userName = params.get('userName');
+      const userRole = params.get('userRole');
+      const userImage = params.get('userImage');
+      const errorParam = params.get('error');
+      const errorDescription = params.get('error_description');
 
       // Check if we have successful login parameters
       if (token && userId && userEmail) {
-        const user: SignInSuccessCallbackPayload["user"] = {
+        const user: SignInSuccessCallbackPayload['user'] = {
           id: userId,
           email: userEmail,
           name: userName || undefined,
@@ -101,8 +102,8 @@ const SignInWithGoogle: React.FC<SignInWithGoogleProps> = ({
         };
 
         // Save to localStorage
-        localStorage.setItem("token", token);
-        localStorage.setItem("user", JSON.stringify(user));
+        localStorage.setItem('token', token);
+        localStorage.setItem('user', JSON.stringify(user));
 
         // Call the provided success callback if it exists
         onLoginSuccess?.(payload);
@@ -122,7 +123,7 @@ const SignInWithGoogle: React.FC<SignInWithGoogleProps> = ({
         // Optionally navigate away after successful login if this component
         // is not on the dashboard page itself.
         // If this component is *only* on the login page and you want to go to dashboard, uncomment:
-        navigate("/dashboard");
+        navigate('/dashboard');
 
         // Note: The original SolidJS code did window.location.reload().
         // In React SPAs, it's generally preferred to update state and navigate
@@ -131,7 +132,7 @@ const SignInWithGoogle: React.FC<SignInWithGoogleProps> = ({
         // window.location.reload();
       } else if (errorParam) {
         // Handle error callback parameters
-        const errorMessage = errorDescription || "Google login failed.";
+        const errorMessage = errorDescription || 'Google login failed.';
         onLoginError?.(new Error(errorMessage));
         window.history.replaceState(
           {},
@@ -149,19 +150,23 @@ const SignInWithGoogle: React.FC<SignInWithGoogleProps> = ({
    * Initiates the Google login flow by redirecting the user to the backend's authentication URL.
    */
   const initiateLogin = () => {
+    const cliPort = window.location.port;
+    
     if (loginUrl) {
-      window.location.href = loginUrl;
+      const finalUrl = cliPort ? `${GOOGLE_AUTH_INIT_URL}?cli_port=${cliPort}` : loginUrl;
+      window.location.href = finalUrl;
     } else {
-      console.error("Google auth URL is not configured (GOOGLE_AUTH_URL).");
-      onLoginError?.(new Error("Google authentication URL is not set."));
+      console.error('Google auth URL is not configured (GOOGLE_AUTH_URL).');
+      onLoginError?.(new Error('Google authentication URL is not set.'));
     }
   };
-
   return (
     <Button
       onClick={initiateLogin}
+      size="lg"
+      variant="secondary"
       // Note: `class` becomes `className` in React JSX
-      className="w-full flex items-center gap-2 justify-center p-3 text-white bg-neutral-900 rounded-md hover:bg-neutral-800 mt-4"
+      className="w-full flex items-center gap-2 justify-center p-3  mt-4"
     >
       <Icon icon="flat-color-icons:google" width="20" height="20" /> Sign in
       with Google

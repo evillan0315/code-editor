@@ -1,6 +1,6 @@
 // src/utils/editorKeymaps.ts (or wherever you prefer to place utilities)
-import { EditorView, type KeyBinding } from "@codemirror/view";
-import { undo, redo } from "@codemirror/commands";
+import { EditorView, type KeyBinding } from '@codemirror/view';
+import { undo, redo } from '@codemirror/commands';
 
 /**
  * Creates an array of CodeMirror keybindings for common editor actions.
@@ -15,22 +15,22 @@ export function createEditorKeybindings(
 ): KeyBinding[] {
   return [
     {
-      key: "Mod-s", // Mod is Ctrl on Windows/Linux, Cmd on macOS
+      key: 'Mod-s', // Mod is Ctrl on Windows/Linux, Cmd on macOS
       run: onSave, // The onSave callback handles the save logic
       preventDefault: true, // Prevent default browser save dialog (e.g., to save webpage)
     },
     {
-      key: "Mod-z",
+      key: 'Mod-z',
       run: undo,
       preventDefault: true,
     },
     {
-      key: "Mod-y", // Common redo shortcut
+      key: 'Mod-y', // Common redo shortcut
       run: redo,
       preventDefault: true,
     },
     {
-      key: "Shift-Mod-z", // Alternative redo shortcut (e.g., on macOS)
+      key: 'Shift-Mod-z', // Alternative redo shortcut (e.g., on macOS)
       run: redo,
       preventDefault: true,
     },

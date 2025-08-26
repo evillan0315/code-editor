@@ -1,8 +1,8 @@
-import { useStore } from "@nanostores/react";
-import { toastStore, removeToast, removeAllToasts } from "@/stores/toast";
-import { Icon } from "@/components/ui/Icon";
-import { Button } from "@/components/ui/Button";
-import { AnimatePresence, motion } from "framer-motion";
+import { useStore } from '@nanostores/react';
+import { toastStore, removeToast, removeAllToasts } from '@/stores/toast';
+import { Icon } from '@/components/ui/Icon';
+import { Button } from '@/components/ui/Button';
+import { AnimatePresence, motion } from 'framer-motion';
 
 export const ToastRenderer = () => {
   const toastsByPosition = useStore(toastStore); // ✅ Correct subscription
@@ -10,19 +10,19 @@ export const ToastRenderer = () => {
   return (
     <>
       {Object.entries(toastsByPosition).map(([positionKey, toasts]) => {
-        const [y, x] = positionKey.split("-");
+        const [y, x] = positionKey.split('-');
         const vertical =
-          y === "top"
-            ? "top-4"
-            : y === "bottom"
-              ? "bottom-10"
-              : "top-1/2 -translate-y-1/2";
+          y === 'top'
+            ? 'top-4'
+            : y === 'bottom'
+              ? 'bottom-10'
+              : 'top-1/2 -translate-y-1/2';
         const horizontal =
-          x === "left"
-            ? "left-4"
-            : x === "right"
-              ? "right-6"
-              : "left-1/2 -translate-x-1/2";
+          x === 'left'
+            ? 'left-4'
+            : x === 'right'
+              ? 'right-6'
+              : 'left-1/2 -translate-x-1/2';
 
         return (
           <div
@@ -44,14 +44,13 @@ export const ToastRenderer = () => {
                   exit={{ opacity: 0, y: -10 }}
                   transition={{ duration: 0.2 }}
                   className={`relative px-4 py-4 rounded shadow text-white pr-10 max-w-[400px] min-h-[60px] ${
-                    toast.type === "success"
-                      ? "bg-green-600"
-                      : toast.type === "error"
-                        ? "bg-red-600"
-                        : "bg-sky-500"
+                    toast.type === 'success'
+                      ? 'bg-green-600'
+                      : toast.type === 'error'
+                        ? 'bg-red-600'
+                        : 'bg-sky-500'
                   }`}
                 >
-
                   {toast.message}
                   <Button
                     onClick={() => removeToast(toast.id)}

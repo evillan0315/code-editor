@@ -1,4 +1,4 @@
-import {PROJECT_STATUSES} from '@/constants';
+import { PROJECT_STATUSES } from '@/constants';
 // Define the ProjectStatus enum, matching the backend's (Prisma's) values
 export enum ProjectStatus {
   ACTIVE = 'ACTIVE',

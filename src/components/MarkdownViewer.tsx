@@ -1,27 +1,27 @@
 // src/components/MarkdownViewer.tsx
-import React, { useEffect, useRef, useCallback, useState, memo } from "react";
-import { marked } from "marked";
-import Prism from "prismjs";
+import React, { useEffect, useRef, useCallback, useState, memo } from 'react';
+import { marked } from 'marked';
+import Prism from 'prismjs';
 
 // Import necessary Prism.js components.
 // Ensure these are installed: npm install prismjs
-import "prismjs/components/prism-javascript";
-import "prismjs/components/prism-typescript";
-import "prismjs/components/prism-python";
-import "prismjs/components/prism-css";
-import "prismjs/components/prism-markup";
-import "prismjs/components/prism-json";
-import "prismjs/components/prism-yaml";
-import "prismjs/components/prism-bash";
-import "prismjs/components/prism-shell-session";
-import "prismjs/components/prism-http";
+import 'prismjs/components/prism-javascript';
+import 'prismjs/components/prism-typescript';
+import 'prismjs/components/prism-python';
+import 'prismjs/components/prism-css';
+import 'prismjs/components/prism-markup';
+import 'prismjs/components/prism-json';
+import 'prismjs/components/prism-yaml';
+import 'prismjs/components/prism-bash';
+import 'prismjs/components/prism-shell-session';
+import 'prismjs/components/prism-http';
 
-import { fileService } from "@/services/fileService";
-import { useToast } from "@/hooks/useToast";
-import { CHAT_CONFIGURATION, LANGUAGE_DISPLAY_MAP } from "@/constants";
-import LoadingDots from "./LoadingDots";
+import { fileService } from '@/services/fileService';
+import { useToast } from '@/hooks/useToast';
+import { CHAT_CONFIGURATION, LANGUAGE_DISPLAY_MAP } from '@/constants';
+import LoadingDots from './LoadingDots';
 
-import "@/styles/markdown.css";
+import '@/styles/markdown.css';
 
 interface MarkdownViewerProps {
   content: string;
@@ -45,7 +45,7 @@ interface MarkdownViewerProps {
 const customMarkedRenderer = new marked.Renderer();
 customMarkedRenderer.code = (code, language) => {
   //console.log(code, 'code');
-  const lang = code.lang || "text";
+  const lang = code.lang || 'text';
   // Marked automatically escapes the code content, so we just wrap it.
   // We add 'markdown-code-pre-highlight' class to mark it for post-processing.
   return `<pre class="language-${lang} markdown-code-pre-highlight"><code class="language-${lang}">${code.text}</code></pre>`;
@@ -70,7 +70,7 @@ const MarkdownViewer: React.FC<MarkdownViewerProps> = memo(
       if (!typewriter) return false;
       // Heuristic: Check for common code block markers.
       // A more robust check might involve parsing the Markdown AST.
-      const hasCodeBlock = content.includes("```"); // Markdown code block indicator
+      const hasCodeBlock = content.includes('```'); // Markdown code block indicator
 
       // If it has code blocks, it's safer to just render directly.
       return !hasCodeBlock;
@@ -83,7 +83,7 @@ const MarkdownViewer: React.FC<MarkdownViewerProps> = memo(
 
       // Select only <pre> elements that haven't been enhanced yet.
       const codeBlocksToEnhance = container.querySelectorAll(
-        "pre.markdown-code-pre-highlight",
+        'pre.markdown-code-pre-highlight',
       );
 
       codeBlocksToEnhance.forEach((block) => {
@@ -95,87 +95,87 @@ const MarkdownViewer: React.FC<MarkdownViewerProps> = memo(
           // This case should ideally not happen if `querySelectorAll` returned it,
           // but as a safeguard.
           console.warn(
-            "Skipping code block enhancement: Parent node is null.",
+            'Skipping code block enhancement: Parent node is null.',
             block,
           );
           return;
         }
 
         // Create wrapper and buttons
-        const wrapper = document.createElement("div");
+        const wrapper = document.createElement('div');
         wrapper.className = `relative group my-4 markdown-code-wrapper ${block.className}`; // Inherit language class from pre
 
-        const codeElement = block.querySelector("code");
+        const codeElement = block.querySelector('code');
         if (!codeElement) return; // Should not happen
 
         // Extract language and display name
         const langClass = [...codeElement.classList].find((cls) =>
-          cls.startsWith("language-"),
+          cls.startsWith('language-'),
         );
-        const lang = langClass ? langClass.replace("language-", "") : "";
+        const lang = langClass ? langClass.replace('language-', '') : '';
         const displayLang =
           LANGUAGE_DISPLAY_MAP[lang] ||
-          (lang ? lang.charAt(0).toUpperCase() + lang.slice(1) : "");
+          (lang ? lang.charAt(0).toUpperCase() + lang.slice(1) : '');
 
-        const langTag = document.createElement("div");
+        const langTag = document.createElement('div');
         langTag.textContent = displayLang;
         langTag.className =
-          "language-btn absolute top-0 left-0 bg-sky-600 text-sm font-bold px-2 py-1 rounded-br-md rounded-tl-md opacity-0 group-hover:opacity-100 transition-opacity duration-150 z-10";
+          'language-btn absolute top-0 left-0 bg-sky-600 text-sm font-bold px-2 py-1 rounded-br-md rounded-tl-md opacity-0 group-hover:opacity-100 transition-opacity duration-150 z-10';
 
-        const copyButton = document.createElement("button");
-        copyButton.innerHTML = "📋";
-        copyButton.title = "Copy code";
+        const copyButton = document.createElement('button');
+        copyButton.innerHTML = '📋';
+        copyButton.title = 'Copy code';
         copyButton.className =
-          "copy-btn absolute top-0 right-8 p-1 text-sm rounded-bl-md bg-sky-500 hover:bg-sky-600 hover:text-white transition-opacity opacity-0 group-hover:opacity-100 z-10";
+          'copy-btn absolute top-0 right-8 p-1 text-sm rounded-bl-md bg-sky-500 hover:bg-sky-600 hover:text-white transition-opacity opacity-0 group-hover:opacity-100 z-10';
         copyButton.onclick = () => {
           const textToCopy = codeElement.innerText;
           if (textToCopy) {
             navigator.clipboard.writeText(textToCopy);
-            copyButton.innerHTML = "✅";
-            showToast("Code copied to clipboard!", "success");
-            setTimeout(() => (copyButton.innerHTML = "📋"), 1000);
+            copyButton.innerHTML = '✅';
+            showToast('Code copied to clipboard!', 'success');
+            setTimeout(() => (copyButton.innerHTML = '📋'), 1000);
           }
         };
 
-        const saveButton = document.createElement("button");
-        saveButton.innerHTML = "💾";
-        saveButton.title = "Save to Server";
+        const saveButton = document.createElement('button');
+        saveButton.innerHTML = '💾';
+        saveButton.title = 'Save to Server';
         saveButton.className =
-          "save-btn absolute top-0 right-0 p-1 text-sm rounded-bl-md rounded-tr-md bg-sky-500 hover:bg-sky-600 hover:text-white transition-opacity opacity-0 group-hover:opacity-100 z-10";
+          'save-btn absolute top-0 right-0 p-1 text-sm rounded-bl-md rounded-tr-md bg-sky-500 hover:bg-sky-600 hover:text-white transition-opacity opacity-0 group-hover:opacity-100 z-10';
         saveButton.onclick = async () => {
           const textToSave = codeElement.innerText;
           if (!textToSave) return;
 
-          const firstLine = textToSave.split("\n")[0];
+          const firstLine = textToSave.split('\n')[0];
           const filePathMatch = firstLine.match(
             /^\/\/\s*(\/?[^\s"]+\.[a-zA-Z0-9]+)/,
           );
-          const fileExt = lang ? `.${lang}` : ".txt";
+          const fileExt = lang ? `.${lang}` : '.txt';
           const defaultFilePath = `/tmp/code-snippet-${Date.now()}${fileExt}`;
           const filePath = filePathMatch ? filePathMatch[1] : defaultFilePath;
 
           try {
-            if (typeof fileService.createFile === "function") {
+            if (typeof fileService.createFile === 'function') {
               await fileService.createFile(filePath, textToSave);
-              showToast(`File saved to ${filePath}`, "success");
-              saveButton.innerHTML = "✅";
-              setTimeout(() => (saveButton.innerHTML = "💾"), 1000);
+              showToast(`File saved to ${filePath}`, 'success');
+              saveButton.innerHTML = '✅';
+              setTimeout(() => (saveButton.innerHTML = '💾'), 1000);
             } else {
-              showToast("File save service is not available.", "error");
+              showToast('File save service is not available.', 'error');
               console.error(
-                "fileService.createFile is not a function or not defined.",
+                'fileService.createFile is not a function or not defined.',
               );
             }
           } catch (err: any) {
             const errMessage =
-              err?.response?.data?.message || err?.message || "Unknown error";
-            console.error("File save failed:", err);
-            if (errMessage.includes("already exists")) {
-              showToast(`File "${filePath}" already exists.`, "warning");
+              err?.response?.data?.message || err?.message || 'Unknown error';
+            console.error('File save failed:', err);
+            if (errMessage.includes('already exists')) {
+              showToast(`File "${filePath}" already exists.`, 'warning');
             } else {
-              showToast(`Failed to save file: ${errMessage}`, "error");
-              saveButton.innerHTML = "❌";
-              setTimeout(() => (saveButton.innerHTML = "💾"), 1500);
+              showToast(`Failed to save file: ${errMessage}`, 'error');
+              saveButton.innerHTML = '❌';
+              setTimeout(() => (saveButton.innerHTML = '💾'), 1500);
             }
           }
         };
@@ -198,8 +198,8 @@ const MarkdownViewer: React.FC<MarkdownViewerProps> = memo(
         // Mark the block as enhanced by removing the pre-highlight class
         // (This should be done *after* it's re-attached in its new structure, or on the wrapper)
         // Since `block` is now inside `wrapper`, we mark the `block` itself.
-        block.classList.remove("markdown-code-pre-highlight");
-        block.classList.add("markdown-code-enhanced");
+        block.classList.remove('markdown-code-pre-highlight');
+        block.classList.add('markdown-code-enhanced');
       });
     }, [showToast]);
 
@@ -229,7 +229,7 @@ const MarkdownViewer: React.FC<MarkdownViewerProps> = memo(
           clearInterval(interval);
         }
         if (container) {
-          container.innerHTML = ""; // Clear content on unmount or new content
+          container.innerHTML = ''; // Clear content on unmount or new content
         }
         setIsTypingAnimationActive(false); // Ensure state is reset
       };
@@ -280,5 +280,5 @@ const MarkdownViewer: React.FC<MarkdownViewerProps> = memo(
   },
 );
 
-MarkdownViewer.displayName = "MarkdownViewer";
+MarkdownViewer.displayName = 'MarkdownViewer';
 export default MarkdownViewer;

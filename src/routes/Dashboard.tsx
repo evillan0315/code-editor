@@ -1,9 +1,8 @@
-import React, { useState, type JSX } from "react";
-import EditorCodeMirror from "@/components/editor/EditorCodeMirror"; // Your editor component
-import { CodeMirrorContextMenuRenderer } from "@/components/editor/CodeMirrorContextMenuRenderer"; // New import
+import React, { useState, type JSX } from 'react';
+import EditorCodeMirror from '@/components/editor/EditorCodeMirror'; // Your editor component
+import { CodeMirrorContextMenuRenderer } from '@/components/editor/CodeMirrorContextMenuRenderer'; // New import
 
-import "@/styles/file-manager.css";
-
+import '@/styles/file-manager.css';
 
 const initialCode = `function greet(name) {
   // This is a single-line comment

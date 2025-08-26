@@ -1,10 +1,10 @@
 // src/components/chat/ChatPartContent.tsx
-import React, { memo, useState, useCallback } from "react";
-import MarkdownViewer from "@/components/MarkdownViewerType"; // Assuming this component exists
-import type { ConversationPart } from "@/types/chat";
-import { Button } from "@/components/ui/Button";
-import { Icon } from "@/components/ui/Icon"; // Import Icon from Iconify
-import { useToast } from "@/hooks/useToast";
+import React, { memo, useState, useCallback } from 'react';
+import MarkdownViewer from '@/components/MarkdownViewerType'; // Assuming this component exists
+import type { ConversationPart } from '@/types/chat';
+import { Button } from '@/components/ui/Button';
+import { Icon } from '@/components/ui/Icon'; // Import Icon from Iconify
+import { useToast } from '@/hooks/useToast';
 
 interface ChatPartContentProps {
   part: ConversationPart;
@@ -33,15 +33,15 @@ const ChatPartContent = memo(
         try {
           await navigator.clipboard.writeText(part.text);
           setCopied(true); // Set state to indicate text has been copied
-          showToast("Copied to clipboard!", "success"); // Show success notification
+          showToast('Copied to clipboard!', 'success'); // Show success notification
 
           // Reset the 'copied' state after a short delay
           setTimeout(() => {
             setCopied(false);
           }, 2000);
         } catch (err) {
-          console.error("Failed to copy text: ", err);
-          showToast("Failed to copy!", "error");
+          console.error('Failed to copy text: ', err);
+          showToast('Failed to copy!', 'error');
         }
       }
     }, [part.text]); // Re-create handler only if part.text changes
@@ -49,7 +49,7 @@ const ChatPartContent = memo(
     return (
       <>
         {part.text &&
-          (role === "model" ? (
+          (role === 'model' ? (
             // For 'model' role, we wrap the MarkdownViewer in a relative div
             // to position the copy button absolutely above it.
             // 'group' class is used to make the copy button visible on hover.
@@ -65,7 +65,7 @@ const ChatPartContent = memo(
               >
                 {/* Iconify component: shows 'check' icon if copied, otherwise 'copy' icon */}
                 <Icon
-                  icon={copied ? "lucide:check" : "lucide:copy"}
+                  icon={copied ? 'lucide:check' : 'lucide:copy'}
                   width="2em"
                   height="2em"
                 />
@@ -78,7 +78,7 @@ const ChatPartContent = memo(
           ))}
         {part.inlineData && (
           <div className="mt-2 max-w-[200px] h-auto">
-            {part.inlineData.mime_type.startsWith("image/") ? (
+            {part.inlineData.mime_type.startsWith('image/') ? (
               <img
                 src={`data:${part.inlineData.mime_type};base64,${part.inlineData.data}`}
                 alt="Uploaded file"
@@ -96,5 +96,5 @@ const ChatPartContent = memo(
   },
 );
 
-ChatPartContent.displayName = "ChatPartContent";
+ChatPartContent.displayName = 'ChatPartContent';
 export default ChatPartContent;

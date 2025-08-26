@@ -6,26 +6,25 @@ import React, {
   useCallback,
   useLayoutEffect,
   useMemo,
-} from "react";
-import { useStore } from "@nanostores/react";
+} from 'react';
+import { useStore } from '@nanostores/react';
 
-import { showCodeMirrorContextMenu } from "@/stores/contextMenu";
+import { showCodeMirrorContextMenu } from '@/stores/contextMenu';
 
-import { theme } from "@/stores/theme";
-import { getLanguageExtensionByLangString } from "@/utils/editorLanguage";
-import { getThemeExtension } from "@/utils/editorTheme";
-import { createEditorKeybindings } from "@/utils/editorKeymaps";
-import { useEditorExplorerActions } from "@/hooks/useEditorExplorerActions";
-import { useEditorTabs } from "@/hooks/useEditorTabs";
-import { Icon } from "@/components/ui/Icon";
-import { EditorView, keymap } from "@codemirror/view";
-import { EditorState, Compartment } from "@codemirror/state";
-import { basicSetup } from "codemirror";
-import Logo from "@/components/ui/Logo";
+import { theme } from '@/stores/theme';
+import { getLanguageExtensionByLangString } from '@/utils/editorLanguage';
+import { getThemeExtension } from '@/utils/editorTheme';
+import { createEditorKeybindings } from '@/utils/editorKeymaps';
+import { useEditorExplorerActions } from '@/hooks/useEditorExplorerActions';
+import { useEditorTabs } from '@/hooks/useEditorTabs';
+import { Icon } from '@/components/ui/Icon';
+import { EditorView, keymap } from '@codemirror/view';
+import { EditorState, Compartment } from '@codemirror/state';
+import { basicSetup } from 'codemirror';
+import Logo from '@/components/ui/Logo';
 
-
-import { CODE_MIRROR_CONTEXT_MENU_ITEMS } from "@/constants";
-import "@/styles/code-mirror.css";
+import { CODE_MIRROR_CONTEXT_MENU_ITEMS } from '@/constants';
+import '@/styles/code-mirror.css';
 
 interface MarkdownCodeMirrorProps {
   activeFilePath?: string;
@@ -97,33 +96,33 @@ const MarkdownCodeMirror: React.FC<MarkdownCodeMirrorProps> = ({
   );
 
   const handleCodemirrorContextMenu = useCallback(() => {
-    console.log("log");
+    console.log('log');
     //handleSave();
     //return true;
   }, []);
   const memoizedCodeMirrorMenuItems = useMemo(() => {
     return CODE_MIRROR_CONTEXT_MENU_ITEMS.map((item) => {
-      if (item.type !== "button") return item;
+      if (item.type !== 'button') return item;
       switch (item.id) {
-        case "optimize-code":
+        case 'optimize-code':
           return {
             ...item,
             icon: OptimizeCodeIcon,
             action: handleCodemirrorContextMenu,
           };
-        case "analyze-code":
+        case 'analyze-code':
           return { ...item, icon: AnalyzeCodeIcon };
-        case "repair-code":
+        case 'repair-code':
           return { ...item, icon: RepairCodeIcon };
-        case "format-code":
+        case 'format-code':
           return { ...item, icon: FormatCodeIcon };
-        case "remove-comments":
+        case 'remove-comments':
           return { ...item, icon: RemoveCommentsIcon };
-        case "generate-code":
+        case 'generate-code':
           return { ...item, icon: GenerateCodeIcon };
-        case "generate-documentation":
+        case 'generate-documentation':
           return { ...item, icon: GenerateDocsIcon };
-        case "generate-inline-documentation":
+        case 'generate-inline-documentation':
           return { ...item, icon: GenerateInlineDocsIcon };
         default:
           return item;
@@ -162,7 +161,7 @@ const MarkdownCodeMirror: React.FC<MarkdownCodeMirrorProps> = ({
       extensions: [
         basicSetup,
         languageCompartment.of(
-          getLanguageExtensionByLangString(language || "plaintext"),
+          getLanguageExtensionByLangString(language || 'plaintext'),
         ),
         themeCompartment.of(getThemeExtension($theme)),
         editableCompartment.of(EditorView.editable.of(!readOnly)),
@@ -220,7 +219,7 @@ const MarkdownCodeMirror: React.FC<MarkdownCodeMirrorProps> = ({
           insert: value,
         },
         selection: { anchor: value.length },
-        userEvent: "external.update",
+        userEvent: 'external.update',
       });
     }
   }, [value]);
@@ -232,7 +231,7 @@ const MarkdownCodeMirror: React.FC<MarkdownCodeMirrorProps> = ({
     view.dispatch({
       effects: [
         languageCompartment.reconfigure(
-          getLanguageExtensionByLangString(language || "plaintext"),
+          getLanguageExtensionByLangString(language || 'plaintext'),
         ),
         themeCompartment.reconfigure(getThemeExtension($theme)),
         editableCompartment.reconfigure(EditorView.editable.of(!readOnly)),
@@ -264,10 +263,10 @@ const MarkdownCodeMirror: React.FC<MarkdownCodeMirrorProps> = ({
       }
     };
 
-    editorDom.addEventListener("contextmenu", handleContextMenu);
+    editorDom.addEventListener('contextmenu', handleContextMenu);
 
     return () => {
-      editorDom.removeEventListener("contextmenu", handleContextMenu);
+      editorDom.removeEventListener('contextmenu', handleContextMenu);
     };
   }, [value]);
 
@@ -279,7 +278,7 @@ const MarkdownCodeMirror: React.FC<MarkdownCodeMirrorProps> = ({
     );
   }
 
-  if (value === "") {
+  if (value === '') {
     return (
       <div className="h-full w-full flex flex-col items-center justify-center text-gray-500">
         <Logo />

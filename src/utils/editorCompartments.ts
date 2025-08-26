@@ -1,5 +1,5 @@
-import { Compartment } from "@codemirror/state";
-import { EditorView } from "@codemirror/view";
+import { Compartment } from '@codemirror/state';
+import { EditorView } from '@codemirror/view';
 
 export interface EditorCompartments {
   language: Compartment;

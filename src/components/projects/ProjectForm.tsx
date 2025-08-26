@@ -17,8 +17,15 @@ import { useProjectOperations } from '@/hooks/useProjectOperations'; // Added im
 
 const projectSchema = z.object({
   name: z.string().min(1, 'Project name is required').max(255, 'Name too long'),
-  description: z.string().max(1000, 'Description too long').optional().or(z.literal('')), // Allow empty string for optional
-  path: z.string().min(1, 'Project path is required').max(1000, 'Path too long'),
+  description: z
+    .string()
+    .max(1000, 'Description too long')
+    .optional()
+    .or(z.literal('')), // Allow empty string for optional
+  path: z
+    .string()
+    .min(1, 'Project path is required')
+    .max(1000, 'Path too long'),
   status: z.nativeEnum(ProjectStatus), // Validate against ProjectStatus enum
   technologies: z
     .string()
@@ -31,9 +38,17 @@ const projectSchema = z.object({
     )
     .pipe(z.array(z.string()).min(1, 'At least one technology is required')), // Comma-separated string to array
   versionControl: z.nativeEnum(VersionControl).optional(), // Validate against VersionControl enum
-  repositoryUrl: z.string().url('Invalid URL format').optional().or(z.literal('')),
+  repositoryUrl: z
+    .string()
+    .url('Invalid URL format')
+    .optional()
+    .or(z.literal('')),
   // lastOpenedAt field is removed from form, so it's only optional at the DTO level
-  ownerId: z.string().min(1, 'Owner ID cannot be empty').optional().or(z.literal('')), // Added for validation; transform for empty string
+  ownerId: z
+    .string()
+    .min(1, 'Owner ID cannot be empty')
+    .optional()
+    .or(z.literal('')), // Added for validation; transform for empty string
   metadata: z
     .string()
     .optional()
@@ -86,7 +101,9 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
       repositoryUrl: initialData?.repositoryUrl || '',
       // lastOpenedAt is no longer directly in the form's default values
       ownerId: initialData?.ownerId || currentUserId || '', // Auto-assign ownerId
-      metadata: initialData?.metadata ? JSON.stringify(initialData.metadata, null, 2) : '',
+      metadata: initialData?.metadata
+        ? JSON.stringify(initialData.metadata, null, 2)
+        : '',
     },
   });
 
@@ -98,59 +115,68 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
   };
 
   return (
-    <form onSubmit={handleSubmit(handleFormSubmit)} className='space-y-4'>
+    <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-4">
       <div>
-        <label htmlFor='name' className='block text-sm font-medium text-base'>
+        <label htmlFor="name" className="block text-sm font-medium text-base">
           Project Name
         </label>
         <input
-          id='name'
-          type='text'
+          id="name"
+          type="text"
           {...register('name')}
-          className='mt-1 block w-full rounded-md shadow-sm bg-secondary text-base'
+          className="mt-1 block w-full rounded-md shadow-sm bg-secondary text-base"
           disabled={isCreatingProject} // Use isCreatingProject from the hook
         />
-        {errors.name && <p className='mt-1 text-sm text-red-600'>{errors.name.message}</p>}
-      </div>
-
-      <div>
-        <label htmlFor='description' className='block text-sm font-medium text-base'>
-          Description
-        </label>
-        <textarea
-          id='description'
-          {...register('description')}
-          rows={2} // Reduced rows
-          className='mt-1 block w-full rounded-md shadow-sm bg-secondary text-base'
-          disabled={isCreatingProject} // Use isCreatingProject from the hook
-        ></textarea>
-        {errors.description && (
-          <p className='mt-1 text-sm text-red-600'>{errors.description.message}</p>
+        {errors.name && (
+          <p className="mt-1 text-sm text-red-600">{errors.name.message}</p>
         )}
       </div>
 
       <div>
-        <label htmlFor='path' className='block text-sm font-medium text-base'>
-          Project Path
+        <label
+          htmlFor="description"
+          className="block text-sm font-medium text-base"
+        >
+          Description
         </label>
-        <input
-          id='path'
-          type='text'
-          {...register('path')}
-          className='mt-1 block w-full rounded-md shadow-sm bg-secondary text-base'
+        <textarea
+          id="description"
+          {...register('description')}
+          rows={2} // Reduced rows
+          className="mt-1 block w-full rounded-md shadow-sm bg-secondary text-base"
           disabled={isCreatingProject} // Use isCreatingProject from the hook
-        />
-        {errors.path && <p className='mt-1 text-sm text-red-600'>{errors.path.message}</p>}
+        ></textarea>
+        {errors.description && (
+          <p className="mt-1 text-sm text-red-600">
+            {errors.description.message}
+          </p>
+        )}
       </div>
 
       <div>
-        <label htmlFor='status' className='block text-sm font-medium text-base'>
+        <label htmlFor="path" className="block text-sm font-medium text-base">
+          Project Path
+        </label>
+        <input
+          id="path"
+          type="text"
+          {...register('path')}
+          className="mt-1 block w-full rounded-md shadow-sm bg-secondary text-base"
+          disabled={isCreatingProject} // Use isCreatingProject from the hook
+        />
+        {errors.path && (
+          <p className="mt-1 text-sm text-red-600">{errors.path.message}</p>
+        )}
+      </div>
+
+      <div>
+        <label htmlFor="status" className="block text-sm font-medium text-base">
           Status
         </label>
         <select
-          id='status'
+          id="status"
           {...register('status')}
-          className='mt-1 block w-full rounded-md shadow-sm bg-secondary text-base'
+          className="mt-1 block w-full rounded-md shadow-sm bg-secondary text-base"
           disabled={isCreatingProject} // Use isCreatingProject from the hook
         >
           {PROJECT_STATUSES.map((status) => (
@@ -159,37 +185,47 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
             </option>
           ))}
         </select>
-        {errors.status && <p className='mt-1 text-sm text-red-600'>{errors.status.message}</p>}
-      </div>
-
-      <div>
-        <label htmlFor='technologies' className='block text-sm font-medium text-base'>
-          Technologies (comma-separated)
-        </label>
-        <input
-          id='technologies'
-          type='text'
-          {...register('technologies')}
-          className='mt-1 block w-full rounded-md shadow-sm bg-secondary text-base'
-          placeholder='e.g., React, Node.js, TypeScript'
-          disabled={isCreatingProject} // Use isCreatingProject from the hook
-        />
-        {errors.technologies && (
-          <p className='mt-1 text-sm text-red-600'>{errors.technologies.message}</p>
+        {errors.status && (
+          <p className="mt-1 text-sm text-red-600">{errors.status.message}</p>
         )}
       </div>
 
       <div>
-        <label htmlFor='versionControl' className='block text-sm font-medium text-base'>
+        <label
+          htmlFor="technologies"
+          className="block text-sm font-medium text-base"
+        >
+          Technologies (comma-separated)
+        </label>
+        <input
+          id="technologies"
+          type="text"
+          {...register('technologies')}
+          className="mt-1 block w-full rounded-md shadow-sm bg-secondary text-base"
+          placeholder="e.g., React, Node.js, TypeScript"
+          disabled={isCreatingProject} // Use isCreatingProject from the hook
+        />
+        {errors.technologies && (
+          <p className="mt-1 text-sm text-red-600">
+            {errors.technologies.message}
+          </p>
+        )}
+      </div>
+
+      <div>
+        <label
+          htmlFor="versionControl"
+          className="block text-sm font-medium text-base"
+        >
           Version Control
         </label>
         <select
-          id='versionControl'
+          id="versionControl"
           {...register('versionControl')}
-          className='mt-1 block w-full rounded-md shadow-sm bg-secondary text-base'
+          className="mt-1 block w-full rounded-md shadow-sm bg-secondary text-base"
           disabled={isCreatingProject} // Use isCreatingProject from the hook
         >
-          <option value=''>Select...</option>
+          <option value="">Select...</option>
           {VERSION_CONTROL_SYSTEMS.map((vcs) => (
             <option key={vcs} value={vcs}>
               {vcs.charAt(0).toUpperCase() + vcs.slice(1)}
@@ -197,50 +233,69 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
           ))}
         </select>
         {errors.versionControl && (
-          <p className='mt-1 text-sm text-red-600'>{errors.versionControl.message}</p>
+          <p className="mt-1 text-sm text-red-600">
+            {errors.versionControl.message}
+          </p>
         )}
       </div>
 
       <div>
-        <label htmlFor='repositoryUrl' className='block text-sm font-medium text-base'>
+        <label
+          htmlFor="repositoryUrl"
+          className="block text-sm font-medium text-base"
+        >
           Repository URL
         </label>
         <input
-          id='repositoryUrl'
-          type='url' // Use type 'url' for browser validation
+          id="repositoryUrl"
+          type="url" // Use type 'url' for browser validation
           {...register('repositoryUrl')}
-          className='mt-1 block w-full rounded-md shadow-sm bg-secondary text-base'
+          className="mt-1 block w-full rounded-md shadow-sm bg-secondary text-base"
           disabled={isCreatingProject} // Use isCreatingProject from the hook
         />
         {errors.repositoryUrl && (
-          <p className='mt-1 text-sm text-red-600'>{errors.repositoryUrl.message}</p>
+          <p className="mt-1 text-sm text-red-600">
+            {errors.repositoryUrl.message}
+          </p>
         )}
       </div>
 
       {/* ownerId field - hidden and auto-assigned */}
-      <input type='hidden' id='ownerId' {...register('ownerId')} />
-      {errors.ownerId && <p className='mt-1 text-sm text-red-600'>{errors.ownerId.message}</p>}
+      <input type="hidden" id="ownerId" {...register('ownerId')} />
+      {errors.ownerId && (
+        <p className="mt-1 text-sm text-red-600">{errors.ownerId.message}</p>
+      )}
 
       <div>
-        <label htmlFor='metadata' className='block text-sm font-medium text-base'>
+        <label
+          htmlFor="metadata"
+          className="block text-sm font-medium text-base"
+        >
           Metadata (JSON)
         </label>
         <textarea
-          id='metadata'
+          id="metadata"
           {...register('metadata')}
           rows={4}
-          className='mt-1 block w-full rounded-md shadow-sm bg-secondary text-base font-mono text-xs'
-          placeholder='{`key:` `value`, number: 123}'
+          className="mt-1 block w-full rounded-md shadow-sm bg-secondary text-base font-mono text-xs"
+          placeholder="{`key:` `value`, number: 123}"
           disabled={isCreatingProject} // Use isCreatingProject from the hook
         ></textarea>
-        {errors.metadata && <p className='mt-1 text-sm text-red-600'>{errors.metadata.message}</p>}
+        {errors.metadata && (
+          <p className="mt-1 text-sm text-red-600">{errors.metadata.message}</p>
+        )}
       </div>
 
-      <div className='flex justify-end space-x-2'>
-        <Button type='button' variant='secondary' onClick={onCancel} disabled={isCreatingProject}>
+      <div className="flex justify-end space-x-2">
+        <Button
+          type="button"
+          variant="secondary"
+          onClick={onCancel}
+          disabled={isCreatingProject}
+        >
           Cancel
         </Button>
-        <Button type='submit' variant='secondary' loading={isCreatingProject}>
+        <Button type="submit" variant="secondary" loading={isCreatingProject}>
           {initialData ? 'Update Project' : 'Create Project'}
         </Button>
       </div>

@@ -1,12 +1,12 @@
 // src/components/motion/MotionSlidePanel.tsx (UPDATED)
 
-import React from "react";
-import { motion, AnimatePresence, HTMLMotionProps } from "framer-motion";
-import { defaultTransition } from "./motionConfig";
+import React from 'react';
+import { motion, AnimatePresence, HTMLMotionProps } from 'framer-motion';
+import { defaultTransition } from './motionConfig';
 
-type SlideSide = "left" | "right" | "top" | "bottom";
+type SlideSide = 'left' | 'right' | 'top' | 'bottom';
 
-interface MotionSlidePanelProps extends HTMLMotionProps<"div"> {
+interface MotionSlidePanelProps extends HTMLMotionProps<'div'> {
   isVisible: boolean;
   children: React.ReactNode;
   side?: SlideSide; // Default to 'left'
@@ -34,18 +34,18 @@ interface MotionSlidePanelProps extends HTMLMotionProps<"div"> {
     };
   };
   // Prop to control if the panel should push content or overlay
-  mode?: "push" | "overlay";
+  mode?: 'push' | 'overlay';
 }
 
 export const MotionSlidePanel: React.FC<MotionSlidePanelProps> = ({
   isVisible,
   children,
-  side = "left",
+  side = 'left',
   duration = defaultTransition.duration,
   dimensionValue, // The width/height from useResizablePanel
   variants,
-  className = "",
-  mode = "push", // Default to push
+  className = '',
+  mode = 'push', // Default to push
   ...rest
 }) => {
   // Determine initial/exit properties based on side and mode
@@ -63,8 +63,8 @@ export const MotionSlidePanel: React.FC<MotionSlidePanelProps> = ({
       height?: string | number;
       opacity?: number;
     } = { opacity: 0 };
-    if (mode === "push") {
-      if (side === "left" || side === "right") {
+    if (mode === 'push') {
+      if (side === 'left' || side === 'right') {
         hiddenState.width = 0; // Animate width for horizontal push
         hiddenState.x = 0; // x should be 0 as it's not sliding on its own plane
       } else {
@@ -74,10 +74,10 @@ export const MotionSlidePanel: React.FC<MotionSlidePanelProps> = ({
       }
     } else {
       // overlay mode
-      if (side === "left") hiddenState.x = "-100%";
-      else if (side === "right") hiddenState.x = "100%";
-      else if (side === "top") hiddenState.y = "-100%";
-      else if (side === "bottom") hiddenState.y = "100%";
+      if (side === 'left') hiddenState.x = '-100%';
+      else if (side === 'right') hiddenState.x = '100%';
+      else if (side === 'top') hiddenState.y = '-100%';
+      else if (side === 'bottom') hiddenState.y = '100%';
     }
     return hiddenState;
   };
@@ -96,12 +96,12 @@ export const MotionSlidePanel: React.FC<MotionSlidePanelProps> = ({
       height?: string | number;
       opacity?: number;
     } = { opacity: 1 };
-    if (mode === "push") {
-      if (side === "left" || side === "right") {
-        visibleState.width = dimensionValue || "auto"; // Use resizable dimension or auto
+    if (mode === 'push') {
+      if (side === 'left' || side === 'right') {
+        visibleState.width = dimensionValue || 'auto'; // Use resizable dimension or auto
       } else {
         // top or bottom
-        visibleState.height = dimensionValue || "auto";
+        visibleState.height = dimensionValue || 'auto';
       }
       visibleState.x = 0; // Ensure no x/y offset when visible
       visibleState.y = 0;
@@ -126,16 +126,16 @@ export const MotionSlidePanel: React.FC<MotionSlidePanelProps> = ({
 
   // Ensure necessary styles for 'overlay' mode
   const panelOverlayStyles: React.CSSProperties =
-    mode === "overlay"
+    mode === 'overlay'
       ? {
-          position: "fixed", // Or 'absolute' if parent is relative and constrained
-          height: side === "left" || side === "right" ? "100%" : undefined,
-          width: side === "top" || side === "bottom" ? "100%" : undefined,
+          position: 'fixed', // Or 'absolute' if parent is relative and constrained
+          height: side === 'left' || side === 'right' ? '100%' : undefined,
+          width: side === 'top' || side === 'bottom' ? '100%' : undefined,
           // Setting these to 0 initially for the slide animation
-          left: side === "right" ? "auto" : 0,
-          right: side === "left" ? "auto" : 0,
-          top: side === "bottom" ? "auto" : 0,
-          bottom: side === "top" ? "auto" : 0,
+          left: side === 'right' ? 'auto' : 0,
+          right: side === 'left' ? 'auto' : 0,
+          top: side === 'bottom' ? 'auto' : 0,
+          bottom: side === 'top' ? 'auto' : 0,
         }
       : {};
 
@@ -147,7 +147,7 @@ export const MotionSlidePanel: React.FC<MotionSlidePanelProps> = ({
           animate="visible"
           exit="hidden"
           variants={defaultVariants}
-          className={`${className} ${mode === "push" ? "flex-shrink-0" : ""}`} // Add flex-shrink-0 for push mode
+          className={`${className} ${mode === 'push' ? 'flex-shrink-0' : ''}`} // Add flex-shrink-0 for push mode
           style={{ ...panelOverlayStyles }}
           {...rest}
         >

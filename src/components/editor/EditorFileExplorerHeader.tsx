@@ -12,25 +12,27 @@ interface EditorFileExplorerHeaderProps {
   // This component only handles path-related display and navigation up.
 }
 
-const EditorFileExplorerHeader: React.FC<EditorFileExplorerHeaderProps> = () => {
+const EditorFileExplorerHeader: React.FC<
+  EditorFileExplorerHeaderProps
+> = () => {
   const $editorCurrentDirectory = useStore(editorCurrentDirectory);
   const { handleCreateNewFile, handleCreateNewFolder, handleGoUpDirectory } =
     useEditorExplorerActions();
 
   return (
-    <div className='explorer-header sticky left-0 top-0 w-full z-50 border-b flex items-center h-12 shadow-md justify-between gap-1 font-light px-1'>
-      <div className='flex-grow text-center'>
+    <div className="explorer-header sticky left-0 top-0 w-full z-50 border-b flex items-center h-12 shadow-md justify-between gap-1 font-light px-1">
+      <div className="flex-grow text-center">
         <div
-          className='flex items-center justify-between font-semibold text-base-content whitespace-nowrap text-ellipsis cursor-pointer'
+          className="flex items-center justify-between font-semibold text-base-content whitespace-nowrap text-ellipsis cursor-pointer"
           title={$editorCurrentDirectory}
         >
           <Button
-            variant='secondary'
+            variant="secondary"
             onClick={toggleBottomLeft}
             className={`${showBottomLeft.get() ? 'active' : ''}`}
-            title='Toggle bottom left sidebar'
+            title="Toggle bottom left sidebar"
           >
-            <Icon icon='mdi:dock-top' width='2em' height='2em' />
+            <Icon icon="mdi:dock-top" width="2em" height="2em" />
           </Button>
 
           <PathDropdown
@@ -38,8 +40,8 @@ const EditorFileExplorerHeader: React.FC<EditorFileExplorerHeaderProps> = () => 
             onPathSelect={handleGoUpDirectory} // This is for 'go up' functionality now
           />
 
-          <Button title='More options' variant='secondary'>
-            <Icon icon='mdi:dots-vertical' width='2em' height='2em' />
+          <Button title="More options" variant="secondary">
+            <Icon icon="mdi:dots-vertical" width="2em" height="2em" />
           </Button>
         </div>
       </div>

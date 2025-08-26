@@ -1,7 +1,7 @@
-import React, { useState } from "react";
+import React, { useState } from 'react';
 import SpeechRecognition, {
   useSpeechRecognition,
-} from "react-speech-recognition";
+} from 'react-speech-recognition';
 
 function AudioToTextComponent() {
   const {
@@ -11,7 +11,7 @@ function AudioToTextComponent() {
     browserSupportsSpeechRecognition,
   } = useSpeechRecognition();
 
-  const [geminiResponse, setGeminiResponse] = useState("");
+  const [geminiResponse, setGeminiResponse] = useState('');
 
   if (!browserSupportsSpeechRecognition) {
     return <span>Browser doesn't support speech recognition.</span>;
@@ -23,7 +23,7 @@ function AudioToTextComponent() {
       // which then calls the Gemini API securely.
       // For a client-side prototype, you might directly use the Google AI SDK,
       // but be aware of API key exposure for production. [15]
-      console.log("Sending transcript to Gemini:", transcript);
+      console.log('Sending transcript to Gemini:', transcript);
 
       try {
         // Placeholder for Gemini API call (requires a backend for secure and robust integration)
@@ -37,18 +37,18 @@ function AudioToTextComponent() {
         // setGeminiResponse(data.geminiOutput);
 
         setGeminiResponse(
-          "Gemini processing (simulated): " + transcript.toUpperCase(),
+          'Gemini processing (simulated): ' + transcript.toUpperCase(),
         ); // Simulated response
       } catch (error) {
-        console.error("Error sending to Gemini:", error);
-        setGeminiResponse("Error processing with Gemini.");
+        console.error('Error sending to Gemini:', error);
+        setGeminiResponse('Error processing with Gemini.');
       }
     }
   };
 
   return (
     <div>
-      <p>Microphone: {listening ? "on" : "off"}</p>
+      <p>Microphone: {listening ? 'on' : 'off'}</p>
       <button onClick={SpeechRecognition.startListening}>
         Start Listening
       </button>

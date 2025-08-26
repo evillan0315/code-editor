@@ -1,4 +1,3 @@
-  
 import {
   FileItem,
   FileReadResponse,
@@ -6,10 +5,7 @@ import {
   FileDeleteRequest,
   FileUploadRequest,
 } from './file-system';
-import {
-  HttpMethod,
-  ResponseType
-} from './http';
+import { HttpMethod, ResponseType } from './http';
 export interface TerminalConnectPayload {
   terminalId: string;
   initialCwd?: string; // Added initialCwd to allow setting CWD on connect
@@ -36,7 +32,6 @@ export type SocketMessage =
   | { type: 'terminal:output'; payload: TerminalOutputPayload }
   | { type: 'terminal:input'; payload: TerminalInputPayload }
   | { type: 'terminal:cwd_change'; payload: TerminalCwdChangePayload };
-  
 
 // This import path should be correct for your project
 
@@ -67,8 +62,8 @@ export type APIProps = {
   endpoint: string;
   method: HttpMethod;
   body?: Record<string, any>;
-  event: string; 
-  responseType?: ResponseType,
+  event: string;
+  responseType?: ResponseType;
   headers?: HeadersInit;
   signal?: AbortSignal;
   requestId?: string; // Client-generated unique ID for request-response correlation
@@ -105,7 +100,7 @@ export interface IFileService {
   stripCodeBlock(content: string): Promise<string>;
   removeCodeComment(content: string, language: string): Promise<string>;
   // --- New methods for TanStack Query ---
-  upload(request: FileUploadRequest): Promise<void>; 
+  upload(request: FileUploadRequest): Promise<void>;
 }
 
 // Factory function type for socket creation

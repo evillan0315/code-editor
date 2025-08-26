@@ -14,7 +14,12 @@ import { toggleTerminal } from '@/stores/layout';
 import { io, Socket } from 'socket.io-client';
 import { Icon } from '@/components/ui/Icon';
 import { Button } from '@/components/ui/Button';
-import { truncateFilePath, joinPaths, getDirname, getBasename } from '@/utils/pathUtils'; // Import browser-compatible path utilities
+import {
+  truncateFilePath,
+  joinPaths,
+  getDirname,
+  getBasename,
+} from '@/utils/pathUtils'; // Import browser-compatible path utilities
 import CommandLineOutputViewer from '@/components/terminal/CommandLineOutputViewer';
 
 import { useEditorExplorerActions } from '@/hooks/useEditorExplorerActions';
@@ -70,13 +75,17 @@ const Terminal: React.FC<TerminalProps> = ({ isResizing }) => {
   const [homeDir, setHomeDir] = useState<string>('~');
   const [isAuth, setIsAuth] = useState<boolean>(true);
   const [status, setStatus] = useState<string>('Disconnected');
-  const [outputMessage, setOutputMessage] = useState<TerminalEntry | null>(null);
+  const [outputMessage, setOutputMessage] = useState<TerminalEntry | null>(
+    null,
+  );
   const [showContextMenu, setShowContextMenu] = useState<boolean>(false);
   const [contextMenuPosition, setContextMenuPosition] = useState<{
     x: number;
     y: number;
   }>({ x: 0, y: 0 });
-  const [filteredContextMenuOptions, setFilteredContextMenuOptions] = useState<CommandDetail[]>([]);
+  const [filteredContextMenuOptions, setFilteredContextMenuOptions] = useState<
+    CommandDetail[]
+  >([]);
 
   // NEW: State for command history
   const [commandHistory, setCommandHistory] = useState<string[]>(() => {
@@ -88,10 +97,13 @@ const Terminal: React.FC<TerminalProps> = ({ isResizing }) => {
       return [];
     }
   });
-  const [historyIndex, setHistoryIndex] = useState<number>(commandHistory.length); // Points to the next available slot for new commands, or current command being edited
+  const [historyIndex, setHistoryIndex] = useState<number>(
+    commandHistory.length,
+  ); // Points to the next available slot for new commands, or current command being edited
 
   // NEW: State for general text input prompt handling (e.g., password, simple questions)
-  const [awaitingTextInputPrompt, setAwaitingTextInputPrompt] = useState<boolean>(false);
+  const [awaitingTextInputPrompt, setAwaitingTextInputPrompt] =
+    useState<boolean>(false);
   const [textInputValue, setTextInputValue] = useState<string>('');
   const textInputRef = useRef<HTMLInputElement>(null); // Ref for the text input prompt
 
@@ -150,7 +162,13 @@ const Terminal: React.FC<TerminalProps> = ({ isResizing }) => {
           description:
             'Build applications, servers, microservices, databases, or custom services. Add topics, instructions and context for better responses',
           icon: 'carbon:build-run',
-          options: ['applications', 'servers', 'microservices', 'databases', 'custom'],
+          options: [
+            'applications',
+            'servers',
+            'microservices',
+            'databases',
+            'custom',
+          ],
           instructions: '',
           context: '',
           topics: [],
@@ -186,8 +204,8 @@ const Terminal: React.FC<TerminalProps> = ({ isResizing }) => {
   // Effect to filter context menu options based on cmd input
   useEffect(() => {
     if (cmd.startsWith('/')) {
-      const flatOptions: CommandDetail[] = availableOptions.flatMap((optionItem) =>
-        Object.values(optionItem),
+      const flatOptions: CommandDetail[] = availableOptions.flatMap(
+        (optionItem) => Object.values(optionItem),
       );
 
       const cleanedInput = cmd.slice(1).toLowerCase(); // Remove '/' prefix for filtering
@@ -205,7 +223,10 @@ const Terminal: React.FC<TerminalProps> = ({ isResizing }) => {
 
   // Effect to save command history to localStorage
   useEffect(() => {
-    localStorage.setItem('terminalCommandHistory', JSON.stringify(commandHistory));
+    localStorage.setItem(
+      'terminalCommandHistory',
+      JSON.stringify(commandHistory),
+    );
   }, [commandHistory]);
 
   const scrollToBottom = useCallback((): void => {
@@ -245,7 +266,9 @@ const Terminal: React.FC<TerminalProps> = ({ isResizing }) => {
 
         const choices = rawChoices.map((choiceLine) => {
           const isSelected = choiceLine.startsWith('❯');
-          const name = choiceLine.replace(/^❯\s*/, '').replace(/\s*\(\S+\)$/, ''); // Remove '❯' and optional info like (currently)
+          const name = choiceLine
+            .replace(/^❯\s*/, '')
+            .replace(/\s*\(\S+\)$/, ''); // Remove '❯' and optional info like (currently)
           const value = name; // In inquirer list prompts, the displayed name is often the value
           return { name, value, isSelected };
         });
@@ -270,7 +293,9 @@ const Terminal: React.FC<TerminalProps> = ({ isResizing }) => {
       }
 
       // Handle general text input prompts (e.g., password, single line)
-      const isPasswordPrompt = /([Ss]udo)?\s*([Pp]assword|password for)/.test(rawContent);
+      const isPasswordPrompt = /([Ss]udo)?\s*([Pp]assword|password for)/.test(
+        rawContent,
+      );
       const isConfirmPrompt = /\?\[(Y\/n|y\/N)\]/i.test(rawContent);
       const isGeneralInputPrompt = /: $/.test(rawContent) && !isPasswordPrompt; // Ends with ': ' but not a password prompt
 
@@ -358,7 +383,10 @@ const Terminal: React.FC<TerminalProps> = ({ isResizing }) => {
 
           // Add a placeholder entry to the terminal output for non-password prompts
           if (!/([Ss]udo)?\s*([Pp]assword|password for)/.test(textInputValue)) {
-            addEntryOptimized('command', `(input hidden: ${textInputValue.length} chars)`);
+            addEntryOptimized(
+              'command',
+              `(input hidden: ${textInputValue.length} chars)`,
+            );
           } else {
             addEntryOptimized('command', '[password hidden]');
           }
@@ -393,10 +421,13 @@ const Terminal: React.FC<TerminalProps> = ({ isResizing }) => {
           break;
         case 'Enter':
           e.preventDefault();
-          const selectedChoice = interactivePromptState.choices[interactivePromptState.activeIndex];
+          const selectedChoice =
+            interactivePromptState.choices[interactivePromptState.activeIndex];
           if (selectedChoice) {
             // Send the selected value + newline back to the PTY
-            socketRef.current?.emit('input', { input: selectedChoice.value + '\n' });
+            socketRef.current?.emit('input', {
+              input: selectedChoice.value + '\n',
+            });
             addEntryOptimized('command', `(selected: ${selectedChoice.name})`); // Add a log for the selection
 
             // Reset interactive prompt state
@@ -420,26 +451,29 @@ const Terminal: React.FC<TerminalProps> = ({ isResizing }) => {
     [interactivePromptState, addEntryOptimized],
   );
 
-  const handleInput = useCallback((e: ChangeEvent<HTMLTextAreaElement>): void => {
-    const value = e.currentTarget.value;
-    setCmd(value);
+  const handleInput = useCallback(
+    (e: ChangeEvent<HTMLTextAreaElement>): void => {
+      const value = e.currentTarget.value;
+      setCmd(value);
 
-    const textarea = e.currentTarget;
-    textarea.style.height = 'auto';
-    textarea.style.height = `${textarea.scrollHeight}px`;
+      const textarea = e.currentTarget;
+      textarea.style.height = 'auto';
+      textarea.style.height = `${textarea.scrollHeight}px`;
 
-    // Position context menu
-    if (value.startsWith('/')) {
-      const rect = textarea.getBoundingClientRect();
-      const menuHeight = 300;
-      const gap = 6;
-      const menuTopY = rect.top - menuHeight - gap;
-      setContextMenuPosition({ x: rect.left, y: menuTopY });
-      // showContextMenu state is now managed by the useEffect above
-    } else {
-      // showContextMenu state is now managed by the useEffect above
-    }
-  }, []);
+      // Position context menu
+      if (value.startsWith('/')) {
+        const rect = textarea.getBoundingClientRect();
+        const menuHeight = 300;
+        const gap = 6;
+        const menuTopY = rect.top - menuHeight - gap;
+        setContextMenuPosition({ x: rect.left, y: menuTopY });
+        // showContextMenu state is now managed by the useEffect above
+      } else {
+        // showContextMenu state is now managed by the useEffect above
+      }
+    },
+    [],
+  );
 
   const handleSelectAndSendCommand = useCallback(
     (option: string): void => {
@@ -521,7 +555,10 @@ const Terminal: React.FC<TerminalProps> = ({ isResizing }) => {
           let partialFileName = '';
 
           if (pathArgument.includes('/')) {
-            baseDirectory = joinPaths(editorCurrentDir, getDirname(pathArgument));
+            baseDirectory = joinPaths(
+              editorCurrentDir,
+              getDirname(pathArgument),
+            );
             partialFileName = getBasename(pathArgument);
           } else {
             baseDirectory = editorCurrentDir;
@@ -571,22 +608,28 @@ const Terminal: React.FC<TerminalProps> = ({ isResizing }) => {
                 completedPathSegment += '/'; // Append '/' for directories when there's a unique match
               }
 
-              const newPathArgument = joinPaths(getDirname(pathArgument), completedPathSegment);
+              const newPathArgument = joinPaths(
+                getDirname(pathArgument),
+                completedPathSegment,
+              );
               const newCmd = `${commandPart} ${newPathArgument}`;
               setCmd(newCmd);
 
               // Manually set cursor position after updating value
               setTimeout(() => {
                 if (mainInputRef.current) {
-                  mainInputRef.current.selectionStart = mainInputRef.current.selectionEnd =
-                    newCmd.length;
+                  mainInputRef.current.selectionStart =
+                    mainInputRef.current.selectionEnd = newCmd.length;
                   mainInputRef.current.focus();
                 }
               }, 0);
             }
           } catch (error) {
             console.error('Error fetching path completions:', error);
-            addEntryOptimized('error', `Error auto-completing path: ${(error as Error).message}`);
+            addEntryOptimized(
+              'error',
+              `Error auto-completing path: ${(error as Error).message}`,
+            );
           }
         }
       } else if (e.key === 'ArrowUp') {
@@ -641,7 +684,7 @@ const Terminal: React.FC<TerminalProps> = ({ isResizing }) => {
     const s = io(`${import.meta.env.VITE_WS_URL}/terminal`, {
       auth: { token: `Bearer ${token}` },
       query: {
-        initialCwd: editorCurrentDir 
+        initialCwd: editorCurrentDir,
       },
       transports: ['websocket', 'polling'],
       forceNew: true,
@@ -713,16 +756,24 @@ const Terminal: React.FC<TerminalProps> = ({ isResizing }) => {
       addEntryOptimized('info', `[INFO] ${msg}`);
     });
 
-    s.on('prompt', ({ cwd: promptCwd, command }: { cwd: string; command: string }) => {
-      if (promptCwd && editorCurrentDirectory.get() !== promptCwd) {
-        editorCurrentDirectory.set(promptCwd);
-      }
-    });
+    s.on(
+      'prompt',
+      ({ cwd: promptCwd, command }: { cwd: string; command: string }) => {
+        if (promptCwd && editorCurrentDirectory.get() !== promptCwd) {
+          editorCurrentDirectory.set(promptCwd);
+        }
+      },
+    );
 
     return () => {
       s.disconnect();
     };
-  }, [editorCurrentDir, addEntryOptimized, fetchAndSetFileTree, scrollToBottom]);
+  }, [
+    editorCurrentDir,
+    addEntryOptimized,
+    fetchAndSetFileTree,
+    scrollToBottom,
+  ]);
 
   useEffect(() => {
     if (mainInputRef.current) {
@@ -753,7 +804,10 @@ const Terminal: React.FC<TerminalProps> = ({ isResizing }) => {
   useEffect(() => {
     if (editorCurrentDir && editorCurrentDir !== cwd) {
       setCwd(editorCurrentDir);
-      addEntryOptimized('info', `[INFO] Editor directory changed to: ${editorCurrentDir}`);
+      addEntryOptimized(
+        'info',
+        `[INFO] Editor directory changed to: ${editorCurrentDir}`,
+      );
       fetchAndSetFileTree();
     }
   }, [editorCurrentDir, cwd, addEntryOptimized, fetchAndSetFileTree]);
@@ -779,25 +833,25 @@ const Terminal: React.FC<TerminalProps> = ({ isResizing }) => {
 
   return (
     <>
-      <div className='flex items-center justify-between px-1 py-0 border-b bg-secondary shadow-xs '>
+      <div className="flex items-center justify-between px-1 py-0 border-b bg-secondary shadow-xs ">
         <div className={`flex gap-2 items-center justify-between `}>
-          <Button className='p-0 m-0'>
-            <Icon icon='mdi-light:console' width='1.7em' height='1.7em' />
+          <Button className="p-0 m-0">
+            <Icon icon="mdi-light:console" width="1.7em" height="1.7em" />
           </Button>
           <span> Terminal </span>
         </div>
-        <div className='flex items-center gap-0'>
-          <Button onClick={() => setEntries([])} title='Clear terminal'>
-            <Icon width='1.7em' height='1.7em' icon='mdi:trash' />
+        <div className="flex items-center gap-0">
+          <Button onClick={() => setEntries([])} title="Clear terminal">
+            <Icon width="1.7em" height="1.7em" icon="mdi:trash" />
           </Button>
-          <Button onClick={toggleTerminal} title='Close Terminal'>
-            <Icon width='1.7em' height='1.7em' icon='mdi:close' />
+          <Button onClick={toggleTerminal} title="Close Terminal">
+            <Icon width="1.7em" height="1.7em" icon="mdi:close" />
           </Button>
         </div>
       </div>
 
       <div
-        className='flex-1 overflow-auto px-4 py-2 scroll-smooth font-mono'
+        className="flex-1 overflow-auto px-4 py-2 scroll-smooth font-mono"
         ref={outputRef}
         onClick={handleOutputContainerClick}
         style={{ cursor: 'text' }}
@@ -818,7 +872,7 @@ const Terminal: React.FC<TerminalProps> = ({ isResizing }) => {
                       : ''
             }
             lineHeight={18}
-            lineWidth='100%'
+            lineWidth="100%"
             tabSpaces={8}
             typewriterEffect={entry.type === 'typewriter'}
             typewriterSpeed={5}
@@ -829,15 +883,15 @@ const Terminal: React.FC<TerminalProps> = ({ isResizing }) => {
         {/* NEW: Interactive List Prompt Renderer */}
         {interactivePromptState && (
           <div
-            className='interactive-prompt mt-2 focus:outline-none'
+            className="interactive-prompt mt-2 focus:outline-none"
             tabIndex={0} // Make it focusable
             onKeyDown={handleInteractivePromptKeyDown}
             ref={interactivePromptRef}
           >
-            <div className='text-purple-400 font-bold mb-1'>
+            <div className="text-purple-400 font-bold mb-1">
               ? {interactivePromptState.question}
             </div>
-            <div className='space-y-0'>
+            <div className="space-y-0">
               {interactivePromptState.choices.map((choice, index) => (
                 <div
                   key={index}
@@ -854,8 +908,13 @@ const Terminal: React.FC<TerminalProps> = ({ isResizing }) => {
                     });
                     // Need a slight delay to allow state update before sending
                     setTimeout(() => {
-                      socketRef.current?.emit('input', { input: choice.value + '\n' });
-                      addEntryOptimized('command', `(selected: ${choice.name})`);
+                      socketRef.current?.emit('input', {
+                        input: choice.value + '\n',
+                      });
+                      addEntryOptimized(
+                        'command',
+                        `(selected: ${choice.name})`,
+                      );
                       setInteractivePromptState(null);
                       setTextInputValue('');
                       setAwaitingTextInputPrompt(false);
@@ -868,14 +927,14 @@ const Terminal: React.FC<TerminalProps> = ({ isResizing }) => {
                 </div>
               ))}
             </div>
-            <div className='text-neutral-500 text-sm mt-1'>
+            <div className="text-neutral-500 text-sm mt-1">
               (Use arrow keys to navigate, Enter to select)
             </div>
           </div>
         )}
       </div>
 
-      <div className='pt-2 shadow-lg '>
+      <div className="pt-2 shadow-lg ">
         {showContextMenu && (
           <InputContextMenu
             position={contextMenuPosition}
@@ -884,7 +943,7 @@ const Terminal: React.FC<TerminalProps> = ({ isResizing }) => {
             onSelect={handleSelectAndSendCommand}
           />
         )}
-        <div className='flex-1 items-center justify-between px-2 mb-2 gap-1 relative '>
+        <div className="flex-1 items-center justify-between px-2 mb-2 gap-1 relative ">
           {/* Render general text input prompt when active */}
           {awaitingTextInputPrompt && (
             <input
@@ -898,7 +957,7 @@ const Terminal: React.FC<TerminalProps> = ({ isResizing }) => {
               }
               className={`flex-1 text-sm w-full text-yellow-400 focus:outline-none focus:ring-0 resize-none overflow-hidden absolute left-2 z-50 p-2 
                 ${!isAuth || !awaitingTextInputPrompt ? 'opacity-50 cursor-not-allowed' : ''}`}
-              placeholder='Enter password...'
+              placeholder="Enter password..."
               value={textInputValue}
               onChange={(e) => setTextInputValue(e.target.value)}
               onKeyDown={handleTextInputEnter}
@@ -914,35 +973,56 @@ const Terminal: React.FC<TerminalProps> = ({ isResizing }) => {
               status === 'Connected' ? 'font-bold' : 'text-red-400'
             } px-1 py-1 focus:outline-none focus:ring-0 resize-none overflow-hidden 
               ${awaitingTextInputPrompt || interactivePromptState ? 'opacity-50 cursor-not-allowed' : ''}`}
-            placeholder={`${status === 'Connected' ? ( awaitingTextInputPrompt ? '' : 'Type a command...'): status}`}
+            placeholder={`${status === 'Connected' ? (awaitingTextInputPrompt ? '' : 'Type a command...') : status}`}
             value={cmd}
             autoFocus={!awaitingTextInputPrompt && !interactivePromptState} // Only auto-focus if no prompt
             onChange={handleInput}
             onKeyDown={handleMainInputKeyDown} // Using mainInputKeyDown
             onFocus={handleInputFocus}
             rows={1}
-            disabled={!isAuth || awaitingTextInputPrompt || interactivePromptState !== null}
+            disabled={
+              !isAuth ||
+              awaitingTextInputPrompt ||
+              interactivePromptState !== null
+            }
           />
         </div>
-        <div className='flex gap-0 text-neutral-400 items-center justify-between px-1 bg-secondary border-t'>
-          <div className='flex items-center px-2 gap-2 max-w-[50%]'>
-            <span className='truncate ' title={`Current Directory: ${editorCurrentDir}`}>
+        <div className="flex gap-0 text-neutral-400 items-center justify-between px-1 bg-secondary border-t">
+          <div className="flex items-center px-2 gap-2 max-w-[50%]">
+            <span
+              className="truncate "
+              title={`Current Directory: ${editorCurrentDir}`}
+            >
               {truncateFilePath(editorCurrentDir)}
             </span>
           </div>
 
-          <div className='flex gap-2'>
-            <Button className='p-0 m-0'>
-              <Icon icon='ph:plus-thin' width='1.2em' height='1.2em' />
+          <div className="flex gap-2">
+            <Button className="p-0 m-0">
+              <Icon icon="ph:plus-thin" width="1.2em" height="1.2em" />
             </Button>
-            <Button className='p-0 m-0'>
-              <Icon icon='material-symbols-light:folder-outline' width='1.7em' height='1.7em' />
+            <Button className="p-0 m-0">
+              <Icon
+                icon="material-symbols-light:folder-outline"
+                width="1.7em"
+                height="1.7em"
+              />
             </Button>
-            <Button className='p-0 m-0 text-neutral-300'>
-              <Icon icon='fluent:mic-32-light' width='1.7em' height='1.7em' className='' />
+            <Button className="p-0 m-0 text-neutral-300">
+              <Icon
+                icon="fluent:mic-32-light"
+                width="1.7em"
+                height="1.7em"
+                className=""
+              />
             </Button>
-            <Button className='p-0 m-0 text-neutral-300'>
-              <Icon icon='fluent:video-32-light' width='1.7em' height='1.7em' className='' />
+            <Button className="p-0 m-0 text-neutral-300">
+              <Icon
+                icon="fluent:video-32-light"
+                width="1.7em"
+                height="1.7em"
+                className=""
+              />
             </Button>
           </div>
         </div>

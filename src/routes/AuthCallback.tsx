@@ -39,9 +39,9 @@ const AuthCallback: React.FC = () => {
   }, [location, navigate]);
 
   return (
-    <div className='flex items-center justify-center min-h-screen bg-gray-900 text-white'>
+    <div className="flex items-center justify-center min-h-screen bg-gray-900 text-white">
       <Loading />
-      <p className='ml-4 text-lg'>Processing authentication...</p>
+      <p className="ml-4 text-lg">Processing authentication...</p>
     </div>
   );
 };

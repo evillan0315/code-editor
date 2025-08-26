@@ -1,10 +1,10 @@
 // src/components/motion/ModalUI.tsx
 // (Previously src/services/CreateModalService.tsx)
-import React, { FC } from "react";
-import { Button } from "@/components/ui/Button";
-import { FormInput } from "@/components/form/FormControl";
-import { MotionModal } from "@/components/motion/MotionModal";
-import { useStore } from "@nanostores/react";
+import React, { FC } from 'react';
+import { Button } from '@/components/ui/Button';
+import { FormInput } from '@/components/form/FormControl';
+import { MotionModal } from '@/components/motion/MotionModal';
+import { useStore } from '@nanostores/react';
 // Import the Nanostore and action functions
 import {
   modalState,
@@ -12,7 +12,7 @@ import {
   handleCancel,
   setPromptInputValue,
   resolveOkVariant, // Import ModalType if not already globally available
-} from "@/stores/modal"; // Adjust path as needed
+} from '@/stores/modal'; // Adjust path as needed
 
 // No props needed for this UI component anymore, as it gets state from the store
 export const ModalUI: FC = () => {
@@ -34,7 +34,7 @@ export const ModalUI: FC = () => {
     >
       <pre className="whitespace-pre-wrap text-sm">{message}</pre>
 
-      {type === "prompt" && (
+      {type === 'prompt' && (
         <FormInput
           type="text"
           value={inputValue}
@@ -46,7 +46,7 @@ export const ModalUI: FC = () => {
       )}
 
       <div className="flex justify-end gap-2">
-        {type !== "alert" && (
+        {type !== 'alert' && (
           <Button
             variant="secondary"
             size="sm"

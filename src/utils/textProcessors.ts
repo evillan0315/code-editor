@@ -28,7 +28,7 @@ export const cleanTerminalOutput = (text: string): string => {
   //      (e.g., \x1bE, \x1bF, \x1b<, \x1b= etc. - these are less common in modern logs but exist)
   cleanedText = cleanedText.replace(
     /\x1b\[[0-?]*[@-~]|\x1b\][^\x07]*(\x07|\x1b\\)|\x1b[!-@^_`]/g,
-    "",
+    '',
   );
 
   // 2. Handle common ANSI-like sequences that might be missing the leading \x1b
@@ -37,11 +37,11 @@ export const cleanTerminalOutput = (text: string): string => {
   //    a. `[<params>m`: Matches `[` followed by digits/semicolons, then `m` (e.g., `[0;1;39m`, `[0m`).
   //    b. `]<params>?`: Matches `]` followed by digits/semicolons, then `?` (e.g., `]11;?`). This is an OSC query.
   //    c. `[<params>n`: Matches `[` followed by digits/semicolons, then `n` (e.g., `[6n`). This is a CSI query for cursor position.
-  cleanedText = cleanedText.replace(/\[[0-9;]*m|\][0-9;]*\?|\[[0-9;]*n/g, "");
+  cleanedText = cleanedText.replace(/\[[0-9;]*m|\][0-9;]*\?|\[[0-9;]*n/g, '');
 
   // 3. Remove Carriage Returns (\r).
   //    In many contexts, \r can cause cursor to return to start of line, overwriting previous text.
-  cleanedText = cleanedText.replace(/\r/g, "");
+  cleanedText = cleanedText.replace(/\r/g, '');
 
   // 4. Remove other non-printable ASCII control characters.
   //    This regex targets characters from ASCII 0-8, 11-12, 14-31, and 127 (DEL).
@@ -51,7 +51,7 @@ export const cleanTerminalOutput = (text: string): string => {
   //    - \x0c: FF (Form Feed)
   //    - [\x0e-\x1f]: SO, SI, DLE, DC1-DC4, NAK, SYN, ETB, CAN, EM, SUB, ESC, FS, GS, RS, US
   //    - \x7f: DEL (Delete)
-  cleanedText = cleanedText.replace(/[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]/g, "");
+  cleanedText = cleanedText.replace(/[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]/g, '');
 
   // 5. Trim leading/trailing whitespace after cleaning (including resulting newlines).
   cleanedText = cleanedText.trim();

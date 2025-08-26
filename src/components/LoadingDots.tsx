@@ -16,13 +16,13 @@ const LoadingDots: React.FC<LoadingDotsProps> = ({
   return (
     <div className={`flex items-center space-x-1 ${color} ${size}`}>
       <span>{message}</span>
-      <span className='animate-bounce' style={{ animationDelay: '0s' }}>
+      <span className="animate-bounce" style={{ animationDelay: '0s' }}>
         •
       </span>
-      <span className='animate-bounce' style={{ animationDelay: '0.1s' }}>
+      <span className="animate-bounce" style={{ animationDelay: '0.1s' }}>
         •
       </span>
-      <span className='animate-bounce' style={{ animationDelay: '0.2s' }}>
+      <span className="animate-bounce" style={{ animationDelay: '0.2s' }}>
         •
       </span>
     </div>

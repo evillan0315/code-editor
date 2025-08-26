@@ -42,7 +42,7 @@ const InputContextMenu: React.FC<InputContextMenuProps> = (props) => {
 
   return (
     <div
-      className=' fixed text-sm rounded-xl shadow-xl z-10 border border-neutral-900 p-1 bg-black'
+      className=" fixed text-sm rounded-xl shadow-xl z-10 border border-neutral-900 p-1 bg-black"
       style={{
         left: `${props.position.x}px`,
         top: `${props.position.y}px`,
@@ -50,14 +50,16 @@ const InputContextMenu: React.FC<InputContextMenuProps> = (props) => {
         height: '300px',
       }}
     >
-      <div className='flex flex-col text-left'>
+      <div className="flex flex-col text-left">
         {filteredOptions.map((optionDetail) => (
           <button
             key={optionDetail.name}
-            className='py-2 px-4 rounded-xl hover:bg-neutral-900 flex gap-2 items-center text-left text-white'
+            className="py-2 px-4 rounded-xl hover:bg-neutral-900 flex gap-2 items-center text-left text-white"
             onClick={() => handleOptionClick(optionDetail.name)}
           >
-            {optionDetail.icon && <Icon width='1.4em' height='1.4em' icon={optionDetail.icon} />}
+            {optionDetail.icon && (
+              <Icon width="1.4em" height="1.4em" icon={optionDetail.icon} />
+            )}
             {optionDetail.name}
           </button>
         ))}

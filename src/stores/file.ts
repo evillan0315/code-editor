@@ -1,10 +1,10 @@
 // src/stores/editorFileStore.ts
-import { atom } from "nanostores";
-import { persistentAtom } from "@nanostores/persistent";
-import type { FileItem } from "@/types/file-system";
+import { atom } from 'nanostores';
+import { persistentAtom } from '@nanostores/persistent';
+import type { FileItem } from '@/types/file-system';
 
 // Persistent save record ID
-export const saveRecordId = persistentAtom<string>("saveRecordId", "");
+export const saveRecordId = persistentAtom<string>('saveRecordId', '');
 
 // Playback/Queue state
 export const shuffledQueue = atom<number[]>([]);
@@ -12,13 +12,10 @@ export const queueIndex = atom<number>(0);
 
 // Current working directory
 export const editorCurrentDirectory = persistentAtom<string>(
-  "currentDirectory",
-  "./",
+  'currentDirectory',
+  './',
 );
-export const activeTerminalId = persistentAtom<string>(
-  "activeTerminalId",
-  "",
-);
+export const activeTerminalId = persistentAtom<string>('activeTerminalId', '');
 // Currently selected file
 export const selectedFile = atom<FileItem | null>(null);
 

@@ -21,7 +21,7 @@ export default defineConfig(({ mode }) => {
       port: 3000,
       proxy: {
         '/api': {
-          target: env.VITE_API_URL,
+          target: env.VITE_API_URI,
           changeOrigin: true,
           rewrite: (path) => path.replace(/^\/api/, ''),
         },
@@ -42,10 +42,9 @@ export default defineConfig(({ mode }) => {
     },
     define: {
       'process.env.NODE_ENV': JSON.stringify(mode),
-      'import.meta.env.BASE_URL_API': JSON.stringify(env.BASE_URL),
-      'import.meta.env.BASE_DIR': JSON.stringify(process.cwd()),
       'import.meta.env.GITHUB_CALLBACK_URL': JSON.stringify(env.GITHUB_CALLBACK_URL),
       'import.meta.env.GOOGLE_CALLBACK_URL': JSON.stringify(env.GOOGLE_CALLBACK_URL),
+      'import.meta.env.FRONTEND_URL': JSON.stringify(env.VITE_FRONTEND_URL), // Add frontend URL for backend redirects
     },
   };
 });

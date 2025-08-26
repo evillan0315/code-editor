@@ -65,7 +65,10 @@ const CommandLineOutputViewer: React.FC<CommandLineOutputProps> = ({
 
   const processLineContent = (line: string): React.ReactNode => {
     if (typeof line !== 'string') {
-      console.warn('CommandLineOutputViewer: Received non-string line content:', line);
+      console.warn(
+        'CommandLineOutputViewer: Received non-string line content:',
+        line,
+      );
       return '';
     }
     if (line === 'undefined') {
@@ -87,7 +90,8 @@ const CommandLineOutputViewer: React.FC<CommandLineOutputProps> = ({
         for (let i = 0; i < node.length; i++) {
           const char = node[i];
           if (char === '\t') {
-            const nextTabStop = Math.ceil((currentOffset + 1) / tabSpaces) * tabSpaces;
+            const nextTabStop =
+              Math.ceil((currentOffset + 1) / tabSpaces) * tabSpaces;
             const spacesToAdd = nextTabStop - currentOffset;
             processedString += ' '.repeat(spacesToAdd);
             currentOffset += spacesToAdd;
@@ -97,18 +101,25 @@ const CommandLineOutputViewer: React.FC<CommandLineOutputProps> = ({
           }
         }
         finalRenderedParts.push(
-          <React.Fragment key={`part-${idx}`}>{processedString}</React.Fragment>,
+          <React.Fragment key={`part-${idx}`}>
+            {processedString}
+          </React.Fragment>,
         );
       } else {
         // This is a React element (e.g., <span> from parseAnsi), push directly
         finalRenderedParts.push(
-          React.cloneElement(node as React.ReactElement, { key: `part-${idx}` }),
+          React.cloneElement(node as React.ReactElement, {
+            key: `part-${idx}`,
+          }),
         );
         // Note: Accurately tracking `currentOffset` for mixed strings/React elements is complex
         // if precise tab alignment is needed across styled spans. For simplicity, this assumes
         // character width for non-tab content within spans is 1 for subsequent tab calculations.
         const textContent = (
-          node as React.ReactElement<any, string | React.JSXElementConstructor<any>>
+          node as React.ReactElement<
+            any,
+            string | React.JSXElementConstructor<any>
+          >
         ).props.children;
         if (typeof textContent === 'string') {
           currentOffset += textContent.length;

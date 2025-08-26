@@ -42,9 +42,11 @@ const FileExplorerThumbnailItem: React.FC<FileExplorerThumbnailItemProps> = ({
         isDirectory={isFolder}
         isOpen={node.isOpen}
         language={node.lang}
-        className='w-12 h-12 mb-1'
+        className="w-12 h-12 mb-1"
       />
-      <span className='text-xs text-center truncate w-full px-1'>{node.name}</span>
+      <span className="text-xs text-center truncate w-full px-1">
+        {node.name}
+      </span>
     </div>
   );
 };

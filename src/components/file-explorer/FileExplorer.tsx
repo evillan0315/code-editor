@@ -10,12 +10,18 @@ import { FileItem } from '@/types/file-system';
 import { useEditorExplorerActions } from '@/hooks/useEditorExplorerActions';
 import LoadingDots from '@/components/LoadingDots';
 import { FileExplorerContextMenuRenderer } from '@/components/editor/FileExplorerContextMenuRenderer';
-import { fileExplorerContextMenu, showFileExplorerContextMenu } from '@/stores/contextMenu';
+import {
+  fileExplorerContextMenu,
+  showFileExplorerContextMenu,
+} from '@/stores/contextMenu';
 import { Icon } from '@/components/ui/Icon';
 import FileExplorerListView from '@/components/file-explorer/FileExplorerListView';
 import FileExplorerThumbnailView from '@/components/file-explorer/FileExplorerThumbnailView';
 import FileExplorerHeader from '@/components/file-explorer/FileExplorerHeader';
-import { fileExplorerViewMode, toggleFileExplorerViewMode } from '@/stores/layout';
+import {
+  fileExplorerViewMode,
+  toggleFileExplorerViewMode,
+} from '@/stores/layout';
 
 import '@/styles/file-manager.css';
 
@@ -39,31 +45,42 @@ const FileExplorer: React.FC = () => {
     handleOpenFile,
     fetchAndSetFileTree,
     handleSelectedPath,
-    handleGoUpDirectory
+    handleGoUpDirectory,
   } = useEditorExplorerActions();
 
   const [search, setSearch] = useState('');
   const [showSearch, setShowSearch] = useState(false);
 
-  const OpenIcon = useMemo(() => <Icon icon='ion:open-outline' width='1.5em' height='1.5em' />, []);
+  const OpenIcon = useMemo(
+    () => <Icon icon="ion:open-outline" width="1.5em" height="1.5em" />,
+    [],
+  );
   const RenameIcon = useMemo(
-    () => <Icon icon='mdi:file-edit-outline' width='1.5em' height='1.5em' />,
+    () => <Icon icon="mdi:file-edit-outline" width="1.5em" height="1.5em" />,
     [],
   );
   const CopyPathIcon = useMemo(
-    () => <Icon icon='mdi:content-copy' width='1.5em' height='1.5em' />,
+    () => <Icon icon="mdi:content-copy" width="1.5em" height="1.5em" />,
     [],
   );
   const NewFileIcon = useMemo(
-    () => <Icon icon='qlementine-icons:add-file-16' width='1.5em' height='1.5em' />,
+    () => (
+      <Icon icon="qlementine-icons:add-file-16" width="1.5em" height="1.5em" />
+    ),
     [],
   );
   const NewFolderIcon = useMemo(
-    () => <Icon icon='mdi:folder-add-outline' width='1.5em' height='1.5em' />,
+    () => <Icon icon="mdi:folder-add-outline" width="1.5em" height="1.5em" />,
     [],
   );
   const DeleteIcon = useMemo(
-    () => <Icon icon='streamline:file-delete-alternate' width='1.5em' height='1.5em' />,
+    () => (
+      <Icon
+        icon="streamline:file-delete-alternate"
+        width="1.5em"
+        height="1.5em"
+      />
+    ),
     [],
   );
 
@@ -163,7 +180,11 @@ const FileExplorer: React.FC = () => {
           matchingItems.push(node);
         }
 
-        if (node.type === 'folder' && node.children && node.children.length > 0) {
+        if (
+          node.type === 'folder' &&
+          node.children &&
+          node.children.length > 0
+        ) {
           traverseAndFilter(node.children);
         }
       });
@@ -190,7 +211,7 @@ const FileExplorer: React.FC = () => {
   );
 
   return (
-    <div className='flex flex-col min-w-full h-full'>
+    <div className="flex flex-col min-w-full h-full">
       <FileExplorerHeader
         search={search}
         setSearch={setSearch}
@@ -204,10 +225,10 @@ const FileExplorer: React.FC = () => {
         onToggleViewMode={toggleFileExplorerViewMode}
         onPathSelect={handleSelectedPath}
       />
-      <div className='flex items-center px-1 gap-4 mt-2 h-4'>
-        {loading && <LoadingDots color='text-sky-500' />}
+      <div className="flex items-center px-1 gap-4 mt-2 h-4">
+        {loading && <LoadingDots color="text-sky-500" />}
       </div>
-      <div className='flex-1 overflow-auto scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-gray-800'>
+      <div className="flex-1 overflow-auto scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-gray-800">
         {$fileExplorerViewMode === 'list' ? (
           <FileExplorerListView
             nodes={filteredNodes}
@@ -227,7 +248,9 @@ const FileExplorer: React.FC = () => {
         )}
       </div>
 
-      {fileExplorerContextMenuState.visible && <FileExplorerContextMenuRenderer />}
+      {fileExplorerContextMenuState.visible && (
+        <FileExplorerContextMenuRenderer />
+      )}
     </div>
   );
 };

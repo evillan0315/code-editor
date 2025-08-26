@@ -1,7 +1,7 @@
 // src/components/ui/Icon.tsx
-import React, { useEffect, useState } from "react";
-import type { HTMLAttributes } from "react";
-import { getIconNameSvg } from "@/services/icon";
+import React, { useEffect, useState } from 'react';
+import type { HTMLAttributes } from 'react';
+import { getIconNameSvg } from '@/services/icon';
 
 interface IconProps extends HTMLAttributes<HTMLSpanElement> {
   icon: string;
@@ -12,19 +12,19 @@ interface IconProps extends HTMLAttributes<HTMLSpanElement> {
 
 export const Icon: React.FC<IconProps> = ({
   icon,
-  size = "1em",
+  size = '1em',
   width,
   height,
-  className = "",
+  className = '',
   ...rest
 }) => {
   const [svg, setSvg] = useState<string | null>(null);
 
   const resolvedWidth =
-    width ?? (typeof size === "number" ? `${size}px` : (size ?? "1.2em"));
+    width ?? (typeof size === 'number' ? `${size}px` : (size ?? '1.2em'));
 
   const resolvedHeight =
-    height ?? (typeof size === "number" ? `${size}px` : (size ?? "1.2em"));
+    height ?? (typeof size === 'number' ? `${size}px` : (size ?? '1.2em'));
 
   useEffect(() => {
     let cancelled = false;

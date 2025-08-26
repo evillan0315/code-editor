@@ -36,7 +36,9 @@ const RecordingManager: React.FC<RecordingManagerProps> = () => {
 
   // Modal states for media playback
   const [isMediaModalOpen, setIsMediaModalOpen] = useState(false);
-  const [selectedMedia, setSelectedMedia] = useState<RecordingResultDto | null>(null);
+  const [selectedMedia, setSelectedMedia] = useState<RecordingResultDto | null>(
+    null,
+  );
 
   // Pagination states
   const [currentPage, setCurrentPage] = useState(1);
@@ -73,7 +75,10 @@ const RecordingManager: React.FC<RecordingManagerProps> = () => {
   const fetchRecordings = useCallback(async () => {
     setIsLoadingRecordings(true);
     try {
-      const result = await recordingService.listPaginatedRecordings(currentPage, pageSize);
+      const result = await recordingService.listPaginatedRecordings(
+        currentPage,
+        pageSize,
+      );
       setRecordings(result.items);
       setTotalPages(result.totalPages);
     } catch (err: any) {
@@ -133,7 +138,10 @@ const RecordingManager: React.FC<RecordingManagerProps> = () => {
         lastStoppedRecording: null, // Clear any previous stopped recording
         mediaToOpen: null, // Ensure no media is pending to open
       });
-      showToast(`Recording started: id: ${result.id} path: ${result.path}`, 'info');
+      showToast(
+        `Recording started: id: ${result.id} path: ${result.path}`,
+        'info',
+      );
       // No need to call fetchStatus immediately as store is already updated
     } catch (err: any) {
       showToast(`Error starting recording: ${err.message}`, 'error');
@@ -189,7 +197,10 @@ const RecordingManager: React.FC<RecordingManagerProps> = () => {
         showToast(`Recording '${name}' deleted successfully.`, 'success');
         fetchRecordings(); // Refresh list
       } catch (err: any) {
-        showToast(`Error deleting recording '${name}': ${err.message}`, 'error');
+        showToast(
+          `Error deleting recording '${name}': ${err.message}`,
+          'error',
+        );
       }
     },
     [fetchRecordings],
@@ -226,8 +237,6 @@ const RecordingManager: React.FC<RecordingManagerProps> = () => {
     [],
   );
 
-  
-
   const handleCloseMediaModal = useCallback(() => {
     setIsMediaModalOpen(false);
     setSelectedMedia(null);
@@ -240,48 +249,54 @@ const RecordingManager: React.FC<RecordingManagerProps> = () => {
   };
 
   return (
-    <div className='p-4 bg-dark  min-h-screen'>
-      <h1 className='text-2xl font-bold mb-6'>Screen Recording & Capture</h1>
+    <div className="p-4 bg-dark  min-h-screen">
+      <h1 className="text-2xl font-bold mb-6">Screen Recording & Capture</h1>
 
-      <div className='grid grid-cols-1 md:grid-cols-2 gap-6 mb-8'>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
         {/* Recording Controls */}
-        <div className='bg-secondary p-4 rounded-lg shadow-md border'>
-          <h2 className='text-xl font-semibold mb-4'>Controls</h2>
-          <div className='flex items-center gap-4'>
+        <div className="bg-secondary p-4 rounded-lg shadow-md border">
+          <h2 className="text-xl font-semibold mb-4">Controls</h2>
+          <div className="flex items-center gap-4">
             <Button
               onClick={handleCaptureScreen}
-              disabled={isCapturing || isStartingRecording || isStoppingRecording}
+              disabled={
+                isCapturing || isStartingRecording || isStoppingRecording
+              }
               loading={isCapturing}
-              variant='primary'
-              size='lg'
-              title='Capture Screenshot'
+              variant="primary"
+              size="lg"
+              title="Capture Screenshot"
             >
-              <Icon icon='mdi:camera-outline' className='mr-2' />
+              <Icon icon="mdi:camera-outline" className="mr-2" />
               {/* No text, icon only as per request */}
             </Button>
 
             {isRecording ? (
               <Button
                 onClick={handleStopRecording}
-                disabled={isCapturing || isStartingRecording || isStoppingRecording}
+                disabled={
+                  isCapturing || isStartingRecording || isStoppingRecording
+                }
                 loading={isStoppingRecording}
-                variant='error'
-                size='lg'
-                title='Stop Recording'
+                variant="error"
+                size="lg"
+                title="Stop Recording"
               >
-                <Icon icon='mdi:stop' />
+                <Icon icon="mdi:stop" />
                 {/* No text, icon only as per request */}
               </Button>
             ) : (
               <Button
                 onClick={handleStartRecording}
-                disabled={isCapturing || isStartingRecording || isStoppingRecording}
+                disabled={
+                  isCapturing || isStartingRecording || isStoppingRecording
+                }
                 loading={isStartingRecording}
-                variant='success'
-                size='lg'
-                title='Start Recording'
+                variant="success"
+                size="lg"
+                title="Start Recording"
               >
-                <Icon icon='mdi:record' />
+                <Icon icon="mdi:record" />
                 {/* No text, icon only as per request */}
               </Button>
             )}
@@ -289,13 +304,13 @@ const RecordingManager: React.FC<RecordingManagerProps> = () => {
         </div>
 
         {/* Current Status */}
-        <div className='bg-secondary p-4 rounded-lg shadow-md border '>
-          <h2 className='text-xl font-semibold mb-4'>Current Status</h2>
+        <div className="bg-secondary p-4 rounded-lg shadow-md border ">
+          <h2 className="text-xl font-semibold mb-4">Current Status</h2>
           {isLoadingStatus ? (
             <Loading />
           ) : (
             <div>
-              <p className='text-lg'>
+              <p className="text-lg">
                 Status:{' '}
                 <span
                   className={`font-semibold ${isRecording ? 'text-green-400' : 'text-red-400'}`}
@@ -304,20 +319,21 @@ const RecordingManager: React.FC<RecordingManagerProps> = () => {
                 </span>
               </p>
               {currentRecordingPath && (
-                <p className='text-sm mt-2'>
+                <p className="text-sm mt-2">
                   File:{' '}
-                  <span className='font-mono text-gray-300 break-all'>
+                  <span className="font-mono text-gray-300 break-all">
                     {currentRecordingPath.split('/').pop()}
                   </span>
                 </p>
               )}
               {currentRecordingStartedAt && (
-                <p className='text-sm'>
-                  Started At: {new Date(currentRecordingStartedAt).toLocaleString()}
+                <p className="text-sm">
+                  Started At:{' '}
+                  {new Date(currentRecordingStartedAt).toLocaleString()}
                 </p>
               )}
               {!isRecording && (
-                <p className='text-sm italic text-gray-400 mt-2'>
+                <p className="text-sm italic text-gray-400 mt-2">
                   No active recording. Click 'Start Recording' to begin.
                 </p>
               )}
@@ -327,85 +343,91 @@ const RecordingManager: React.FC<RecordingManagerProps> = () => {
       </div>
 
       {/* Recordings List */}
-      <h2 className='text-lg my-3'>Saved Recordings & Screenshots</h2>
-      <div className='bg-dark rounded-lg shadow-md border'>
-        
+      <h2 className="text-lg my-3">Saved Recordings & Screenshots</h2>
+      <div className="bg-dark rounded-lg shadow-md border">
         {isLoadingRecordings ? (
           <Loading />
         ) : recordings.length === 0 ? (
-          <p className='text-gray-400'>No recordings or screenshots saved yet.</p>
+          <p className="text-gray-400">
+            No recordings or screenshots saved yet.
+          </p>
         ) : (
           <>
-            <div className='overflow-x-auto'>
-              <table className='min-w-full divide-y divide-neutral-300 dark:divide-neutral-800'>
-                <thead className='bg-secondary'>
+            <div className="overflow-x-auto">
+              <table className="min-w-full divide-y divide-neutral-300 dark:divide-neutral-800">
+                <thead className="bg-secondary">
                   <tr>
                     <th
-                      scope='col'
-                      className='px-2 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider'
+                      scope="col"
+                      className="px-2 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider"
                     >
                       Name
                     </th>
                     <th
-                      scope='col'
-                      className='px-2 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider'
+                      scope="col"
+                      className="px-2 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider"
                     >
                       Status
                     </th>
                     <th
-                      scope='col'
-                      className='px-2 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider'
+                      scope="col"
+                      className="px-2 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider"
                     >
                       Size
                     </th>
                     <th
-                      scope='col'
-                      className='px-2 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider'
+                      scope="col"
+                      className="px-2 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider"
                     >
                       Created At
                     </th>
-                    <th scope='col' className='relative px-6 py-3'>
-                      <span className='sr-only'>Actions</span>
+                    <th scope="col" className="relative px-6 py-3">
+                      <span className="sr-only">Actions</span>
                     </th>
                   </tr>
                 </thead>
-                <tbody className='divide-y divide-neutral-800'>
+                <tbody className="divide-y divide-neutral-800">
                   {recordings.map((rec) => (
-                    <tr key={rec.id} className='hover:bg-neutral-800'>
-                      <td className='px-2 py-3 whitespace-nowrap text-sm font-medium text-neutral-300 break-all flex items-center gap-2'>
+                    <tr key={rec.id} className="hover:bg-neutral-800">
+                      <td className="px-2 py-3 whitespace-nowrap text-sm font-medium text-neutral-300 break-all flex items-center gap-2">
                         {rec.type === 'screenRecord' &&
-                          (rec.status === 'finished' || rec.status === 'ready') && (
+                          (rec.status === 'finished' ||
+                            rec.status === 'ready') && (
                             <Button
                               onClick={() => handleOpenMedia(rec)}
-                              variant='primary'
-                              size='sm'
-                              title='Play Recording'
-                              className='flex-shrink-0'
+                              variant="primary"
+                              size="sm"
+                              title="Play Recording"
+                              className="flex-shrink-0"
                             >
-                              <Icon icon='mdi:play' />
+                              <Icon icon="mdi:play" />
                             </Button>
                           )}
                         {rec.type === 'screenShot' &&
-                          (rec.status === 'finished' || rec.status === 'ready') && (
+                          (rec.status === 'finished' ||
+                            rec.status === 'ready') && (
                             <Button
                               onClick={() => handleOpenMedia(rec)}
-                              variant='primary'
-                              size='sm'
-                              title='View Screenshot'
-                              className='flex-shrink-0'
+                              variant="primary"
+                              size="sm"
+                              title="View Screenshot"
+                              className="flex-shrink-0"
                             >
-                              <Icon icon='mdi:play' />
+                              <Icon icon="mdi:play" />
                             </Button>
                           )}
-                        <span className='flex-grow'>{rec.path.split('/').pop()}</span>
+                        <span className="flex-grow">
+                          {rec.path.split('/').pop()}
+                        </span>
                       </td>
-                      <td className='px-2 py-3 whitespace-nowrap text-sm'>
+                      <td className="px-2 py-3 whitespace-nowrap text-sm">
                         <Icon
-                          icon='mdi:circle'
+                          icon="mdi:circle"
                           className={`
                             w-3 h-3 rounded-full inline-block mr-2
                             ${
-                              rec.status === 'finished' || rec.status === 'ready'
+                              rec.status === 'finished' ||
+                              rec.status === 'ready'
                                 ? 'text-green-500' // Success
                                 : rec.status === 'started'
                                   ? 'text-blue-500' // Info
@@ -415,33 +437,42 @@ const RecordingManager: React.FC<RecordingManagerProps> = () => {
                           title={rec.status}
                         />
                       </td>
-                      <td className='px-2 py-3 whitespace-nowrap text-sm text-neutral-400'>
-                        {rec.data?.fileSize && typeof rec.data.fileSize === 'number'
+                      <td className="px-2 py-3 whitespace-nowrap text-sm text-neutral-400">
+                        {rec.data?.fileSize &&
+                        typeof rec.data.fileSize === 'number'
                           ? formatBytes(rec.data.fileSize)
                           : 'N/A'}
                       </td>
-                      <td className='px-2 py-3 whitespace-nowrap text-sm text-neutral-400'>
+                      <td className="px-2 py-3 whitespace-nowrap text-sm text-neutral-400">
                         {new Date(rec.createdAt).toLocaleDateString()}
                       </td>
-                      <td className='px-2 py-3 whitespace-nowrap text-right text-sm font-medium'>
-                        <div className='flex justify-end space-x-2'>
+                      <td className="px-2 py-3 whitespace-nowrap text-right text-sm font-medium">
+                        <div className="flex justify-end space-x-2">
                           <Button
-                            onClick={() => handleDownloadFile(rec.path, rec.path.split('/').pop()!)}
-                            variant='secondary'
-                            size='sm'
-                            title='Download'
+                            onClick={() =>
+                              handleDownloadFile(
+                                rec.path,
+                                rec.path.split('/').pop()!,
+                              )
+                            }
+                            variant="secondary"
+                            size="sm"
+                            title="Download"
                           >
-                            <Icon icon='mdi:download' />
+                            <Icon icon="mdi:download" />
                           </Button>
                           <Button
                             onClick={() =>
-                              handleDeleteRecording(rec.id, rec.path.split('/').pop()!)
+                              handleDeleteRecording(
+                                rec.id,
+                                rec.path.split('/').pop()!,
+                              )
                             }
-                            variant='error'
-                            size='sm'
-                            title='Delete'
+                            variant="error"
+                            size="sm"
+                            title="Delete"
                           >
-                            <Icon icon='mdi:trash-can-outline' />
+                            <Icon icon="mdi:trash-can-outline" />
                           </Button>
                         </div>
                       </td>
@@ -453,30 +484,30 @@ const RecordingManager: React.FC<RecordingManagerProps> = () => {
 
             {/* Pagination Controls */}
             {totalPages > 1 && (
-              <nav className='flex items-center justify-between p-2 border-t'>
-                <div className='flex-1 flex justify-between sm:justify-end'>
+              <nav className="flex items-center justify-between p-2 border-t">
+                <div className="flex-1 flex justify-between sm:justify-end">
                   <Button
                     onClick={() => handlePageChange(currentPage - 1)}
                     disabled={currentPage === 1}
-                    variant='secondary'
-                    size='sm'
-                    className='mr-2'
+                    variant="secondary"
+                    size="sm"
+                    className="mr-2"
                   >
                     Previous
                   </Button>
                   <Button
                     onClick={() => handlePageChange(currentPage + 1)}
                     disabled={currentPage === totalPages}
-                    variant='secondary'
-                    size='sm'
+                    variant="secondary"
+                    size="sm"
                   >
                     Next
                   </Button>
                 </div>
-                <div className='hidden sm:flex sm:flex-1 sm:items-center sm:justify-center'>
-                  <p className='text-sm text-gray-400'>
-                    Page <span className='font-medium'>{currentPage}</span> of{' '}
-                    <span className='font-medium'>{totalPages}</span>
+                <div className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-center">
+                  <p className="text-sm text-gray-400">
+                    Page <span className="font-medium">{currentPage}</span> of{' '}
+                    <span className="font-medium">{totalPages}</span>
                   </p>
                 </div>
               </nav>
@@ -489,17 +520,21 @@ const RecordingManager: React.FC<RecordingManagerProps> = () => {
       <Modal
         isOpen={isMediaModalOpen}
         onClose={handleCloseMediaModal}
-        title={selectedMedia ? `Opened: ${selectedMedia.path.split('/').pop()}` : 'Media Player'}
-        size='lg' // Changed to fullscreen as per request for modal sizes
-        className='bg-secondary flex flex-col' // Added flex flex-col for internal layout
+        title={
+          selectedMedia
+            ? `Opened: ${selectedMedia.path.split('/').pop()}`
+            : 'Media Player'
+        }
+        size="lg" // Changed to fullscreen as per request for modal sizes
+        className="bg-secondary flex flex-col" // Added flex flex-col for internal layout
       >
         {selectedMedia && (
-          <div className='flex items-center justify-center bg-secondary rounded-md flex-grow'>
+          <div className="flex items-center justify-center bg-secondary rounded-md flex-grow">
             {selectedMedia.type === 'screenRecord' ? (
               <video
                 controls
                 src={getMediaUrl(selectedMedia.path)}
-                className='w-full h-full object-contain'
+                className="w-full h-full object-contain"
                 autoPlay
               >
                 Your browser does not support the video tag.
@@ -508,10 +543,10 @@ const RecordingManager: React.FC<RecordingManagerProps> = () => {
               <img
                 src={getMediaUrl(selectedMedia.path)}
                 alt={selectedMedia.path.split('/').pop()}
-                className='w-full h-full object-contain'
+                className="w-full h-full object-contain"
               />
             ) : (
-              <p className='text-gray-400'>Unsupported media type.</p>
+              <p className="text-gray-400">Unsupported media type.</p>
             )}
           </div>
         )}

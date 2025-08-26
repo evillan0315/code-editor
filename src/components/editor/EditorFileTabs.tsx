@@ -1,8 +1,8 @@
-import React, { useCallback, RefObject } from "react";
-import { useToast } from "@/hooks/useToast";
-import { confirm } from "@/stores/modal";
-import { isFileUnsaved, getFileLanguage } from "@/stores/editorContent";
-import { EditorFileTabItem } from "@/components/editor/EditorFileTabItem";
+import React, { useCallback, RefObject } from 'react';
+import { useToast } from '@/hooks/useToast';
+import { confirm } from '@/stores/modal';
+import { isFileUnsaved, getFileLanguage } from '@/stores/editorContent';
+import { EditorFileTabItem } from '@/components/editor/EditorFileTabItem';
 
 export interface EditorFileTabsProps {
   openFiles: string[];
@@ -38,12 +38,12 @@ export function EditorFileTabs({
           `You have unsaved changes in "${path}". Are you sure you want to close it? Your changes will be lost.`,
         );
         if (!confirmClose) {
-          showToast(`Closing of "${path}" was cancelled.`, "info");
+          showToast(`Closing of "${path}" was cancelled.`, 'info');
           return;
         }
       }
       await handleCloseFile(path);
-      showToast(`"${path}" has been closed.`, "info");
+      showToast(`"${path}" has been closed.`, 'info');
     },
     [confirm, handleCloseFile, showToast],
   );

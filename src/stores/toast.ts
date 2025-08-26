@@ -1,10 +1,10 @@
 // src/stores/toast.ts
-import { atom } from "nanostores";
-import { nanoid } from "nanoid";
+import { atom } from 'nanostores';
+import { nanoid } from 'nanoid';
 
-export type ToastType = "success" | "error" | "info" | "warning";
-export type ToastPosY = "top" | "center" | "bottom";
-export type ToastPosX = "left" | "center" | "right";
+export type ToastType = 'success' | 'error' | 'info' | 'warning';
+export type ToastPosY = 'top' | 'center' | 'bottom';
+export type ToastPosX = 'left' | 'center' | 'right';
 
 export interface Toast {
   id: string;
@@ -32,9 +32,9 @@ const getPositionKey = (position: ToastPosition) =>
 
 export function showToast(
   message: string,
-  type: ToastType = "info",
+  type: ToastType = 'info',
   duration = 3000,
-  position: ToastPosition = { x: "right", y: "bottom" },
+  position: ToastPosition = { x: 'right', y: 'bottom' },
 ) {
   const id = nanoid();
   const toast: Toast = { id, message, type, duration, position };

@@ -1,7 +1,14 @@
-import React, { useEffect, useRef, useCallback, useLayoutEffect, useMemo } from 'react';
+import React, {
+  useEffect,
+  useRef,
+  useCallback,
+  useLayoutEffect,
+  useMemo,
+} from 'react';
 import { useStore } from '@nanostores/react';
 import { showCodeMirrorContextMenu } from '@/stores/contextMenu';
 import { CodeMirrorContextMenuRenderer } from '@/components/editor/CodeMirrorContextMenuRenderer';
+import { CodeMirrorStatus } from '@/components/editor/CodeMirrorStatus';
 import { theme } from '@/stores/theme';
 import {
   editorFilesMap,
@@ -12,6 +19,7 @@ import {
 } from '@/stores/editorContent';
 import { getLanguageExtensionByLangString } from '@/utils/editorLanguage';
 import { getThemeExtension } from '@/utils/editorTheme';
+import { darkTheme } from '@/themes/codeMirrorTheme';
 import { createEditorKeybindings } from '@/utils/editorKeymaps';
 import { useEditorExplorerActions } from '@/hooks/useEditorExplorerActions';
 import { useEditorTabs } from '@/hooks/useEditorTabs';
@@ -24,18 +32,40 @@ import {
   highlightActiveLineGutter,
   highlightActiveLine,
 } from '@codemirror/view';
-import { EditorState, Compartment, EditorSelection, EditorStateConfig } from '@codemirror/state';
+import {
+  EditorState,
+  Compartment,
+  EditorSelection,
+  EditorStateConfig,
+} from '@codemirror/state';
 
-import { defaultKeymap, history, historyKeymap, indentWithTab } from '@codemirror/commands';
-import { indentOnInput, bracketMatching, foldGutter, foldKeymap } from '@codemirror/language';
+import {
+  defaultKeymap,
+  history,
+  historyKeymap,
+  indentWithTab,
+} from '@codemirror/commands';
+import {
+  indentOnInput,
+  bracketMatching,
+  foldGutter,
+  foldKeymap,
+} from '@codemirror/language';
 import {
   autocompletion,
   completionKeymap,
   closeBrackets,
   closeBracketsKeymap,
-  CompletionSource, CompletionResult, CompletionContext, Completion 
+  CompletionSource,
+  CompletionResult,
+  CompletionContext,
+  Completion,
 } from '@codemirror/autocomplete';
-import { search, searchKeymap, highlightSelectionMatches } from '@codemirror/search';
+import {
+  search,
+  searchKeymap,
+  highlightSelectionMatches,
+} from '@codemirror/search';
 import { rectangularSelection, crosshairCursor } from '@codemirror/view';
 
 import { lintGutter } from '@codemirror/lint';
@@ -89,35 +119,43 @@ const EditorCodeMirror: React.FC<EditorCodeMirrorProps> = ({
   // const importDetectionCompartment = useRef(new Compartment()).current;
 
   const OptimizeCodeIcon = useMemo(
-    () => <Icon icon='mdi:speedometer' width='1.5em' height='1.5em' />,
+    () => <Icon icon="mdi:speedometer" width="1.5em" height="1.5em" />,
     [],
   );
   const AnalyzeCodeIcon = useMemo(
-    () => <Icon icon='mdi:magnify' width='1.5em' height='1.5em' />,
+    () => <Icon icon="mdi:magnify" width="1.5em" height="1.5em" />,
     [],
   );
   const RepairCodeIcon = useMemo(
-    () => <Icon icon='mdi:wrench-outline' width='1.5em' height='1.5em' />,
+    () => <Icon icon="mdi:wrench-outline" width="1.5em" height="1.5em" />,
     [],
   );
   const FormatCodeIcon = useMemo(
-    () => <Icon icon='mdi:format-align-left' width='1.5em' height='1.5em' />,
+    () => <Icon icon="mdi:format-align-left" width="1.5em" height="1.5em" />,
     [],
   );
   const RemoveCommentsIcon = useMemo(
-    () => <Icon icon='mdi:comment-remove-outline' width='1.5em' height='1.5em' />,
+    () => (
+      <Icon icon="mdi:comment-remove-outline" width="1.5em" height="1.5em" />
+    ),
     [],
   );
   const GenerateCodeIcon = useMemo(
-    () => <Icon icon='mdi:lightbulb-on-outline' width='1.5em' height='1.5em' />,
+    () => <Icon icon="mdi:lightbulb-on-outline" width="1.5em" height="1.5em" />,
     [],
   );
   const GenerateDocsIcon = useMemo(
-    () => <Icon icon='mdi:book-open-outline' width='1.5em' height='1.5em' />,
+    () => <Icon icon="mdi:book-open-outline" width="1.5em" height="1.5em" />,
     [],
   );
   const GenerateInlineDocsIcon = useMemo(
-    () => <Icon icon='mdi:comment-text-multiple-outline' width='1.5em' height='1.5em' />,
+    () => (
+      <Icon
+        icon="mdi:comment-text-multiple-outline"
+        width="1.5em"
+        height="1.5em"
+      />
+    ),
     [],
   );
 
@@ -130,14 +168,18 @@ const EditorCodeMirror: React.FC<EditorCodeMirrorProps> = ({
         const { text, selection } = await getSelectionOrDoc(view);
 
         const formattedText = await formatCode({ code: text, language });
+        console.log(formattedText, selection);
         if (formattedText !== text) {
+          console.log(text, selection);
           view.dispatch({
             changes: {
               from: selection.from,
               to: selection.to,
               insert: formattedText,
             },
-            selection: EditorSelection.cursor(selection.from + formattedText.length),
+            selection: EditorSelection.cursor(
+              selection.from + formattedText.length,
+            ),
             userEvent: 'format',
           });
         }
@@ -249,7 +291,9 @@ const EditorCodeMirror: React.FC<EditorCodeMirrorProps> = ({
         'aria-multiline': 'true',
       }),
 
-      languageCompartment.of(getLanguageExtensionByLangString(language || 'typescript')),
+      languageCompartment.of(
+        getLanguageExtensionByLangString(language || 'typescript'),
+      ),
       themeCompartment.of(getThemeExtension($theme)),
       editableCompartment.of(EditorView.editable.of(!readOnly)),
       keymapCompartment.of(
@@ -328,7 +372,12 @@ const EditorCodeMirror: React.FC<EditorCodeMirrorProps> = ({
     return () => {
       view.destroy();
       viewRef.current = null;
-      codeMirrorStatus.set({ language: 'plaintext', line: 1, col: 1, isUnsaved: false });
+      codeMirrorStatus.set({
+        language: 'plaintext',
+        line: 1,
+        col: 1,
+        isUnsaved: false,
+      });
     };
   }, [
     containerRef,
@@ -369,7 +418,9 @@ const EditorCodeMirror: React.FC<EditorCodeMirrorProps> = ({
 
     view.dispatch({
       effects: [
-        languageCompartment.reconfigure(getLanguageExtensionByLangString(language || 'plaintext')),
+        languageCompartment.reconfigure(
+          getLanguageExtensionByLangString(language || 'plaintext'),
+        ),
         themeCompartment.reconfigure(getThemeExtension($theme)),
         editableCompartment.reconfigure(EditorView.editable.of(!readOnly)),
         // If importDetectionCompartment was used, reconfigure it here too if `activeFilePath` changes:
@@ -428,17 +479,19 @@ const EditorCodeMirror: React.FC<EditorCodeMirrorProps> = ({
   return (
     <>
       {value === null || value === undefined ? (
-        <div className='flex h-full w-full items-center justify-center text-gray-500'>
+        <div className="flex h-full w-full items-center justify-center text-gray-500">
           No file selected. Please select a file from the explorer.
         </div>
       ) : value === '' ? (
-        <div className='flex h-full w-full items-center  justify-center flex-col  text-gray-500'>
+        <div className="flex h-full w-full items-center  justify-center flex-col  text-gray-500">
           <Logo />
-          <p className='text-sm'>Add some content here to get started.</p>
+          <p className="text-sm">Add some content here to get started.</p>
         </div>
       ) : (
-        <div className='h-full w-full'>
-          <div ref={containerRef} className='h-full cm-editor' />
+        <div className="flex flex-col h-full overflow-hidden">
+          <div ref={containerRef} className="cm-editor flex-grow min-h-0" />{' '}
+          {/* CodeMirror instance */}
+          <CodeMirrorStatus />
         </div>
       )}
       <CodeMirrorContextMenuRenderer />
@@ -447,4 +500,3 @@ const EditorCodeMirror: React.FC<EditorCodeMirrorProps> = ({
 };
 
 export default EditorCodeMirror;
-

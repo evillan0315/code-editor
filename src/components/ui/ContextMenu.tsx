@@ -1,6 +1,9 @@
 import React, { useEffect, useRef, useState, useLayoutEffect } from 'react';
 import { useStore } from '@nanostores/react';
-import { codeMirrorContextMenu, hideCodeMirrorContextMenu } from '@/stores/contextMenu';
+import {
+  codeMirrorContextMenu,
+  hideCodeMirrorContextMenu,
+} from '@/stores/contextMenu';
 
 export const ContextMenu = () => {
   const state = useStore(codeMirrorContextMenu);
@@ -30,7 +33,9 @@ export const ContextMenu = () => {
       newLeft = Math.max(0, newLeft);
 
       setAdjustedTop((prevTop) => (prevTop === newTop ? prevTop : newTop));
-      setAdjustedLeft((prevLeft) => (prevLeft === newLeft ? prevLeft : newLeft));
+      setAdjustedLeft((prevLeft) =>
+        prevLeft === newLeft ? prevLeft : newLeft,
+      );
     } else if (!state.visible) {
       setAdjustedTop(state.y);
       setAdjustedLeft(state.x);

@@ -94,3 +94,9 @@ We welcome contributions! Please see our `CONTRIBUTING.md` (if available) for gu
 ## License
 
 This project is licensed under the MIT License - see the `LICENSE` file for details.
+
+## Author
+
+Made with love by [Eddie Villanueva](https://github.com/evillan0315)
+📧 [evillan0315@gmail.com](mailto:evillan0315@gmail.com)
+

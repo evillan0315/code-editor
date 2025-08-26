@@ -1,7 +1,7 @@
 // src/types/gemini.ts
 
-import { Terminal } from "@xterm/xterm";
-import type { FileItem } from "@/types/file-system";
+import { Terminal } from '@xterm/xterm';
+import type { FileItem } from '@/types/file-system';
 
 export interface UseGeminiProps {
   fontSize?: number;

@@ -7,7 +7,18 @@ import type { FileItem, ContextMenuItem } from '@/types/file-system';
 import { getSelectionOrDoc, formatCode } from '@/utils/codeMirror';
 
 // --- UI General Constants ---
-export const SPINNER_FRAMES = ['⠋', '⠙', '⠹', '⠸', '⠼', '⠴', '⠦', '⠧', '⠇', '⠏'];
+export const SPINNER_FRAMES = [
+  '⠋',
+  '⠙',
+  '⠹',
+  '⠸',
+  '⠼',
+  '⠴',
+  '⠦',
+  '⠧',
+  '⠇',
+  '⠏',
+];
 
 export const TERMINAL_COMMANDS = [
   '/new',
@@ -157,7 +168,10 @@ export const CODE_MIRROR_CONTEXT_MENU_ITEMS: CodeMirrorActionItem[] = [
     label: 'Optimize Code',
     action: (view) => {
       const selectedCode = getSelectionOrDoc(view);
-      console.log('Action: Optimizing code:', selectedCode.substring(0, 100) + '...');
+      console.log(
+        'Action: Optimizing code:',
+        selectedCode.substring(0, 100) + '...',
+      );
     },
     icon: 'mdi:speedometer',
     type: 'button',
@@ -167,7 +181,10 @@ export const CODE_MIRROR_CONTEXT_MENU_ITEMS: CodeMirrorActionItem[] = [
     label: 'Analyze Code',
     action: (view) => {
       const selectedCode = getSelectionOrDoc(view);
-      console.log('Action: Analyzing code:', selectedCode.substring(0, 100) + '...');
+      console.log(
+        'Action: Analyzing code:',
+        selectedCode.substring(0, 100) + '...',
+      );
     },
     icon: 'mdi:magnify',
     type: 'button',
@@ -177,7 +194,10 @@ export const CODE_MIRROR_CONTEXT_MENU_ITEMS: CodeMirrorActionItem[] = [
     label: 'Repair Code',
     action: (view) => {
       const selectedCode = getSelectionOrDoc(view);
-      console.log('Action: Repairing code:', selectedCode.substring(0, 100) + '...');
+      console.log(
+        'Action: Repairing code:',
+        selectedCode.substring(0, 100) + '...',
+      );
     },
     icon: 'mdi:wrench-outline',
     type: 'button',
@@ -220,7 +240,10 @@ export const CODE_MIRROR_CONTEXT_MENU_ITEMS: CodeMirrorActionItem[] = [
     action: (view) => {
       const currentDoc = view.state.doc.toString();
 
-      const cleanedCode = currentDoc.replace(/\/\*[\s\S]*?\*\/|(?<=[^:])\/\/.*|/g, '');
+      const cleanedCode = currentDoc.replace(
+        /\/\*[\s\S]*?\*\/|(?<=[^:])\/\/.*|/g,
+        '',
+      );
       view.dispatch({
         changes: { from: 0, to: view.state.doc.length, insert: cleanedCode },
         selection: EditorSelection.cursor(0),
@@ -239,7 +262,10 @@ export const CODE_MIRROR_CONTEXT_MENU_ITEMS: CodeMirrorActionItem[] = [
     label: 'Generate Code',
     action: (view) => {
       const selectedCode = getSelectionOrDoc(view);
-      console.log('Action: Generating code:', selectedCode.substring(0, 100) + '...');
+      console.log(
+        'Action: Generating code:',
+        selectedCode.substring(0, 100) + '...',
+      );
     },
     icon: 'mdi:lightbulb-on-outline',
     type: 'button',
@@ -249,7 +275,10 @@ export const CODE_MIRROR_CONTEXT_MENU_ITEMS: CodeMirrorActionItem[] = [
     label: 'Generate Documentation',
     action: (view) => {
       const selectedCode = getSelectionOrDoc(view);
-      console.log('Action: Generating documentation:', selectedCode.substring(0, 100) + '...');
+      console.log(
+        'Action: Generating documentation:',
+        selectedCode.substring(0, 100) + '...',
+      );
     },
     icon: 'mdi:book-open-outline',
     type: 'button',
@@ -259,7 +288,10 @@ export const CODE_MIRROR_CONTEXT_MENU_ITEMS: CodeMirrorActionItem[] = [
     label: 'Generate Inline Documentation',
     action: (view) => {
       const selectedCode = getSelectionOrDoc(view);
-      console.log('Action: Generating inline docs:', selectedCode.substring(0, 100) + '...');
+      console.log(
+        'Action: Generating inline docs:',
+        selectedCode.substring(0, 100) + '...',
+      );
     },
     icon: 'mdi:comment-text-multiple-outline',
     type: 'button',

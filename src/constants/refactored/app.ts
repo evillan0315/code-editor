@@ -12,7 +12,8 @@ if (!VITE_BASE_DIR) {
     'VITE_BASE_DIR is not set in environment variables. ESLint may not find correct configurations.',
   );
 }
-export const IMPORT_SPECIFIER_REGEX = /(?:import|export)(?:["'\s]*(?:[\w*{}\n\r\t, ]+)from\s*)?["']((?:@|\.{1,2}\/)?[\w\/.-]+)["']/g;
+export const IMPORT_SPECIFIER_REGEX =
+  /(?:import|export)(?:["'\s]*(?:[\w*{}\n\r\t, ]+)from\s*)?["']((?:@|\.{1,2}\/)?[\w\/.-]+)["']/g;
 
 export const DEFAULT_LANGUAGE = 'typescript';
 
@@ -31,17 +32,22 @@ export const PROJECT_STATUSES = [
   'DEPRECATED',
 ] as const;
 
-export const VERSION_CONTROL_SYSTEMS = ['git', 'svn', 'mercurial', 'other'] as const;
+export const VERSION_CONTROL_SYSTEMS = [
+  'git',
+  'svn',
+  'mercurial',
+  'other',
+] as const;
 
 export const PATH_ALIASES_MAP = {
-  "@/": "src/",
-  "@components/": "src/components/",
-  "@contexts/": "src/contexts/",
-  "@hooks/": "src/hooks/",
-  "@utils/": "src/utils/",
-  "@services/": "src/services/",
-  "@stores/": "src/stores/",
-  "@providers/": "src/providers/",
-  "@types/": "src/types/",
-  "@lib/": "src/lib/",
+  '@/': 'src/',
+  '@components/': 'src/components/',
+  '@contexts/': 'src/contexts/',
+  '@hooks/': 'src/hooks/',
+  '@utils/': 'src/utils/',
+  '@services/': 'src/services/',
+  '@stores/': 'src/stores/',
+  '@providers/': 'src/providers/',
+  '@types/': 'src/types/',
+  '@lib/': 'src/lib/',
 };

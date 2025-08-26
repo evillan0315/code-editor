@@ -29,7 +29,10 @@ export const ProjectModal: React.FC<ProjectModalProps> = ({
       onClose();
     },
     onError: (error: any) => {
-      showToast(`Error creating project: ${error.message || 'Unknown error'}`, 'error');
+      showToast(
+        `Error creating project: ${error.message || 'Unknown error'}`,
+        'error',
+      );
     },
   });
 
@@ -42,7 +45,10 @@ export const ProjectModal: React.FC<ProjectModalProps> = ({
       onClose();
     },
     onError: (error: any) => {
-      showToast(`Error updating project: ${error.message || 'Unknown error'}`, 'error');
+      showToast(
+        `Error updating project: ${error.message || 'Unknown error'}`,
+        'error',
+      );
     },
   });
 

@@ -385,6 +385,7 @@ export function AiChatPanel() {
     if ($newChatEvent > 0) {
       // Only trigger if event count is greater than 0
       handleNewChat();
+      newChatEvent.set(0); // Reset the event after handling to prevent re-triggering
     }
   }, [$newChatEvent, handleNewChat]); // Dependency on the new chat event atom
 

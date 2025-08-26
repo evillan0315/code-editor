@@ -34,7 +34,7 @@ export function EditorRightSidebar() {
 
   return (
     <aside className="flex flex-col h-full w-full relative bg-dark border-l">
-      <div className="flex items-center justify-around h-12 border-b border-dark-secondary bg-secondary flex-shrink-0">
+      <div className="flex items-center justify-around h-12 border-b border-dark-secondary bg-secondary flex-shrink-0 px-1 gap-1">
         {/* NEW: View All Chats button icon at the beginning of the tabs */}
         {$activeTab === 'codeAssist' && (
           <Button

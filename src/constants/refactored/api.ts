@@ -36,7 +36,11 @@ export const API_ENDPOINTS = {
     GENERATE_VIDEO: '/api/gemini/file/generate-video',
   },
   _GOOGLE_GEMINI: {
+    ANALYZE_CODE: '/api/google-gemini/analyze-code',
+    GENERATE_CODE: '/api/google-gemini/generate-code',
+    GENERATE_CODE_DOCUMENTATION: '/api/google-gemini/generate-doc',
     OPTIMIZE_CODE: '/api/google-gemini/optimize-code',
+    REPAIR_CODE: '/api/google-gemini/repair-code',
   },
   _LLM: {
     GENERATE_CONTENT: '/api/llm/generate-llm',

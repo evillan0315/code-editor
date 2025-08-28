@@ -2,7 +2,7 @@
 
 This repository contains the front-end application for **CodeGen**, a powerful, feature-rich code editor designed to empower developers with an integrated, AI-enhanced environment. Built with React, TypeScript, and Tailwind CSS, CodeGen provides a seamless experience for writing, managing, and collaborating on code, augmented by intelligent AI capabilities.
 
-![Demo](demo.gif)
+![Demo](recorded-terminal.gif)
 
 ## Why CodeGen?
 

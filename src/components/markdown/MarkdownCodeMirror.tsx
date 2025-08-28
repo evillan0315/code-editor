@@ -268,7 +268,7 @@ const MarkdownCodeMirror: React.FC<MarkdownCodeMirrorProps> = ({
     return () => {
       editorDom.removeEventListener('contextmenu', handleContextMenu);
     };
-  }, [value]);
+  }, [value,memoizedCodeMirrorMenuItems]);
 
   if (value === null || value === undefined) {
     return (

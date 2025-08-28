@@ -214,8 +214,9 @@ This `README.md` supports rendering **Mermaid diagrams** directly within GitHub'
 
 To include a Mermaid diagram, simply use the `mermaid` code block:
 
-````markdown
+
 ```mermaid
+
 graph TD
     A[User Action] --> B(CodeGen UI);
     B --> C{AI Chat / CLI Request?};
@@ -225,12 +226,14 @@ graph TD
     C -- No --> G[Normal Editor Operations];
     F --> H[Display Changes];
     G --> H;
+    
 ```
-````
+
 
 **Example: AI Interaction Flow**
 
 ```mermaid
+
 graph TD
     A[User Input in CodeGen] --> B{AI Chat or CLI Command};
     B -- AI Chat --> C(Send Prompt to AI Service);
@@ -240,6 +243,7 @@ graph TD
     E -- Code / Suggestions --> F(Display Results in UI);
     F -- User Accepts --> G[Apply Changes to Editor / Files];
     F -- User Rejects --> H[Discard Changes];
+    
 ```
 
 ## Contributing
@@ -251,16 +255,8 @@ We welcome contributions! Please see our `CONTRIBUTING.md` (if available) for gu
 This project is licensed under the MIT License - see the `LICENSE` file for details.
 
 ## Author
-
-Made with love by [Eddie Villanueva](https://github.com/evillan0315)
+Developed by [Eddie Villanueva](https://github.com/evillan0315)  
 📧 [evillan0315@gmail.com](mailto:evillan0315@gmail.com)
-```
-
----
-
-## Part 2: Proposed `src/docs` Folder Structure and Content Ideas
-
-Given your existing `src/docs` and the new features, here's a recommended updated structure and what each file could contain. This keeps your documentation co-located with the code it describes, which can be very effective.
 
 ```
 src/docs/
@@ -307,20 +303,14 @@ src/docs/
 
 ---
 
-## Part 3: Mermaid Diagram Integration (for GitHub)
-
-As confirmed, GitHub's native Markdown renderer fully supports Mermaid. You simply need to wrap your Mermaid code in a `mermaid` code block, as demonstrated in the `README.md` example above.
-
 **Key points:**
 
-*   **Syntax:** Use ````markdown
+*   **Syntax:** Use
+
     ```mermaid
     [your mermaid code]
     ```
-    ````
+ 
 *   **Supported Diagram Types:** GitHub supports most common Mermaid diagram types including `graph` (flowcharts), `sequenceDiagram`, `classDiagram`, `stateDiagram`, `gantt`, `pie`, `journey`, `gitGraph`, `erDiagram`, `mindmap`, `timeline`.
 *   **Local Preview:** For local development, if you use VS Code, the "Markdown Preview Enhanced" extension (or similar) will render Mermaid diagrams.
 
----
-
-This comprehensive update should significantly enhance your project's documentation, making it more approachable for new users and contributors, while also clearly showcasing its advanced capabilities and the `codegen-cli` integration. Let me know if you'd like any specific sections further elaborated!

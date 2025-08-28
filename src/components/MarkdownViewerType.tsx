@@ -92,9 +92,9 @@ const MarkdownViewer: React.FC<MarkdownViewerProps> = ({ markdown }) => {
         const classAttr = codeNode.attribs?.class || '';
         const languageMatch = classAttr.match(/language-(\w+)/);
         const language = languageMatch ? languageMatch[1] : 'plaintext';
-
+        
         const codeContent = extractTextFromDomNode(codeNode);
-
+        //console.log(language, codeContent);
         // Handle Mermaid diagrams
         if (language === 'mermaid') {
           return <MermaidDiagram chart={codeContent} />;

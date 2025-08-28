@@ -2,50 +2,50 @@
 
 import React, { useState, FormEvent, ChangeEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '@/hooks/useAuth'; // Ensure this imports your Nanostore-based useAuth hook
+import { useAuth } from '@/hooks/useAuth'; 
 import Loading from '@/components/Loading';
 import SignInWithGoogle from '@/components/SignInWithGoogle';
 import SignInWithGithub from '@/components/SignInWithGithub';
 import { Button } from '@/components/ui/Button';
-import  Logo  from '@/components/ui/Logo';
-import { EDITOR_PATH } from '@/constants/paths'; // Import your dashboard path
+import Logo from '@/components/ui/Logo';
+import { EDITOR_PATH } from '@/constants/paths'; 
 
 const LoginForm: React.FC = () => {
-  const { login } = useAuth(); // Accessing the login function from your Nanostore auth system
+  const { login } = useAuth(); 
   const navigate = useNavigate();
 
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState<boolean>(false); // This `loading` is for the form submission itself
+  const [loading, setLoading] = useState<boolean>(false); 
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError(null);
-    setLoading(true); // Start local form loading indicator
+    setLoading(true); 
 
     try {
       await login({ email: email, password: password });
 
-      // If login succeeds, navigate to the dashboard (or your primary authenticated route)
+      
 
       navigate(EDITOR_PATH);
     } catch (err) {
-      // Catch any errors during login and display them
+      
       setError(
         (err as Error).message ||
           'Login failed. Please check your credentials.',
       );
     } finally {
-      setLoading(false); // End local form loading indicator
+      setLoading(false); 
     }
   };
 
   return (
-    // You might combine this `loading` with `useAuth().isLoading` if `Loading` is a full page loader
-    // For now, it correctly indicates the form submission loading state.
-    loading ? ( // This `loading` state is specifically for the form submission
-      <Loading /> // This `Loading` component might be a spinner or a div that covers the form
+    
+    
+    loading ? ( 
+      <Loading /> 
     ) : (
       <div className="login-wrapper py-16">
         <div className="flex items-center justify-center">
@@ -54,7 +54,6 @@ const LoginForm: React.FC = () => {
               <Logo />
               <p className="text-sm mt-2">Please Sign In below</p>
             </div>
-            
 
             {error && (
               <p className="text-center text-sm text-red-400">{error}</p>
@@ -96,13 +95,13 @@ const LoginForm: React.FC = () => {
                 variant="primary"
                 type="submit"
                 size="lg"
-                disabled={loading} // Disable button while login is in progress
+                disabled={loading} 
                 className="w-full rounded-md bg-sky-500 p-3 hover:bg-sky-600 focus:outline-none focus:ring-2 focus:ring-sky-400"
               >
                 {loading ? 'Signing In...' : 'Sign In'}
               </Button>
             </form>
-            {/* Social sign-in components */}
+            {}
             <SignInWithGoogle />
             <SignInWithGithub />
           </div>

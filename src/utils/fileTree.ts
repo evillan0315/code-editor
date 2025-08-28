@@ -1,7 +1,6 @@
-// src/utils/fileTree.ts
 import { Project, ts } from 'ts-morph';
 import * as path from 'path';
-import type { FileItem } from '../types/file-system';
+import type { FileItem } from '../types/file-system'; // Assuming this path is correct
 
 export function findFileByPath(
   path: string,
@@ -63,7 +62,6 @@ export function updateFolderStateRecursive(
 export function ensureFolderDefaults(items: FileItem[]): FileItem[] {
   return items.map((item) => ({
     ...item,
-
     ...(item.type === 'folder' && {
       children: item.children || [],
       isOpen: item.isOpen || false,
@@ -71,6 +69,7 @@ export function ensureFolderDefaults(items: FileItem[]): FileItem[] {
     }),
   }));
 }
+
 export function toggleFolderState(path: string, items: FileItem[]): FileItem[] {
   return items.map((item) => {
     if (item.path === path && item.type === 'folder') {
@@ -103,13 +102,11 @@ export const getParentPath = (path: string): string => {
 export const createNewFileItem = (
   name: string,
   fullPath: string,
-
   type: 'file' | 'folder',
 ): FileItem => ({
   name,
   path: fullPath,
   type,
-
   ...(type === 'folder' && { children: [], isOpen: false }),
 });
 
@@ -124,10 +121,8 @@ export const updateTreeWithNewItem = (
     (parentPath === '/' && explorerRootPath === '/')
   ) {
     const newNodes = [...currentNodes, newItem];
-
     newNodes.sort((a, b) => {
       if (a.type === b.type) return a.name.localeCompare(b.name);
-
       return a.type === 'folder' ? -1 : 1;
     });
     return newNodes;
@@ -140,7 +135,6 @@ export const updateTreeWithNewItem = (
         : [newItem];
       newChildren.sort((a, b) => {
         if (a.type === b.type) return a.name.localeCompare(b.name);
-
         return a.type === 'folder' ? -1 : 1;
       });
       return {
@@ -161,7 +155,6 @@ export const updateTreeWithNewItem = (
       return {
         ...node,
         children: updatedChildren,
-
         isOpen: node.children ? node.isOpen : true,
       };
     }
@@ -169,28 +162,54 @@ export const updateTreeWithNewItem = (
   });
 };
 
+/**
+ * Removes an item (file or folder) from the file tree recursively.
+ * It returns the new tree state and the item that was removed.
+ * This function handles immutable updates by returning new array/object references.
+ */
 export const removeItemFromTree = (
   nodes: FileItem[],
   itemPath: string,
 ): { updatedNodes: FileItem[]; removedItem: FileItem | null } => {
   let removedItem: FileItem | null = null;
-  const updatedNodes = nodes.filter((node) => {
-    if (node.path === itemPath) {
-      removedItem = node;
-      return false;
-    }
 
+  // First, map through the nodes to update children arrays if the item is nested.
+  // We use map here to reconstruct parent nodes with new children arrays if necessary.
+  const mappedNodes = nodes.map((node) => {
     if (node.type === 'folder' && itemPath.startsWith(node.path + '/')) {
+      // Recursively call for children
       const result = removeItemFromTree(node.children || [], itemPath);
       if (result.removedItem) {
-        removedItem = result.removedItem;
-
-        return { ...node, children: result.updatedNodes };
+        removedItem = result.removedItem; // Propagate the removed item upwards
+        return { ...node, children: result.updatedNodes }; // Return the folder with updated children
       }
     }
-    return true;
+    return node; // Return node as is if no child was removed or it's not a parent
   });
-  return { updatedNodes, removedItem };
+
+  // Then, filter the top-level array to remove the item itself if found at this level.
+  // We use filter here to exclude the target node from the current level's array.
+  const finalNodes = mappedNodes.filter((node) => {
+    if (node.path === itemPath) {
+      removedItem = node; // Capture the item if it's being removed at this level
+      return false; // Exclude this node
+    }
+    return true; // Include all other nodes
+  });
+
+  return { updatedNodes: finalNodes, removedItem };
+};
+
+/**
+ * A convenience wrapper around `removeItemFromTree` that only returns the updated FileItem[] array.
+ * Ideal for scenarios where only the updated tree state is needed after a deletion.
+ */
+export const updateTreeWithRemoveItem = (
+  currentNodes: FileItem[],
+  itemPathToRemove: string,
+): FileItem[] => {
+  const { updatedNodes } = removeItemFromTree(currentNodes, itemPathToRemove);
+  return updatedNodes;
 };
 
 export const updatePathsRecursively = (
@@ -219,7 +238,6 @@ export const updatePathsRecursively = (
  * A script to detect local imports and get their resolved file paths
  * using the ts-morph library.
  */
-
 export async function findLocalImports(filePath: string): Promise<void> {
   try {
     // Create a new ts-morph project instance.

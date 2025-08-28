@@ -12,11 +12,16 @@ import { useEditorExplorerActions } from '@/hooks/useEditorExplorerActions';
 import { useEditorTabs } from '@/hooks/useEditorTabs';
 
 import { Button } from '@/components/ui/Button';
-import { Modal } from '@/components/ui/Modal';
-import { EditorFileTabs } from '@/components/editor/EditorFileTabs';
 import { FilePickerBrowser } from '@/components/file-picker/FilePickerBrowser';
 import EditorCodeMirror from '@/components/editor/EditorCodeMirror';
-import MediaPreviewer from '@/components/MediaPreviewer';
+import { EditorFileTabs } from '@/components/editor/EditorFileTabs';
+
+import {
+  setRightSidebarActiveTab,
+  setPreviewContent,
+  showRightSidebar,
+  PreviewContentType,
+} from '@/stores/layout'; // NEW: Import layout store actions
 
 import { getFileExtension, getFileName } from '@/utils/pathUtils';
 import { isValidHttpUrl } from '@/utils/urlUtils';
@@ -24,7 +29,8 @@ import { isValidHttpUrl } from '@/utils/urlUtils';
 import '@/styles/file-manager.css';
 
 export default function EditorPageView(): JSX.Element {
-  const { handleCodeMirrorChange, handleCreateNewFile, handleRename } = useEditorExplorerActions();
+  const { handleCodeMirrorChange, handleCreateNewFile, handleRename } =
+    useEditorExplorerActions();
 
   const {
     activeFilePath,
@@ -48,7 +54,7 @@ export default function EditorPageView(): JSX.Element {
   const $editorCurrentDirectory = useStore(editorCurrentDirectory);
 
   const [isFilePickerOpen, setIsFilePickerOpen] = useState(false);
-  const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false); // New state for preview modal
+  // const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false); // Removed: No longer using a modal for preview
 
   const handleOpenFilePicker = () => setIsFilePickerOpen(true);
   const handleCloseFilePicker = () => setIsFilePickerOpen(false);
@@ -62,8 +68,42 @@ export default function EditorPageView(): JSX.Element {
     await handleCreateNewFile($editorCurrentDirectory);
   }, [handleCreateNewFile, $editorCurrentDirectory]);
 
-  const handleOpenPreview = () => setIsPreviewModalOpen(true);
-  const handleClosePreview = () => setIsPreviewModalOpen(false);
+  const determinePreviewContentType = useCallback(
+    (
+      fileExtension: string | null | undefined,
+      fileContent: string,
+    ): PreviewContentType => {
+      if (isValidHttpUrl(fileContent.trim())) {
+        return 'url';
+      }
+      if (['md', 'markdown'].includes(fileExtension || '')) {
+        return 'markdown';
+      }
+      if (fileExtension === 'svg') {
+        return 'svg';
+      }
+      if (fileExtension === 'html') {
+        return 'html';
+      }
+      // For other media types (images, audio, video), PreviewPanel currently shows 'Unsupported'
+      return null;
+    },
+    [],
+  );
+  const currentFileExtension = getFileExtension(
+    activeFilePath || '',
+  )?.toLowerCase();
+  const currentFileContent = getFileContent(activeFilePath || '') || '';
+  const handleOpenPreview = useCallback(() => {
+    showRightSidebar.set(true); // Ensure right sidebar is visible
+    setRightSidebarActiveTab('preview'); // Switch to the preview tab
+
+    const previewType = determinePreviewContentType(
+      currentFileExtension,
+      currentFileContent,
+    );
+    setPreviewContent(previewType, currentFileContent); // Set content for the PreviewPanel
+  }, [currentFileExtension, currentFileContent, determinePreviewContentType]);
 
   const memoizedOnContentChange = useCallback(
     (newContent: string) => {
@@ -75,13 +115,12 @@ export default function EditorPageView(): JSX.Element {
     [activeFilePath, handleCodeMirrorChange],
   );
 
-  const currentFileContent = getFileContent(activeFilePath || '') || '';
-  const currentFileExtension = getFileExtension(activeFilePath || '')?.toLowerCase();
-
   const isPreviewSupported =
     activeFilePath &&
     (['md', 'markdown'].includes(currentFileExtension || '') || // Markdown
-      ['png', 'jpg', 'jpeg', 'gif', 'svg', 'webp'].includes(currentFileExtension || '') || // Images
+      ['png', 'jpg', 'jpeg', 'gif', 'svg', 'webp'].includes(
+        currentFileExtension || '',
+      ) || // Images
       ['mp4', 'webm', 'ogg', 'mov'].includes(currentFileExtension || '') || // Videos
       ['mp3', 'wav', 'ogg'].includes(currentFileExtension || '') || // Audios
       ['html', 'htm'].includes(currentFileExtension || '') || // HTML
@@ -89,7 +128,6 @@ export default function EditorPageView(): JSX.Element {
 
   return (
     <>
-      
       <div className="main-content flex flex-col flex-grow min-w-0 h-full text-sm">
         <div className="browser-header h-12 text-gray-500 border-b flex items-center px-1 shadow-xs justify-between flex-shrink-0">
           <div className="flex items-center gap-1">
@@ -99,7 +137,11 @@ export default function EditorPageView(): JSX.Element {
               disabled={openFiles.length === 0}
               title="Close All Tabs"
             >
-              <Icon icon="mdi:close-box-multiple-outline" width="2em" height="2em" />
+              <Icon
+                icon="mdi:close-box-multiple-outline"
+                width="2em"
+                height="2em"
+              />
             </Button>
 
             <Button
@@ -129,14 +171,26 @@ export default function EditorPageView(): JSX.Element {
             >
               <Icon icon="mdi:chevron-right" width="2em" height="2em" />
             </Button>
-            <Button variant="secondary" onClick={handleOpenFilePicker} title="Open File">
+            <Button
+              variant="secondary"
+              onClick={handleOpenFilePicker}
+              title="Open File"
+            >
               <Icon icon="mdi:folder-open-outline" width="2em" height="2em" />
             </Button>
-            <Button variant="secondary" onClick={handleCreateNewFileAction} title="Create New File">
+            <Button
+              variant="secondary"
+              onClick={handleCreateNewFileAction}
+              title="Create New File"
+            >
               <Icon icon="mdi:plus-box-outline" width="2em" height="2em" />
             </Button>
             {isPreviewSupported && (
-              <Button variant="secondary" onClick={handleOpenPreview} title="Preview File">
+              <Button
+                variant="secondary"
+                onClick={handleOpenPreview}
+                title="Preview File"
+              >
                 <Icon icon="mdi:eye-outline" width="2em" height="2em" />
               </Button>
             )}
@@ -158,16 +212,7 @@ export default function EditorPageView(): JSX.Element {
         onClose={handleCloseFilePicker}
         onFileSelect={handleFilePickerSelect}
       />
-      <Modal
-        isOpen={isPreviewModalOpen}
-        onClose={handleClosePreview}
-        title={`Preview: ${getFileName(activeFilePath || '')}`}
-        size="fullscreen"
-      >
-        {activeFilePath && (
-          <MediaPreviewer filePath={activeFilePath} fileContent={currentFileContent} />
-        )}
-      </Modal>
+      {/* Removed: Preview Modal and MediaPreviewer as preview now goes to the right sidebar */}
     </>
   );
 }

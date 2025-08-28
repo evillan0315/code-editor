@@ -67,7 +67,10 @@ const ConversationListView = memo((props: ConversationListViewProps) => {
   // Helper function to format RequestType for display
   const formatRequestType = (type: RequestType | null | undefined): string => {
     if (!type) return 'N/A';
-    return type.replace(/_/g, ' ').toLowerCase().replace(/\b\w/g, (char) => char.toUpperCase());
+    return type
+      .replace(/_/g, ' ')
+      .toLowerCase()
+      .replace(/\b\w/g, (char) => char.toUpperCase());
   };
 
   return (
@@ -78,7 +81,9 @@ const ConversationListView = memo((props: ConversationListViewProps) => {
       exit="hidden"
       variants={listVariants}
     >
-      <div className="p-2 border-b border-zinc-700 space-y-2"> {/* Added space-y-2 for gap */}
+      <div className="p-2 border-b border-zinc-700 space-y-2">
+        {' '}
+        {/* Added space-y-2 for gap */}
         {/* Search Input */}
         <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400" />
@@ -90,7 +95,6 @@ const ConversationListView = memo((props: ConversationListViewProps) => {
             onChange={(e) => onSearchChange(e.target.value)}
           />
         </div>
-
         {/* Request Type Filter Dropdown */}
         <div className="relative">
           <select

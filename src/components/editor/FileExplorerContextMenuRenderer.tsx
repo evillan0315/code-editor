@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState, useLayoutEffect } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useStore } from '@nanostores/react';
+import { FileIcon } from '@/components/FileIcon';
 import {
   fileExplorerContextMenu,
   hideFileExplorerContextMenu,
@@ -96,7 +97,7 @@ export const FileExplorerContextMenuRenderer = () => {
                     <div className="flex items-center gap-4">
                       <div className="flex items-center min-w-[30%]">PATH:</div>
                       <div className="flex items-center text-muted font-normal max-w-[70%]">
-                        <span className="truncate px-2">{state.file.path}</span>
+                        <span className="truncate px-2" title={state.file.path}>{state.file.path}</span>
                       </div>
                     </div>
                     <div className="flex items-center gap-4">
@@ -113,48 +114,55 @@ export const FileExplorerContextMenuRenderer = () => {
                           </>
                         ) : (
                           <>
-                            <Icon
-                              icon="mdi:file"
-                              width="1.2em"
-                              height="1.2em"
-                            />{' '}
+                            
+                            <FileIcon
+                              filename={state.file.name}
+                              isDirectory={false}
+                              isOpen={false}
+                              language={state.file.lang}
+                            />
+                              {' '}
                             <span
                               className="truncate"
                               title={state.file.mimeType}
-                            >
-                              
-                            </span>
+                            >{state.file.lang}</span>
                           </>
                         )}
                       </div>
                     </div>
                     {state.file.type === 'file' ? (
                       <>
-                    <div className="flex items-center gap-4">
-                      <div className="flex items-center min-w-[30%]">SIZE:</div>
-                      <div className="flex items-center">
-                        <span>{(state.file.size / 1024).toFixed(2)} KB</span>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-4">
-                      <div className="flex items-center min-w-[30%]">
-                        CREATED:
-                      </div>
-                      <div className="flex items-center">
-                        {new Date(state.file.createdAt).toLocaleString()}
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-4">
-                      <div className="flex items-center min-w-[30%]">
-                        MODIFIED:
-                      </div>
-                      <div className="flex items-center">
-                        {new Date(state.file.updatedAt).toLocaleString()}
-                      </div>
-                    </div>
-                        </>
-                    ) : ''} 
-                   
+                        <div className="flex items-center gap-4">
+                          <div className="flex items-center min-w-[30%]">
+                            SIZE:
+                          </div>
+                          <div className="flex items-center">
+                            <span>
+                              {(state.file.size / 1024).toFixed(2)} KB
+                            </span>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-4">
+                          <div className="flex items-center min-w-[30%]">
+                            CREATED:
+                          </div>
+                          <div className="flex items-center">
+                            {new Date(state.file.createdAt).toLocaleString()}
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-4">
+                          <div className="flex items-center min-w-[30%]">
+                            MODIFIED:
+                          </div>
+                          <div className="flex items-center">
+                            {new Date(state.file.updatedAt).toLocaleString()}
+                          </div>
+                        </div>
+                      </>
+                    ) : (
+                      ''
+                    )}
+
                     {state.file.type === 'folder' && state.file.children && (
                       <div className="flex items-center gap-4">
                         <div className="flex items-center min-w-[30%]">

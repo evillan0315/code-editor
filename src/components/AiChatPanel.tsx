@@ -48,7 +48,9 @@ export function AiChatPanel() {
 
   const { showToast } = useToast();
 
-  const [activeConversationId, setActiveConversationId] = useState<string | null>(null);
+  const [activeConversationId, setActiveConversationId] = useState<
+    string | null
+  >(null);
   const [chatHistory, setChatHistory] = useState<ConversationHistoryItem[]>([]);
   const [newMessage, setNewMessage] = useState('');
   const [isSendingMessage, setIsSendingMessage] = useState(false);
@@ -60,10 +62,12 @@ export function AiChatPanel() {
   const [loadingHistory, setLoadingHistory] = useState(false);
 
   const [conversationListPage, setConversationListPage] = useState(1);
-  const [conversationListTotalPages, setConversationListTotalPages] = useState(1);
+  const [conversationListTotalPages, setConversationListTotalPages] =
+    useState(1);
 
   const [searchQuery, setSearchQuery] = useState<string>('');
-  const [selectedRequestType, setSelectedRequestType] = useState<RequestType | null>(null); // NEW: State for request type filter
+  const [selectedRequestType, setSelectedRequestType] =
+    useState<RequestType | null>(null); // NEW: State for request type filter
 
   const [systemInstructions, setSystemInstructions] = useState<string>(
     PERSONAS[$persona] || SYSTEM_INSTRUCTIONS_REACT_EXPERT,
@@ -145,22 +149,23 @@ export function AiChatPanel() {
     async (convId: string) => {
       setLoadingHistory(true);
       try {
-        const response: PaginatedResponse<ModelResponse> = await apiService.conversation.getHistory(
-          convId,
-          {
+        const response: PaginatedResponse<ModelResponse> =
+          await apiService.conversation.getHistory(convId, {
             page: 1,
             limit: CONVERSATION_HISTORY_LIMIT,
-          } as PaginationParams,
-        );
+          } as PaginationParams);
 
         // Convert ModelResponse to ConversationHistoryItem by adding an ID
-        const historyWithIds: ConversationHistoryItem[] = response.data.map((item) => ({
-          ...item,
-          id: uuidv4(), // Assign a unique ID for React keys
-        }));
+        const historyWithIds: ConversationHistoryItem[] = response.data.map(
+          (item) => ({
+            ...item,
+            id: uuidv4(), // Assign a unique ID for React keys
+          }),
+        );
 
         const sortedHistory = historyWithIds.sort(
-          (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
+          (a, b) =>
+            new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
         );
         setChatHistory(sortedHistory);
       } catch (err: any) {
@@ -211,7 +216,10 @@ export function AiChatPanel() {
     const trimmedMessage = newMessage.trim();
 
     if (!trimmedMessage && selectedFiles.length === 0) {
-      showToast('Please enter a message or select at least one file.', 'warning');
+      showToast(
+        'Please enter a message or select at least one file.',
+        'warning',
+      );
       return;
     }
     if (isSendingMessage) return;
@@ -220,7 +228,9 @@ export function AiChatPanel() {
 
     const isNewConversation = !activeConversationId;
 
-    const conversationToUseId = isNewConversation ? uuidv4() : activeConversationId;
+    const conversationToUseId = isNewConversation
+      ? uuidv4()
+      : activeConversationId;
 
     const userMessage: ConversationHistoryItem = {
       id: uuidv4(),
@@ -272,7 +282,8 @@ export function AiChatPanel() {
         payload.filesData = filesDataPayload;
       }
 
-      const response: SendMessageResponse = await apiService.conversation.sendMessage(payload);
+      const response: SendMessageResponse =
+        await apiService.conversation.sendMessage(payload);
 
       if (isNewConversation && response.conversationId) {
         setActiveConversationId(response.conversationId);
@@ -294,7 +305,10 @@ export function AiChatPanel() {
       }
     } catch (err: any) {
       console.error('Error sending message:', err);
-      showToast(`Error sending message: ${err.message || 'Failed to send message.'}`, 'error');
+      showToast(
+        `Error sending message: ${err.message || 'Failed to send message.'}`,
+        'error',
+      );
 
       setChatHistory((prev) => prev.filter((msg) => msg !== userMessage));
 
@@ -326,7 +340,8 @@ export function AiChatPanel() {
     if (fileInputRef.current) fileInputRef.current.value = '';
     textareaRef.current?.focus();
 
-    const currentSystemInstructions = PERSONAS[$persona] || SYSTEM_INSTRUCTIONS_REACT_EXPERT;
+    const currentSystemInstructions =
+      PERSONAS[$persona] || SYSTEM_INSTRUCTIONS_REACT_EXPERT;
     setSystemInstructions(currentSystemInstructions);
 
     // Generate a new temporary ID for the new conversation
@@ -336,7 +351,8 @@ export function AiChatPanel() {
 
     setIsSendingMessage(true);
     try {
-      const initialPrompt = 'Hello! Please introduce yourself and your capabilities.';
+      const initialPrompt =
+        'Hello! Please introduce yourself and your capabilities.';
 
       const payload: ApiChatRequestPayload = {
         conversationId: newConvoId,
@@ -429,7 +445,10 @@ export function AiChatPanel() {
           const { base64, mimeType } = await readFileAsDataURL(file);
           newFiles.push({ file, base64, mimeType });
         } catch (error: any) {
-          showToast(`Could not read file '${file.name}': ${error.message}`, 'error');
+          showToast(
+            `Could not read file '${file.name}': ${error.message}`,
+            'error',
+          );
         }
       }
 
@@ -442,7 +461,9 @@ export function AiChatPanel() {
   );
 
   const handleRemoveFile = useCallback((indexToRemove: number) => {
-    setSelectedFiles((prevFiles) => prevFiles.filter((_, index) => index !== indexToRemove));
+    setSelectedFiles((prevFiles) =>
+      prevFiles.filter((_, index) => index !== indexToRemove),
+    );
   }, []);
 
   const handleKeyDown = useCallback(
@@ -502,7 +523,9 @@ export function AiChatPanel() {
       setChatHistory([]);
     }
 
-    setSystemInstructions(PERSONAS[$persona] || SYSTEM_INSTRUCTIONS_REACT_EXPERT);
+    setSystemInstructions(
+      PERSONAS[$persona] || SYSTEM_INSTRUCTIONS_REACT_EXPERT,
+    );
   }, [$persona]);
 
   // NEW: Handler for search query change
@@ -512,10 +535,13 @@ export function AiChatPanel() {
   }, []);
 
   // NEW: Handler for request type filter change
-  const handleRequestTypeFilterChange = useCallback((type: RequestType | null) => {
-    setSelectedRequestType(type);
-    setConversationListPage(1); // Reset to first page when filter changes
-  }, []);
+  const handleRequestTypeFilterChange = useCallback(
+    (type: RequestType | null) => {
+      setSelectedRequestType(type);
+      setConversationListPage(1); // Reset to first page when filter changes
+    },
+    [],
+  );
 
   if (!$visible) return null;
 

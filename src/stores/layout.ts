@@ -15,7 +15,10 @@ export const activeTerminal = atom<TerminalMode>('local');
 export const showTerminal = atom<boolean>(true);
 export const fileExplorerViewMode = atom<FileExplorerViewMode>('list');
 export const rightSidebarActiveTab = atom<RightSidebarTab>('codeAssist');
-export const previewContent = atom<{ type: PreviewContentType; content: string | null }>({
+export const previewContent = atom<{
+  type: PreviewContentType;
+  content: string | null;
+}>({
   type: null,
   content: null,
 });
@@ -96,7 +99,9 @@ showLeftSidebar.subscribe((value) => writeBool(STORAGE_KEYS.left, value));
 showRightSidebar.subscribe((value) => writeBool(STORAGE_KEYS.right, value));
 showBottomLeft.subscribe((value) => writeBool(STORAGE_KEYS.bottomLeft, value));
 showTerminal.subscribe((value) => writeBool(STORAGE_KEYS.showTerminal, value));
-showBottomRight.subscribe((value) => writeBool(STORAGE_KEYS.bottomRight, value));
+showBottomRight.subscribe((value) =>
+  writeBool(STORAGE_KEYS.bottomRight, value),
+);
 activeTerminal.subscribe((value) => {
   try {
     localStorage.setItem(STORAGE_KEYS.terminal, value);
@@ -146,13 +151,17 @@ export const toggleTerminal = () => {
 };
 
 export const toggleFileExplorerViewMode = () => {
-  fileExplorerViewMode.set(fileExplorerViewMode.get() === 'list' ? 'thumbnail' : 'list');
+  fileExplorerViewMode.set(
+    fileExplorerViewMode.get() === 'list' ? 'thumbnail' : 'list',
+  );
 };
-export const setPreviewContent = (type: PreviewContentType, content: string | null) => {
+export const setPreviewContent = (
+  type: PreviewContentType,
+  content: string | null,
+) => {
   previewContent.set({ type, content });
 };
 
 export const setRightSidebarActiveTab = (tab: RightSidebarTab) => {
   rightSidebarActiveTab.set(tab);
 };
-

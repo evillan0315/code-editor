@@ -113,7 +113,9 @@ export function useEditorTabs(): UseEditorTabsResult {
   );
 
   const handleCloseAllTabs = useCallback(async () => {
-    const unsavedFiles = Object.entries($filesMap).filter(([_, entry]) => entry.unsaved);
+    const unsavedFiles = Object.entries($filesMap).filter(
+      ([_, entry]) => entry.unsaved,
+    );
     if (unsavedFiles.length > 0) {
       const confirmed = await confirm(
         `Unsaved changes in ${unsavedFiles.length} files. Close all anyway?`,

@@ -7,7 +7,8 @@ import { useFileSystemOperations } from '@/hooks/useFileSystemOperations';
 export function useEditorExplorerActions() {
   const { handleSelectedPath, handleGoUpDirectory } = useExplorerNavigation();
 
-  const { fetchAndSetFileTree, handleToggleFolder, isLoading } = useFileTreeManager();
+  const { fetchAndSetFileTree, handleToggleFolder, isLoading } =
+    useFileTreeManager();
 
   const { handleFileSelect, handleCodeMirrorChange } = useEditorFileContent();
 

@@ -5,7 +5,11 @@ import { Icon } from '@iconify/react';
 import LoadingDots from '@/components/LoadingDots';
 import { getFileIcon } from '@/utils/fileIcon';
 import { useEditorExplorerActions } from '@/hooks/useEditorExplorerActions';
-import { editorCurrentDirectory, renamingPath, renamingOriginalName } from '@/stores/editorContent';
+import {
+  editorCurrentDirectory,
+  renamingPath,
+  renamingOriginalName,
+} from '@/stores/editorContent';
 import { useStore } from '@nanostores/react';
 
 interface EditorFileExplorerNodeProps {
@@ -23,7 +27,8 @@ const EditorExplorerNode: React.FC<EditorFileExplorerNodeProps> = ({
   onContextMenu,
   onRenameSubmit,
 }) => {
-  const { handleFileSelect, handleToggleFolder, fetchAndSetFileTree } = useEditorExplorerActions();
+  const { handleFileSelect, handleToggleFolder, fetchAndSetFileTree } =
+    useEditorExplorerActions();
 
   const $renamingPath = useStore(renamingPath);
   const $renamingOriginalName = useStore(renamingOriginalName);
@@ -32,9 +37,10 @@ const EditorExplorerNode: React.FC<EditorFileExplorerNodeProps> = ({
   const [currentName, setCurrentName] = useState(node.name);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const paddingLeft = level * 16 + 8;
+  const paddingLeft = level === 0 ? 8 : level * 16 + 8;
   const isFolder = node.type === 'folder';
-  const hasChildren = isFolder && Array.isArray(node.children) && node.children.length > 0;
+  const hasChildren =
+    isFolder && Array.isArray(node.children) && node.children.length > 0;
   const isActive = activeFilePath === node.path;
   const isLoadingChildren = isFolder && node.isOpen && node.isLoadingChildren;
   const fileIcon = getFileIcon({
@@ -74,7 +80,14 @@ const EditorExplorerNode: React.FC<EditorFileExplorerNodeProps> = ({
       editorCurrentDirectory.set(node.path);
       await fetchAndSetFileTree();
     }
-  }, [isRenaming, isFolder, node.isOpen, node.path, handleToggleFolder, fetchAndSetFileTree]);
+  }, [
+    isRenaming,
+    isFolder,
+    node.isOpen,
+    node.path,
+    handleToggleFolder,
+    fetchAndSetFileTree,
+  ]);
 
   const handleContextMenu = useCallback(
     async (event: React.MouseEvent) => {
@@ -94,7 +107,13 @@ const EditorExplorerNode: React.FC<EditorFileExplorerNodeProps> = ({
       renamingPath.set(null);
       renamingOriginalName.set(null);
     }
-  }, [isRenaming, currentName, $renamingOriginalName, node.path, onRenameSubmit]);
+  }, [
+    isRenaming,
+    currentName,
+    $renamingOriginalName,
+    node.path,
+    onRenameSubmit,
+  ]);
 
   const handleInputKeyDown = useCallback(
     async (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -110,9 +129,9 @@ const EditorExplorerNode: React.FC<EditorFileExplorerNodeProps> = ({
   );
 
   return (
-    <div className="explorer-node-container">
+    <div className="explorer-node-container flex flex-col">
       <div
-        className={`flex items-center  gap-1 px-2 py-1 hover:bg-neutral-500/10 cursor-pointer select-none ${isActive ? 'active' : ''}
+        className={`flex items-center  hover:bg-neutral-500/10 cursor-pointer select-none ${isActive ? 'active' : ''}
         ${isRenaming ? 'bg-neutral-600/20' : ''}`}
         style={{ paddingLeft }}
         onClick={handleClick}
@@ -120,40 +139,43 @@ const EditorExplorerNode: React.FC<EditorFileExplorerNodeProps> = ({
         onContextMenu={handleContextMenu}
         title={node.path}
       >
-        {isFolder ? (
-          isLoadingChildren ? (
-            <Icon icon="mdi:loading" className="text-muted-foreground animate-spin" />
-          ) : node.isOpen ? (
-            <MdExpandMore className="text-muted-foreground" />
+        <div className="flex items-center w-full gap-2 pr-2 py-1">
+          <Icon icon={fileIcon} className="min-w-6" />
+          {isRenaming ? (
+            <input
+              ref={inputRef}
+              type="text"
+              value={currentName}
+              onChange={(e) => setCurrentName(e.target.value)}
+              onBlur={handleInputBlur}
+              onKeyDown={handleInputKeyDown}
+              className="flex-grow min-w-0 bg-transparent rounded text-sm px-2 py-0.5 "
+              onFocus={(e) => e.target.select()} // Select all text on focus
+            />
           ) : (
-            <MdChevronRight className="text-muted-foreground" />
-          )
-        ) : (
-          <span className="w-5 inline-block" />
-        )}
-
-        <Icon icon={fileIcon} className="text-lg min-w-[20px]" />
-        {isRenaming ? (
-          <input
-            ref={inputRef}
-            type="text"
-            value={currentName}
-            onChange={(e) => setCurrentName(e.target.value)}
-            onBlur={handleInputBlur}
-            onKeyDown={handleInputKeyDown}
-            className="flex-grow min-w-0 bg-transparent border border-neutral-500 rounded px-1 py-0.5 text-sm"
-            onFocus={(e) => e.target.select()} // Select all text on focus
-          />
-        ) : (
-          <span className="truncate">{node.name}</span>
-        )}
+            <div className="flex items-center justify-between w-full overflow-hidden gap-2 ">
+              <span className="truncate">{node.name}</span>
+              {isFolder ? (
+                isLoadingChildren ? (
+                  <LoadingDots />
+                ) : node.isOpen ? (
+                  <MdExpandMore className="text-muted-foreground" />
+                ) : (
+                  <MdChevronRight className="text-muted-foreground" />
+                )
+              ) : (
+                ''
+              )}
+            </div>
+          )}
+        </div>
       </div>
 
       {isFolder && node.isOpen && (
-        <div className="folder-children">
+        <div className="folder-children py-1">
           {isLoadingChildren ? (
             <div
-              className="text-muted-foreground text-sm py-1 px-2"
+              className="text-muted-foreground px-2"
               style={{ paddingLeft: paddingLeft + 16 }}
             >
               <LoadingDots />
@@ -171,7 +193,7 @@ const EditorExplorerNode: React.FC<EditorFileExplorerNodeProps> = ({
             ))
           ) : (
             <div
-              className="text-muted-foreground text-sm py-1 px-2"
+              className="text-muted-foreground text-sm "
               style={{ paddingLeft: paddingLeft + 16 }}
             >
               (empty)

@@ -12,13 +12,21 @@ interface MediaPreviewerProps {
 
 const ImagePreview: React.FC<{ src: string; alt: string }> = ({ src, alt }) => (
   <div className="flex items-center justify-center w-full h-full p-4">
-    <img src={src} alt={alt} className="max-w-full max-h-full object-contain bg-neutral-800" />
+    <img
+      src={src}
+      alt={alt}
+      className="max-w-full max-h-full object-contain bg-neutral-800"
+    />
   </div>
 );
 
 const VideoPreview: React.FC<{ src: string }> = ({ src }) => (
   <div className="flex items-center justify-center w-full h-full p-4">
-    <video src={src} controls className="max-w-full max-h-full bg-neutral-800" />
+    <video
+      src={src}
+      controls
+      className="max-w-full max-h-full bg-neutral-800"
+    />
   </div>
 );
 
@@ -38,7 +46,10 @@ const UrlIframePreview: React.FC<{ src: string }> = ({ src }) => (
 );
 
 const HtmlPreview: React.FC<{ htmlContent: string }> = ({ htmlContent }) => {
-  const sanitizedHtml = useMemo(() => DOMPurify.sanitize(htmlContent), [htmlContent]);
+  const sanitizedHtml = useMemo(
+    () => DOMPurify.sanitize(htmlContent),
+    [htmlContent],
+  );
   return (
     <div
       dangerouslySetInnerHTML={{ __html: sanitizedHtml }}
@@ -47,7 +58,10 @@ const HtmlPreview: React.FC<{ htmlContent: string }> = ({ htmlContent }) => {
   );
 };
 
-const MediaPreviewer: React.FC<MediaPreviewerProps> = ({ filePath, fileContent }) => {
+const MediaPreviewer: React.FC<MediaPreviewerProps> = ({
+  filePath,
+  fileContent,
+}) => {
   const extension = getFileExtension(filePath)?.toLowerCase();
   const fileName = getFileName(filePath);
 
@@ -64,7 +78,9 @@ const MediaPreviewer: React.FC<MediaPreviewerProps> = ({ filePath, fileContent }
 
   if (extension === 'md' || extension === 'markdown') {
     previewElement = <MarkdownViewer markdown={fileContent} />;
-  } else if (['png', 'jpg', 'jpeg', 'gif', 'svg', 'webp'].includes(extension || '')) {
+  } else if (
+    ['png', 'jpg', 'jpeg', 'gif', 'svg', 'webp'].includes(extension || '')
+  ) {
     previewElement = <ImagePreview src={fileSourceUrl} alt={fileName} />;
   } else if (['mp4', 'webm', 'ogg', 'mov'].includes(extension || '')) {
     previewElement = <VideoPreview src={fileSourceUrl} />;
@@ -84,7 +100,10 @@ const MediaPreviewer: React.FC<MediaPreviewerProps> = ({ filePath, fileContent }
       <div className="flex flex-col items-center justify-center p-8 text-center text-gray-500 w-full h-full">
         <p className="text-xl font-medium">No preview available</p>
         <p>
-          File type <span className="font-semibold text-gray-400">.{extension || 'unknown'}</span>{' '}
+          File type{' '}
+          <span className="font-semibold text-gray-400">
+            .{extension || 'unknown'}
+          </span>{' '}
           is not supported for preview, or content is not a valid URL.
         </p>
       </div>

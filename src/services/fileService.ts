@@ -7,17 +7,26 @@ import type {
   FileCopyRequest,
 } from '@/types/file-system';
 import { apiFetch } from '@/services/apiFetch';
-import { BASE_URL_API } from '@/constants/refactored/app';
-import { API_ENDPOINTS } from '@/constants/refactored/api';
+
+import {
+  API_ENDPOINTS,
+  BASE_URL_API,
+  SOCKET_EVENTS_MERGED,
+  EVENT_PREFIX,
+} from '@/constants';
 
 export const fileService = {
   async read(filePath: string): Promise<FileItem> {
-    const file = await apiFetch<FileItem>(API_ENDPOINTS._FILE.READ_FILE_CONTENT, {
-      method: 'POST',
-      body: { filePath },
-      responseType: 'json',
-      event: 'readFile',
-    });
+    const file = await apiFetch<FileItem>(
+      API_ENDPOINTS._FILE.READ_FILE_CONTENT,
+      {
+        method: 'POST',
+        body: { filePath },
+        responseType: 'json',
+        event: EVENT_PREFIX.FILE_READ_FILE_CONTENT,
+      },
+    );
+    console.log(file, EVENT_PREFIX);
     return file;
   },
   async createFile(filePath: string, content: string): Promise<any> {
@@ -33,19 +42,25 @@ export const fileService = {
     // API_ENDPOINTS._FILE.CREATE also maps to /api/file/create.
     // If the intention was to use /api/file/create-folder, then API_ENDPOINTS._FILE.CREATE_FOLDER should be used.
     // Following the original implementation, we use API_ENDPOINTS._FILE.CREATE which matches the original path.
-    const folder = await apiFetch<FileWriteRequest>(API_ENDPOINTS._FILE.CREATE, {
-      method: 'POST',
-      body: { filePath, type: 'folder', isDirectory: true },
-      responseType: 'json',
-    });
+    const folder = await apiFetch<FileWriteRequest>(
+      API_ENDPOINTS._FILE.CREATE,
+      {
+        method: 'POST',
+        body: { filePath, type: 'folder', isDirectory: true },
+        responseType: 'json',
+      },
+    );
     return folder;
   },
   async write(filePath: string, content: string): Promise<any> {
-    const file = await apiFetch<FileWriteRequest>(API_ENDPOINTS._FILE.WRITE_FILE_CONTENT, {
-      method: 'POST',
-      body: { filePath, content },
-      responseType: 'json',
-    });
+    const file = await apiFetch<FileWriteRequest>(
+      API_ENDPOINTS._FILE.WRITE_FILE_CONTENT,
+      {
+        method: 'POST',
+        body: { filePath, content },
+        responseType: 'json',
+      },
+    );
     return file;
   },
 
@@ -55,11 +70,14 @@ export const fileService = {
       body: { filePath },
     });
   },
-  async rename(oldPath: string, newPath: string): Promise<any> {
-    return await apiFetch<FileRenameRequest>(API_ENDPOINTS._FILE.RENAME_FILE_OR_FOLDER, {
-      method: 'POST',
-      body: { oldPath, newPath },
-    });
+  async rename(data: FileRenameRequest): Promise<any> {
+    return await apiFetch<FileRenameRequest>(
+      API_ENDPOINTS._FILE.RENAME_FILE_OR_FOLDER,
+      {
+        method: 'POST',
+        body: data,
+      },
+    );
   },
 
   async move(data: FileMoveRequest): Promise<any> {
@@ -88,24 +106,5 @@ export const fileService = {
   },
 };
 
-export const conversationService = {
-  list({ page, limit }: { page: number; limit: number }): Promise<any[]> {
-    return apiFetch(
-      `${API_ENDPOINTS._CONVERSATION.GET_CONVERSATIONS}?page=${page}&limit=${limit}`,
-      {
-        method: 'GET',
-      },
-    ).then((res: any) => res.data);
-  },
-};
-
-export const utilsService = {
-  async formatCode(code: string, language: string): Promise<any> {
-    const formatted = await apiFetch<FileWriteRequest>(API_ENDPOINTS._UTILS.FORMAT_CODE, {
-      method: 'POST',
-      body: { code, language },
-      responseType: 'json',
-    });
-    return formatted;
-  },
-};
+export { conversationService } from './conversationService';
+export { utilsService } from './utilsService';

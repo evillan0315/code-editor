@@ -1,7 +1,12 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Roboto:wght@300;400;500;700&family=Ubuntu:wght@300;400;500;700&display=swap');
+
 @import "tailwindcss";
 
+
 @custom-variant dark (&:where(.dark, .dark *));
+
 @layer base {
+  
   :root {
     --btn-bg: theme(colors.neutral.50);
     --btn-text: theme(colors.neutral.900);
@@ -10,6 +15,15 @@
     --btn-hover-text: theme(colors.sky.700);
     --btn-icon: theme(colors.neutral.600);
     --btn-icon-hover: theme(colors.sky.600);
+    --font-poppins: 'Poppins', sans-serif; /* Updated to use single quotes for CSS value */
+    --font-ubuntu: 'Ubuntu', sans-serif; /* Updated to use single quotes for CSS value */
+    --font-roboto: 'Roboto', sans-serif; /* Updated to use single quotes for CSS value */
+    --font-sans: ui-sans-serif, system-ui, var(--font-roboto), 'Oxygen',
+      'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', "Apple Color Emoji", "Segoe UI Emoji", 
+      "Segoe UI Symbol", "Noto Color Emoji";  
+    --font-serif: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;  
+    --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", 
+      monospace;  
   }
   html.dark {
     --btn-bg: theme(colors.neutral.800);
@@ -67,12 +81,17 @@
     --color-shadow: rgba(255, 255, 255, 0.1);
   }
 
+
   body {
     background-color: var(--color-bg);
     color: var(--color-text);
-    font-size: var(--color-text);
+    font-family: var(--font-poppins); /* This will now correctly pull 'Roboto' from Google Fonts */
     @apply transition-colors duration-300;
+    margin: 0;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
+
   button {
     @apply p-[2px] min-w-[24px] text-sm;
   }
@@ -87,8 +106,10 @@
     }
   }
 }
+
 .text-base {
   color: var(--color-text);
+  
 }
 .text-primary {
   color: var(--color-primary-text);
@@ -339,6 +360,11 @@ button:disabled {
   }
   .explorer-header .search-input {
     border-color: var(--color-border);
+  }
+  .explorer-node-container > div.active {
+    background-color: var(--color-pre-bg);
+     border-color: theme(colors.sky-500);
+    @apply border-l;
   }
 }
 @layer components {

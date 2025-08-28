@@ -116,7 +116,7 @@ const EditorCodeMirror: React.FC<EditorCodeMirrorProps> = ({
 
   // If you need to reconfigure the import detection plugin later (e.g., change debounce time)
   // you would use a compartment for it:
-  // const importDetectionCompartment = useRef(new Compartment()).current;
+  const importDetectionCompartment = useRef(new Compartment()).current;
 
   const OptimizeCodeIcon = useMemo(
     () => <Icon icon="mdi:speedometer" width="1.5em" height="1.5em" />,
@@ -316,7 +316,7 @@ const EditorCodeMirror: React.FC<EditorCodeMirrorProps> = ({
       // It will receive the activeFilePath to provide context in its console logs.
       importDetectionPlugin(activeFilePath),
       // If using a compartment:
-      // importDetectionCompartment.of(importDetectionPlugin(activeFilePath)),
+      importDetectionCompartment.of(importDetectionPlugin(activeFilePath)),
 
       EditorView.updateListener.of((update) => {
         if (update.docChanged && viewRef.current) {
@@ -388,7 +388,7 @@ const EditorCodeMirror: React.FC<EditorCodeMirrorProps> = ({
     editableCompartment,
     keymapCompartment,
     activeFilePath, // Re-create plugin if activeFilePath changes
-    // If using a compartment: importDetectionCompartment,
+    importDetectionCompartment,
   ]);
 
   useEffect(() => {
@@ -424,7 +424,9 @@ const EditorCodeMirror: React.FC<EditorCodeMirrorProps> = ({
         themeCompartment.reconfigure(getThemeExtension($theme)),
         editableCompartment.reconfigure(EditorView.editable.of(!readOnly)),
         // If importDetectionCompartment was used, reconfigure it here too if `activeFilePath` changes:
-        // importDetectionCompartment.reconfigure(importDetectionPlugin(activeFilePath)),
+        importDetectionCompartment.reconfigure(
+          importDetectionPlugin(activeFilePath),
+        ),
       ],
     });
 

@@ -48,7 +48,10 @@ export function AppHeader({ logo, childrean }: AppHeaderProps) {
   const [isProjectModalOpen, setIsProjectModalOpen] = useState(false); // New state for project modal
 
   const handleOpenNewFile = useCallback(() => setIsFilePickerOpen(true), []);
-  const handleCloseFilePicker = useCallback(() => setIsFilePickerOpen(false), []);
+  const handleCloseFilePicker = useCallback(
+    () => setIsFilePickerOpen(false),
+    [],
+  );
   const handleFilePickerSelect = useCallback(
     (path: string) => {
       handleSetActiveFile(path);
@@ -154,13 +157,26 @@ export function AppHeader({ logo, childrean }: AppHeaderProps) {
                   title="Save (Ctrl+S)"
                 >
                   Save
-                  <Icon icon="mdi:content-save" width="2em" height="2em" className="ml-3" />
+                  <Icon
+                    icon="mdi:content-save"
+                    width="2em"
+                    height="2em"
+                    className="ml-3"
+                  />
                 </Button>
 
-                <Button variant="secondary" onClick={handleRunProject} title="Run Project">
+                <Button
+                  variant="secondary"
+                  onClick={handleRunProject}
+                  title="Run Project"
+                >
                   <Icon icon="mdi:play" width="2em" height="2em" />
                 </Button>
-                <Button variant="secondary" onClick={handleBuildProject} title="Build Project">
+                <Button
+                  variant="secondary"
+                  onClick={handleBuildProject}
+                  title="Build Project"
+                >
                   <Icon icon="mdi:hammer" width="2em" height="2em" />
                 </Button>
               </div>
@@ -205,7 +221,11 @@ export function AppHeader({ logo, childrean }: AppHeaderProps) {
         onFileSelect={handleFilePickerSelect}
       />
       {/* Project Modal Integration */}
-      <ProjectModal isOpen={isProjectModalOpen} onClose={handleCloseProjectModal} size="md" />
+      <ProjectModal
+        isOpen={isProjectModalOpen}
+        onClose={handleCloseProjectModal}
+        size="md"
+      />
     </>
   );
 }

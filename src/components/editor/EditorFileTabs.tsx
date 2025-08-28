@@ -53,7 +53,9 @@ export function EditorFileTabs({
   return (
     <div className="flex flex-1 overflow-x-auto whitespace-nowrap scrollbar-hide h-full">
       {openFiles.length === 0 ? (
-        <div className="flex items-center px-0 flex-shrink-0 pl-4">No tabs open.</div>
+        <div className="flex items-center px-0 flex-shrink-0 pl-4">
+          No tabs open.
+        </div>
       ) : (
         openFiles.map((path) => (
           <EditorFileTabItem

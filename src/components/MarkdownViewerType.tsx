@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/Button';
 
 import { useToast } from '@/hooks/useToast';
 import MarkdownCodeMirror from '@/components/markdown/MarkdownCodeMirror';
+import MermaidDiagram from '@/components/markdown/MermaidDiagram'; // Import MermaidDiagram
 import { LANGUAGE_DISPLAY_MAP } from '@/constants';
 
 import '@/styles/markdown.css';
@@ -92,6 +93,14 @@ const MarkdownViewer: React.FC<MarkdownViewerProps> = ({ markdown }) => {
         const languageMatch = classAttr.match(/language-(\w+)/);
         const language = languageMatch ? languageMatch[1] : 'plaintext';
 
+        const codeContent = extractTextFromDomNode(codeNode);
+
+        // Handle Mermaid diagrams
+        if (language === 'mermaid') {
+          return <MermaidDiagram chart={codeContent} />;
+        }
+
+        // Handle other code blocks (existing logic)
         const isReactCode = language === 'jsx' || language === 'tsx';
 
         const displayLanguage = isReactCode
@@ -99,8 +108,6 @@ const MarkdownViewer: React.FC<MarkdownViewerProps> = ({ markdown }) => {
             ? 'React JSX'
             : 'React TSX'
           : LANGUAGE_DISPLAY_MAP[language] || language.toUpperCase();
-
-        const codeContent = extractTextFromDomNode(codeNode);
 
         const handlePreviewClick = () => {
           showToast(
@@ -111,22 +118,15 @@ const MarkdownViewer: React.FC<MarkdownViewerProps> = ({ markdown }) => {
           console.log('React code to preview:', codeContent);
         };
         return (
-          <div className="relative group markdown-code-wrapper">
-            <div className="absolute -top-8 inset-x-0 flex items-start justify-between px-4 py-1 bg-dark rounded-t-md border-t border-l border-r text-sm font-light z-10">
-              <div className="flex">
-                {displayLanguage} {}
-              </div>
-              {}
+          <div className="relative group markdown-code-wrapper my-4">
+            <div className="absolute -top-8 inset-x-0 flex items-center justify-between px-4 py-1 bg-dark rounded-t-md border-t border-l border-r text-sm font-light z-10">
+              <div className="flex">{displayLanguage}</div>
               <div className="flex items-center gap-1.5">
                 {isReactCode && <PreviewButton onClick={handlePreviewClick} />}
                 <CopyButton text={codeContent} />
               </div>
             </div>
-            <MarkdownCodeMirror
-              value={codeContent}
-              language={language}
-              readOnly={true}
-            />
+            <MarkdownCodeMirror value={codeContent} language={language} readOnly={true} />
           </div>
         );
       }

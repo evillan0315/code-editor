@@ -21,10 +21,15 @@ export const codeMirrorStatus = atom({
   isUnsaved: false,
 });
 export type FileSystemEvent =
-  | { type: 'created'; path: string; item: FileItem }
-  | { type: 'deleted'; path: string }
-  | { type: 'renamed'; oldPath: string; newPath: string; item: FileItem }
-  | { type: 'modified'; path: string };
+  | { type: 'created'; path: string; itemType: 'file' | 'folder' }
+  | { type: 'deleted'; path: string; itemType: 'file' | 'folder' }
+  | {
+      type: 'renamed';
+      oldPath: string;
+      newPath: string;
+      itemType: 'file' | 'folder';
+    }
+  | { type: 'modified'; path: string; itemType: 'file' };
 
 export const editorCurrentDirectory = persistentAtom<string>(
   'editorCurrentDirectory',
@@ -33,9 +38,15 @@ export const editorCurrentDirectory = persistentAtom<string>(
 
 export const editorOpenFiles = persistentAtom<string[]>('editorOpenFiles', []);
 
-export const editorFilesMap = persistentAtom<Record<string, EditorFileEntry>>('editorFilesMap', {});
+export const editorFilesMap = persistentAtom<Record<string, EditorFileEntry>>(
+  'editorFilesMap',
+  {},
+);
 
-export const editorActiveFilePath = persistentAtom<string>('editorActiveFilePath', '');
+export const editorActiveFilePath = persistentAtom<string>(
+  'editorActiveFilePath',
+  '',
+);
 
 export const editorLanguage = atom<string>('plain');
 export const isTerminalOpen = persistentAtom<boolean>('isTerminalOpen', false);
@@ -49,11 +60,16 @@ export const renamingOriginalName = atom<string | null>(null);
 
 // Updated atoms for ESLint diagnostics to use CodeMirror's Diagnostic type
 export const lintDiagnostics = atom<Record<string, CodeMirrorDiagnostic[]>>({}); // Stores diagnostics for individually linted files (e.g., active editor file)
-export const directoryLintDiagnostics = atom<Record<string, CodeMirrorDiagnostic[]>>({}); // Stores diagnostics for all files in a linted directory
+export const directoryLintDiagnostics = atom<
+  Record<string, CodeMirrorDiagnostic[]>
+>({}); // Stores diagnostics for all files in a linted directory
 
-export const activeFileEntry = computed([editorActiveFilePath, editorFilesMap], (path, map) => {
-  return path && map?.[path] ? map[path] : null;
-});
+export const activeFileEntry = computed(
+  [editorActiveFilePath, editorFilesMap],
+  (path, map) => {
+    return path && map?.[path] ? map[path] : null;
+  },
+);
 
 export const isFileUnsaved = (path: string): boolean => {
   return editorFilesMap.get()?.[path]?.unsaved ?? false;

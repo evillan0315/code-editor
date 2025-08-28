@@ -2,7 +2,12 @@ export { fileService, conversationService, utilsService } from './fileService';
 export { eslintService } from './eslintService';
 export { projectService } from './projectService';
 export * from './api';
-export { configureTokenGetter, configureFileService, ApiError, apiFetch } from './apiFetch';
+export {
+  configureTokenGetter,
+  configureFileService,
+  ApiError,
+  apiFetch,
+} from './apiFetch';
 export {
   generateGeminiText,
   generateGeminiImageBase64,

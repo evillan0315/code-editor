@@ -26,7 +26,7 @@ export interface FileCreateRequest {
 }
 export interface FileRenameRequest {
   oldPath: string;
-  newpath: string;
+  newPath: string;
 }
 export interface FileRenameResponse {
   success: boolean;
@@ -53,13 +53,13 @@ export interface FileDeleteRequest {
 }
 
 export interface FileMoveRequest {
-  fromPath: string;
-  toPath: string;
+  sourcePath: string;
+  destinationPath?: string;
 }
 
 export interface FileCopyRequest {
   sourcePath: string;
-  destinationPath: string;
+  destinationPath?: string;
 }
 
 export interface FileListRequest {

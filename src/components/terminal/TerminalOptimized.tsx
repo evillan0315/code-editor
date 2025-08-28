@@ -686,8 +686,8 @@ const Terminal: React.FC<TerminalProps> = ({ isResizing }) => {
       query: {
         initialCwd: editorCurrentDir,
       },
-      transports: ['websocket', 'polling'],
-      forceNew: true,
+      //transports: ['websocket', 'polling'],
+      //forceNew: true,
     });
 
     socketRef.current = s;

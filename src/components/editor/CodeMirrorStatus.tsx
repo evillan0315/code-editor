@@ -64,38 +64,38 @@ export const CodeMirrorStatus: React.FC = () => {
   return (
     <>
       {getFileContent($editorActiveFilePath) ? (
- 
         <div className="flex w-full items-center justify-between gap-4 py-1 px-4 border-t bg-dark-secondary text-base text-xs">
-          <Breadcrumbs filePath={$editorActiveFilePath} onPathSelect={handleSelectedPath}/>
-          
+          <Breadcrumbs
+            filePath={$editorActiveFilePath}
+            onPathSelect={handleSelectedPath}
+          />
 
           {/* Main info section, might need some responsive handling if it gets too long */}
           <div className="flex items-center gap-4 text-center">
             <div className="relative flex items-center gap-3">
-            {fileLintSummary.errors > 0 && (
-              <span className="text-red-500 font-bold whitespace-nowrap">
-                Errors: {fileLintSummary.errors}
-              </span> // Use text-error and prevent wrapping
-            )}
-            {fileLintSummary.warnings > 0 && (
-              <span className="text-yellow-500 font-bold whitespace-nowrap">
-                Warnings: {fileLintSummary.warnings}
-              </span> // Use text-warning and prevent wrapping
-            )}
-            <div className="border-l pl-4 ml-4 flex items-center whitespace-nowrap">
-              {directoryDiagnosticsSummary.errors > 0 && (
-                <span className="text-red-500 font-bold ml-1">
-                  Errors: {directoryDiagnosticsSummary.errors}
-                </span>
+              {fileLintSummary.errors > 0 && (
+                <span className="text-red-500 font-bold whitespace-nowrap">
+                  Errors: {fileLintSummary.errors}
+                </span> // Use text-error and prevent wrapping
               )}
-              {directoryDiagnosticsSummary.warnings > 0 && (
-                <span className="text-yellow-500 font-bold ml-1">
-                  Warnings: {directoryDiagnosticsSummary.warnings}
-                </span>
+              {fileLintSummary.warnings > 0 && (
+                <span className="text-yellow-500 font-bold whitespace-nowrap">
+                  Warnings: {fileLintSummary.warnings}
+                </span> // Use text-warning and prevent wrapping
               )}
-
+              <div className="border-l pl-4 ml-4 flex items-center whitespace-nowrap">
+                {directoryDiagnosticsSummary.errors > 0 && (
+                  <span className="text-red-500 font-bold ml-1">
+                    Errors: {directoryDiagnosticsSummary.errors}
+                  </span>
+                )}
+                {directoryDiagnosticsSummary.warnings > 0 && (
+                  <span className="text-yellow-500 font-bold ml-1">
+                    Warnings: {directoryDiagnosticsSummary.warnings}
+                  </span>
+                )}
+              </div>
             </div>
-          </div>
             <span className="uppercase whitespace-nowrap">{language}</span>
             <span className="whitespace-nowrap">
               Ln {line}, Col {col}
@@ -107,7 +107,6 @@ export const CodeMirrorStatus: React.FC = () => {
             )}
           </div>
         </div>
-   
       ) : (
         ''
       )}

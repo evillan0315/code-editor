@@ -14,8 +14,8 @@ export enum RequestType {
 export interface PaginationParams {
   page: number;
   limit: number;
-  search?: string; 
-  requestType?: RequestType | null; 
+  search?: string;
+  requestType?: RequestType | null;
 }
 
 export interface PaginatedResponse<T> {
@@ -31,7 +31,7 @@ export interface ConversationSummary {
   lastUpdatedAt: string;
   requestCount: number;
   firstPrompt: string;
-  firstRequestType?: RequestType | null; 
+  firstRequestType?: RequestType | null;
 }
 
 export interface ConversationPart {
@@ -47,7 +47,7 @@ export interface ConversationHistoryItem {
   role: 'user' | 'model';
   parts: ConversationPart[];
   createdAt: string;
-  requestType?: RequestType; 
+  requestType?: RequestType;
 }
 
 export interface ModelResponse {

@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { useStore } from '@nanostores/react';
 import { previewContent, setPreviewContent } from '@/stores/layout';
-import MarkdownViewer from '@/components/MarkdownViewer'; // Assuming this component exists
+import MarkdownViewer from '@/components/MarkdownViewerType'; // Assuming this component exists
 
 /**
  * Renders various types of content (URL, Markdown, SVG) within a preview panel.
@@ -40,8 +40,8 @@ export function PreviewPanel() {
       );
     case 'markdown':
       return (
-        <div className="overflow-auto p-4 flex-grow w-full h-full">
-          <MarkdownViewer content={content} />
+        <div className="markdown-wrapper overflow-auto p-4 flex-grow w-full h-full">
+          <MarkdownViewer markdown={content} />
         </div>
       );
     case 'svg':

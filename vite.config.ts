@@ -21,13 +21,13 @@ export default defineConfig(({ mode }) => {
       port: 3000,
       proxy: {
         '/api': {
-          target: env.VITE_API_URI,
+          target: env.VITE_API_URL,
           changeOrigin: true,
           rewrite: (path) => path.replace(/^\/api/, ''),
         },
 
         '/socket.io': {
-          target: env.VITE_API_URL,
+          target: env.VITE_WS_URL,
           changeOrigin: true,
           ws: true,
         },

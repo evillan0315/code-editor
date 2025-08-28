@@ -10,7 +10,7 @@ import React, {
 } from 'react';
 import { Icon } from '@/components/ui/Icon';
 import { FileIcon } from '@/components/FileIcon';
-
+import { FileRenameRequest } from '@/types/file-system';
 export interface EditorFileTabItemProps {
   file: string;
   language?: string;
@@ -18,12 +18,15 @@ export interface EditorFileTabItemProps {
   unSaved: boolean;
   onClick: (path: string, unSaved: boolean) => void;
   onClose: (path: string, unSaved: boolean) => void;
-  onRenameSubmit: (oldPath: string, newName: string) => Promise<void>;
+  onRenameSubmit: (data: FileRenameRequest) => Promise<void>;
 }
 
 export const EditorFileTabItem = memo(
   forwardRef<HTMLButtonElement, EditorFileTabItemProps>(
-    ({ file, isActive, onClick, onClose, language, unSaved, onRenameSubmit }, ref) => {
+    (
+      { file, isActive, onClick, onClose, language, unSaved, onRenameSubmit },
+      ref,
+    ) => {
       const filename = useMemo(() => file.split('/').pop() || '', [file]);
       const [isRenaming, setIsRenaming] = useState(false);
       const [currentName, setCurrentName] = useState(filename);
@@ -59,7 +62,7 @@ export const EditorFileTabItem = memo(
         if (currentName.trim() && currentName !== filename) {
           const parentPath = file.substring(0, file.lastIndexOf('/') + 1);
           const newPath = `${parentPath}${currentName}`;
-          await onRenameSubmit(file, newPath);
+          await onRenameSubmit({ oldPath: file, newPath });
         }
         setIsRenaming(false);
       }, [isRenaming, currentName, filename, file, onRenameSubmit]);
@@ -90,7 +93,12 @@ export const EditorFileTabItem = memo(
             className={`min-w-[100px] text-base h-full flex items-center gap-2 px-4 border-r ${isActive ? 'active border-b-2 bg-dark border-secondary' : ''}
             ${isRenaming ? 'bg-neutral-600/20' : ''} relative`}
           >
-            <FileIcon filename={filename} isDirectory={false} isOpen={false} language={language} />
+            <FileIcon
+              filename={filename}
+              isDirectory={false}
+              isOpen={false}
+              language={language}
+            />
             {isRenaming ? (
               <input
                 ref={inputRef}
@@ -104,7 +112,9 @@ export const EditorFileTabItem = memo(
                 onFocus={(e) => e.target.select()} // Select all text on focus
               />
             ) : (
-              <span className="file-name truncate px-2 max-w-[120px]">{filename}</span>
+              <span className="file-name truncate px-2 max-w-[120px]">
+                {filename}
+              </span>
             )}
 
             {unSaved && !isRenaming && (

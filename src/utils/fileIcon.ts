@@ -31,19 +31,15 @@ export function getFileIcon({
   if (lang) {
     switch (lang) {
       case 'javascript':
-        return 'vscode-icons:file-type-javascript';
-      case 'typescript':
-      case 'ts':
-      case 'tsx':
-        return 'vscode-icons:file-type-typescript';
+        return 'vscode-icons:file-type-js';
       case 'html':
-        return 'mdi:language-html5';
+        return 'vscode-icons:file-type-html';
       case 'css':
         return 'mdi:language-css3';
       case 'json':
-        return 'mdi:json';
+        return 'vscode-icons:file-type-json';
       case 'markdown':
-        return 'mdi:markdown';
+        return 'vscode-icons:file-type-markdown';
       case 'python':
         return 'mdi:language-python';
       case 'go':
@@ -64,16 +60,17 @@ export function getFileIcon({
         return 'mdi:database';
       case 'yaml':
       case 'yml':
-        return 'mdi:file-cog-outline';
+        return 'vscode-icons:file-type-yaml';
       case 'xml':
         return 'mdi:xml';
       case 'dockerfile':
         return 'mdi:docker';
       case 'shell':
       case 'bash':
-        return 'mdi:bash';
+        return 'vscode-icons:file-type-shell';
       case 'powershell':
         return 'mdi:microsoft-powershell';
+
       case 'plaintext':
         return 'mdi:file-document-outline';
     }
@@ -85,7 +82,7 @@ export function getFileIcon({
     jsx: 'tabler:file-type-jsx',
     ts: 'vscode-icons:file-type-typescript',
     tsx: 'tabler:file-type-tsx',
-    json: 'bi:filetype-json',
+    json: 'vscode-icons:file-type-json',
     html: 'vscode-icons:file-type-html',
     css: 'vscode-icons:file-type-css',
     md: 'lineicons:markdown',
@@ -97,6 +94,9 @@ export function getFileIcon({
     jpg: 'bi:filetype-jpg',
     jpeg: 'bi:filetype-jpg',
     gif: 'bi:filetype-gif',
+    svg: 'bi:filetype-svg',
+    cjs: 'bi:filetype-js',
+    yaml: 'bi:filetype-yml',
     env: 'vscode-icons:file-type-dotenv',
     sh: 'bi:terminal',
     config: 'vscode-icons:folder-type-config',
@@ -104,6 +104,15 @@ export function getFileIcon({
     csv: 'bi:filetype-csv',
     doc: 'vscode-icons:file-type-doc',
     docx: 'vscode-icons:file-type-docx',
+    prisma: 'vscode-icons:file-type-prisma',
+    jsx: 'bi:filetype-jsx',
+    tsx: 'vscode-icons:file-type-typescript-official',
+    ts: 'vscode-icons:file-type-typescript',
+
+    webm: 'mdi:music',
+    js: 'vscode-icons:file-type-javascript',
+    mjs: 'bi:filetype-js',
+    ejs: 'file-icons:ejs',
     gitignore: 'simple-icons:gitignoredotio',
   };
 

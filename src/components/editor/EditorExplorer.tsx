@@ -8,9 +8,14 @@ import {
   renamingPath,
   renamingOriginalName,
 } from '@/stores/editorContent';
-import { type FileItem, type ContextMenuItem } from '@/types/file-system';
+import {
+  type FileItem,
+  type ContextMenuItem,
+  FileMoveRequest,
+} from '@/types/file-system';
 import { useEditorExplorerActions } from '@/hooks/useEditorExplorerActions';
 import LoadingDots from '@/components/LoadingDots';
+import LoadingIndicator from '@/components/LoadingIndicator';
 import EditorExplorerNode from '@/components/editor/EditorExplorerNode';
 import EditorExplorerHeader from '@/components/editor/EditorExplorerHeader';
 import { Icon } from '@/components/ui/Icon';
@@ -22,7 +27,7 @@ import {
 } from '@/stores/contextMenu';
 import { FileExplorerContextMenuRenderer } from '@/components/editor/FileExplorerContextMenuRenderer';
 import { showTerminal, activeTerminal } from '@/stores/layout'; // Import terminal stores
-
+import { getParentPath } from '@/utils/fileTree';
 import '@/styles/file-manager.css';
 
 const EditorExplorer: React.FC = () => {
@@ -52,7 +57,10 @@ const EditorExplorer: React.FC = () => {
   const [search, setSearch] = useState('');
   const [showSearch, setShowSearch] = useState(false);
 
-  const OpenIcon = useMemo(() => <Icon icon="ion:open-outline" width="1.5em" height="1.5em" />, []);
+  const OpenIcon = useMemo(
+    () => <Icon icon="ion:open-outline" width="1.5em" height="1.5em" />,
+    [],
+  );
   const RenameIcon = useMemo(
     () => <Icon icon="mdi:file-edit-outline" width="1.5em" height="1.5em" />,
     [],
@@ -62,7 +70,9 @@ const EditorExplorer: React.FC = () => {
     [],
   );
   const NewFileIcon = useMemo(
-    () => <Icon icon="qlementine-icons:add-file-16" width="1.5em" height="1.5em" />,
+    () => (
+      <Icon icon="qlementine-icons:add-file-16" width="1.5em" height="1.5em" />
+    ),
     [],
   );
   const NewFolderIcon = useMemo(
@@ -70,10 +80,19 @@ const EditorExplorer: React.FC = () => {
     [],
   );
   const DeleteIcon = useMemo(
-    () => <Icon icon="streamline:file-delete-alternate" width="1.5em" height="1.5em" />,
+    () => (
+      <Icon
+        icon="streamline:file-delete-alternate"
+        width="1.5em"
+        height="1.5em"
+      />
+    ),
     [],
   );
-  const CopyIcon = useMemo(() => <Icon icon="mdi:content-copy" width="1.5em" height="1.5em" />, []);
+  const CopyIcon = useMemo(
+    () => <Icon icon="mdi:content-copy" width="1.5em" height="1.5em" />,
+    [],
+  );
   const MoveIcon = useMemo(
     () => <Icon icon="mdi:file-move-outline" width="1.5em" height="1.5em" />,
     [],
@@ -249,7 +268,11 @@ const EditorExplorer: React.FC = () => {
           matchingItems.push(node);
         }
 
-        if (node.type === 'folder' && node.children && node.children.length > 0) {
+        if (
+          node.type === 'folder' &&
+          node.children &&
+          node.children.length > 0
+        ) {
           traverseAndFilter(node.children);
         }
       });
@@ -276,7 +299,8 @@ const EditorExplorer: React.FC = () => {
 
   const handleRenameSubmit = useCallback(
     async (oldPath: string, newName: string) => {
-      await handleRename(oldPath, newName);
+      const newPath = `${getParentPath(oldPath)}/${newName}`;
+      await handleRename({ oldPath, newPath });
       renamingPath.set(null); // Exit rename mode
       renamingOriginalName.set(null);
     },
@@ -284,7 +308,7 @@ const EditorExplorer: React.FC = () => {
   );
 
   return (
-    <div className="flex flex-col min-w-full">
+    <div className="flex flex-col min-w-full min-h-0 ">
       <EditorExplorerHeader
         search={search}
         setSearch={setSearch}
@@ -292,22 +316,24 @@ const EditorExplorer: React.FC = () => {
         setShowSearch={setShowSearch}
         onPathSelect={handleSelectedPath}
       />
-      <div className="flex items-center px-1 gap-4 mt-2 h-4">
-        {loading && <LoadingDots color="text-sky-500" />}
-      </div>
-      {Array.isArray(filteredNodes) &&
-        filteredNodes.map((node) => (
-          <EditorExplorerNode
-            key={node.path}
-            node={node}
-            level={0}
-            activeFilePath={activeFilePath}
-            onContextMenu={handleNodeContextMenu}
-            onRenameSubmit={handleRenameSubmit} // Pass rename submit handler
-          />
-        ))}
 
-      {fileExplorerContextMenuState.visible && <FileExplorerContextMenuRenderer />}
+      {loading && <LoadingIndicator color="text-sky-500" />}
+      <div className="py-2 px-1 ">
+        {Array.isArray(filteredNodes) &&
+          filteredNodes.map((node) => (
+            <EditorExplorerNode
+              key={node.path}
+              node={node}
+              level={0}
+              activeFilePath={activeFilePath}
+              onContextMenu={handleNodeContextMenu}
+              onRenameSubmit={handleRenameSubmit} // Pass rename submit handler
+            />
+          ))}
+      </div>
+      {fileExplorerContextMenuState.visible && (
+        <FileExplorerContextMenuRenderer />
+      )}
     </div>
   );
 };

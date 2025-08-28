@@ -173,8 +173,7 @@ export const apiService = {
         queryParams.append('page', params.page.toString());
       if (params.limit !== undefined)
         queryParams.append('limit', params.limit.toString());
-      if (params.search)
-        queryParams.append('search', params.search); // Add search query
+      if (params.search) queryParams.append('search', params.search); // Add search query
       if (params.requestType)
         queryParams.append('requestType', params.requestType); // Add request type filter
 
@@ -265,4 +264,3 @@ export const apiService = {
     },
   },
 };
-

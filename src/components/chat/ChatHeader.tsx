@@ -32,7 +32,6 @@ const ChatHeader = memo((props: ChatHeaderProps) => {
     <div className="ai-chat-header  flex bg-dark-secondary border-b  h-12 px-1 shadow-md w-full">
       <div className="flex items-center justify-between w-full">
         <div className="flex flex-shrink items-center gap-2">
-          
           <Button
             variant="secondary"
             onClick={onToggleChatList}
@@ -65,8 +64,6 @@ const ChatHeader = memo((props: ChatHeaderProps) => {
           >
             <Icon icon="mdi-light:plus" width="2em" height="2em" />
           </Button>
-
-          
         </div>
       </div>
     </div>

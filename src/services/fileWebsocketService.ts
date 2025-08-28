@@ -13,7 +13,11 @@ import {
   BASE_URL_API,
 } from '@/constants';
 import { showToast } from '@/stores/toast';
-import { editorLanguage, editorFileTreeNodes } from '@/stores/editorContent';
+import {
+  editorLanguage,
+  editorFileTreeNodes,
+  fileSystemEvents,
+} from '@/stores/editorContent';
 import {
   FileItem,
   FileReadResponse,
@@ -60,10 +64,10 @@ export class FileService implements IFileService {
     }
 
     const token = localStorage.getItem('token');
-    const uri = `${BASE_URL_API}${this.namespace}`;
+    const uri = `${this.base}${this.namespace}`;
     const opts = {
       auth: { token: `Bearer ${token}` },
-      //forceNew: true
+      forceNew: true,
       // Optional: Add reconnection strategies, timeouts if needed
     };
 
@@ -103,12 +107,24 @@ export class FileService implements IFileService {
     this.socket.on(SOCKET_EVENTS_MERGED.GET_FILES_RESPONSE, (data: any) => {
       console.log(data, 'SOCKET_EVENTS_MERGED.GET_FILES_RESPONSE');
     });
-    this.socket.on(SOCKET_EVENTS_MERGED.READ_FILE_RESPONSE, (data: any) => {
-      console.log(data, 'SOCKET_EVENTS_MERGED.READ_FILE_RESPONSE');
-    });
-    this.socket.on(SOCKET_EVENTS_MERGED.READ_FILE_PROGRESS, (data: any) => {
-      console.log(data, 'SOCKET_EVENTS_MERGED.READ_FILE_PROGRESS');
-    });
+    this.socket.on(
+      SOCKET_EVENTS_MERGED.FILE_READ_FILE_CONTENT_RESPONSE,
+      (data: any) => {
+        console.log(
+          data,
+          'SOCKET_EVENTS_MERGED.FILE_READ_FILE_CONTENT_RESPONSE',
+        );
+      },
+    );
+    this.socket.on(
+      SOCKET_EVENTS_MERGED.FILE_READ_FILE_CONTENT_PROGRESS,
+      (data: any) => {
+        console.log(
+          data,
+          'SOCKET_EVENTS_MERGED.FILE_READ_FILE_CONTENT_PROGRESS',
+        );
+      },
+    );
     this.socket.on(SOCKET_EVENTS_MERGED.WRITE_FILE_RESPONSE, (data: any) => {
       console.log(data, 'SOCKET_EVENTS_MERGED.WRITE_FILE_RESPONSE');
     });
@@ -137,6 +153,82 @@ export class FileService implements IFileService {
     this.socket.on(SOCKET_EVENTS_MERGED.UPLOAD_FILE_RESPONSE, (data: any) => {
       console.log('Upload file response:', data);
     });
+
+    // Listen for general file system changes (add, modify, delete, rename)
+    this.socket.on(
+      SOCKET_EVENTS.FS_CHANGE_CREATED,
+      (data: { path: string; itemType: 'file' | 'dir' }) => {
+        fileSystemEvents.set({
+          type: 'created',
+          path: data.path,
+          itemType: data.itemType,
+        });
+      },
+    );
+    this.socket.on(
+      SOCKET_EVENTS.FS_CHANGE_DELETED,
+      (data: { path: string; itemType: 'file' | 'dir' }) => {
+        fileSystemEvents.set({
+          type: 'deleted',
+          path: data.path,
+          itemType: data.itemType,
+        });
+      },
+    );
+    this.socket.on(
+      SOCKET_EVENTS_MERGED.FS_CHANGE_RENAMED,
+      (data: {
+        oldPath: string;
+        newPath: string;
+        itemType: 'file' | 'dir';
+      }) => {
+        fileSystemEvents.set({
+          type: 'renamed',
+          oldPath: data.oldPath,
+          newPath: data.newPath,
+          itemType: data.itemType,
+        });
+      },
+    );
+    this.socket.on(
+      SOCKET_EVENTS.FS_CHANGE_MODIFIED,
+      (data: { path: string; itemType: 'file' | 'dir' }) => {
+        fileSystemEvents.set({
+          type: 'change',
+          path: data.path,
+          itemType: data.itemType,
+        });
+      },
+    );
+
+    // Generic fileSystemChange handler (from handleWatcherEvent in gateway)
+    this.socket.on(
+      'fileSystemChange',
+      (data: {
+        path: string;
+        eventType: 'created' | 'changed' | 'deleted' | 'renamed';
+        oldPath?: string;
+        itemType?: 'file' | 'folder';
+      }) => {
+        const { path, eventType, oldPath, itemType } = data;
+        if (eventType === 'renamed' && oldPath && itemType) {
+          fileSystemEvents.set({
+            type: 'renamed',
+            oldPath,
+            newPath: path,
+            itemType,
+          });
+        } else if (eventType === 'created' && itemType) {
+          fileSystemEvents.set({ type: 'created', path, itemType });
+        } else if (eventType === 'deleted' && itemType) {
+          fileSystemEvents.set({ type: 'deleted', path, itemType });
+        } else if (eventType === 'changed' && itemType) {
+          console.log({ type: 'changed', path, itemType });
+          fileSystemEvents.set({ type: 'changed', path, itemType });
+        }
+        // console.log('Generic fileSystemChange:', data);
+      },
+    );
 
     this.socket.on(SOCKET_EVENTS_MERGED.DISCONNECT, () => {
       console.log(`FileService disconnected: ${this.socket?.id}`);
@@ -194,6 +286,7 @@ export class FileService implements IFileService {
 
       this.socket.on(responseEvent, (res: T) => {
         //cleanup();
+        //console.log(res, 'res');
         resolve(res);
       });
 
@@ -317,7 +410,8 @@ export class FileService implements IFileService {
 
   public async formatCode(content: string, language: string): Promise<string> {
     try {
-      const response = await this.emitDynamicFileEvent<{ content: string }>({
+      const response = await this.emitDynamicFileEvent<{ content: string }>;
+      incessantly({
         endpoint: API_ENDPOINTS._UTILS.FORMAT_CODE,
         method: 'POST',
         body: { content, language },
@@ -368,7 +462,8 @@ export class FileService implements IFileService {
   }
   public async stripCodeBlock(content: string): Promise<string> {
     try {
-      const response = await this.emitDynamicFileEvent<{ content: string }>({
+      const response = await this.emitDynamicFileEvent<{ content: string }>;
+      incessantly({
         endpoint: API_ENDPOINTS._UTILS.STRIP_CODE_BLOCK,
         method: 'POST',
         body: { content },
@@ -391,7 +486,8 @@ export class FileService implements IFileService {
     language: string,
   ): Promise<string> {
     try {
-      const response = await this.emitDynamicFileEvent<{ content: string }>({
+      const response = await this.emitDynamicFileEvent<{ content: string }>;
+      incessantly({
         endpoint: API_ENDPOINTS._UTILS.REMOVE_CODE_COMMENT,
         method: 'POST',
         body: { content, language },

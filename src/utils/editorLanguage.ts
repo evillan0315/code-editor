@@ -7,6 +7,7 @@ import { xml } from '@codemirror/lang-xml';
 import { json } from '@codemirror/lang-json';
 import { html } from '@codemirror/lang-html';
 import { css } from '@codemirror/lang-css';
+
 import { type Extension } from '@codemirror/state';
 
 // If you have specific CodeMirror language extensions for these, uncomment and import them:
@@ -43,16 +44,15 @@ export function getLanguageExtensionByLangString(
     // JavaScript/TypeScript and related
     case 'javascript':
     case 'js': // Added common extension
+    case 'jsx':
     case 'typescript':
     case 'ts': // Added common extension
-    case 'jsx':
     case 'tsx':
     case 'cjs': // CommonJS module extension
     case 'mjs': // ES module extension
     case 'ejs': // Embedded JavaScript extension
     case 'prisma': // Prisma schema files often use JS-like syntax highlighting
       return javascript();
-
     // HTML and related
     case 'html':
     case 'htm': // Common abbreviation
@@ -92,7 +92,9 @@ export function getLanguageExtensionByLangString(
     // XML
     case 'xml':
       return xml();
-
+    //case "sh": // Shell Script
+    //case "bash": // Bash Script
+    ///return shell();
     // Add cases for other languages if you have their CodeMirror extensions imported:
     // case "go": return go();
     // case "java": return java();

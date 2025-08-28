@@ -151,9 +151,11 @@ const SignInWithGoogle: React.FC<SignInWithGoogleProps> = ({
    */
   const initiateLogin = () => {
     const cliPort = window.location.port;
-    
+
     if (loginUrl) {
-      const finalUrl = cliPort ? `${GOOGLE_AUTH_INIT_URL}?cli_port=${cliPort}` : loginUrl;
+      const finalUrl = cliPort
+        ? `${GOOGLE_AUTH_INIT_URL}?cli_port=${cliPort}`
+        : loginUrl;
       window.location.href = finalUrl;
     } else {
       console.error('Google auth URL is not configured (GOOGLE_AUTH_URL).');

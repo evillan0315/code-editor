@@ -27,7 +27,7 @@ export interface TerminalCwdChangePayload {
 }
 
 // Example of a union type for all socket messages (if used)
-export type SocketMessage =
+export type TerminalSocketMessage =
   | { type: 'terminal:connect'; payload: TerminalConnectPayload }
   | { type: 'terminal:output'; payload: TerminalOutputPayload }
   | { type: 'terminal:input'; payload: TerminalInputPayload }
@@ -105,3 +105,106 @@ export interface IFileService {
 
 // Factory function type for socket creation
 export type SocketFactory = (uri: string, opts?: any) => ISocket;
+
+export interface SocketMessage<T = any> {
+  event: string;
+  payload: T;
+  timestamp: string;
+}
+
+export interface GenericSocketResponse<T = any> {
+  status: 'Progress' | 'Response' | 'Error';
+  message?: string;
+  data?: T;
+  error?: string;
+}
+
+// Generic file system event payload (for FS_CHANGE events)
+export interface FileSystemEventPayload {
+  path: string;
+  type: 'file' | 'directory';
+  // For renamed events
+  oldPath?: string;
+  newPath?: string;
+  // For modified events
+  content?: string; // e.g., if a file modification sends content diff or full content
+}
+
+// Specific payloads for API-related events (e.g., FILE_CREATE_RESPONSE)
+export interface FileOperationPayload {
+  filePath: string;
+  content?: string;
+  oldPath?: string;
+  newPath?: string;
+  message?: string;
+  error?: string;
+}
+
+export interface LintPayload {
+  filePath: string;
+  issues: any[]; // Adjust with actual ESLint issue type
+}
+
+export interface CodeGenerationPayload {
+  prompt: string;
+  generatedCode: string;
+}
+
+// ... add more specific interfaces as needed for other event groups
+
+/**
+ * A map defining the payload types for all known WebSocket events.
+ * Keys correspond to the actual camelCase event strings (values from SOCKET_EVENTS_MERGED).
+ * This provides strong type checking for `on` and `emit` methods in the WebSocket service.
+ */
+export interface DetailedSocketEventPayloadMap {
+  // Connection events
+  connect: undefined;
+  disconnect: string; // reason
+  connect_error: Error;
+
+  // File system watcher events
+  fsChangeCreated: FileSystemEventPayload;
+  fsChangeDeleted: FileSystemEventPayload;
+  fsChangeRenamed: FileSystemEventPayload;
+  fsChangeModified: FileSystemEventPayload;
+
+  // API-derived events (examples for clarity, extend as needed)
+  // FILE events
+  fileCreateProgress: GenericSocketResponse<FileOperationPayload>;
+  fileCreateResponse: GenericSocketResponse<FileOperationPayload>;
+  fileCreateError: GenericSocketResponse<FileOperationPayload>;
+
+  fileReadProgress: GenericSocketResponse<
+    FileOperationPayload & { content: string }
+  >;
+  fileReadResponse: GenericSocketResponse<
+    FileOperationPayload & { content: string }
+  >;
+  fileReadError: GenericSocketResponse<FileOperationPayload>;
+
+  fileWriteProgress: GenericSocketResponse<FileOperationPayload>;
+  fileWriteResponse: GenericSocketResponse<FileOperationPayload>;
+  fileWriteError: GenericSocketResponse<FileOperationPayload>;
+
+  fileDeleteProgress: GenericSocketResponse<FileOperationPayload>;
+  fileDeleteResponse: GenericSocketResponse<FileOperationPayload>;
+  fileDeleteError: GenericSocketResponse<FileOperationPayload>;
+
+  fileRenameProgress: GenericSocketResponse<FileOperationPayload>;
+  fileRenameResponse: GenericSocketResponse<FileOperationPayload>;
+  fileRenameError: GenericSocketResponse<FileOperationPayload>;
+
+  // ESLINT events (example)
+  eslintLintCodeProgress: GenericSocketResponse<LintPayload>;
+  eslintLintCodeResponse: GenericSocketResponse<LintPayload>;
+  eslintLintCodeError: GenericSocketResponse<LintPayload>;
+
+  // GOOGLE_GEMINI events (example)
+  googleGeminiGenerateCodeProgress: GenericSocketResponse<CodeGenerationPayload>;
+  googleGeminiGenerateCodeResponse: GenericSocketResponse<CodeGenerationPayload>;
+  googleGeminiGenerateCodeError: GenericSocketResponse<CodeGenerationPayload>;
+
+  // Catch-all for any other event not explicitly typed above
+  [key: string]: any;
+}

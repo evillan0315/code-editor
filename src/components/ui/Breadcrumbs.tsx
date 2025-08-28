@@ -42,7 +42,7 @@ export function Breadcrumbs({
   // Memoize the array of path segments to display, applying the 5-path limit
   const displayedPathSegments = useMemo(() => {
     const maxSegments = 5; // The maximum number of segments to display
-    const ellipsisThreshold = 0 // Number of segments from the start to show before ellipsis
+    const ellipsisThreshold = 0; // Number of segments from the start to show before ellipsis
     const endSegmentsToShow = 4; // Number of segments from the end to show after ellipsis (excluding the last one)
 
     if (allPathSegments.length <= maxSegments) {
@@ -60,44 +60,59 @@ export function Breadcrumbs({
 
     // Build the unique list for display
     const uniqueDisplayedSegments = new Map();
-    firstSegments.forEach(segment => uniqueDisplayedSegments.set(segment.fullPath, segment));
-    lastSegments.forEach(segment => uniqueDisplayedSegments.set(segment.fullPath, segment));
+    firstSegments.forEach((segment) =>
+      uniqueDisplayedSegments.set(segment.fullPath, segment),
+    );
+    lastSegments.forEach((segment) =>
+      uniqueDisplayedSegments.set(segment.fullPath, segment),
+    );
     uniqueDisplayedSegments.set(lastSegment.fullPath, lastSegment); // Ensure last segment is always there
 
     const result = Array.from(uniqueDisplayedSegments.values());
 
     // Sort to maintain order
     result.sort((a, b) => {
-        const indexA = allPathSegments.findIndex(s => s.fullPath === a.fullPath);
-        const indexB = allPathSegments.findIndex(s => s.fullPath === b.fullPath);
-        return indexA - indexB;
+      const indexA = allPathSegments.findIndex(
+        (s) => s.fullPath === a.fullPath,
+      );
+      const indexB = allPathSegments.findIndex(
+        (s) => s.fullPath === b.fullPath,
+      );
+      return indexA - indexB;
     });
 
     // Insert ellipsis segment
-    const ellipsisSegment = { name: '...', fullPath: 'ellipsis', isEllipsis: true };
+    const ellipsisSegment = {
+      name: '...',
+      fullPath: 'ellipsis',
+      isEllipsis: true,
+    };
     if (result.length < allPathSegments.length) {
-        // Find where to insert ellipsis, typically after the first set and before the last set
-        // A simple approach is to insert it after the Nth element, if it's not the actual next element
-        // For example, if we have A, B, C, X, Y, Z and want A, B, ... , Y, Z
-        // Insert "..." if there's a gap between the first and last displayed segment
-        const firstDisplayedFullPath = result[result.length - 2]?.fullPath; // Second to last displayed
-        const lastDisplayedFullPath = result[result.length - 1]?.fullPath; // Last displayed
+      // Find where to insert ellipsis, typically after the first set and before the last set
+      // A simple approach is to insert it after the Nth element, if it's not the actual next element
+      // For example, if we have A, B, C, X, Y, Z and want A, B, ... , Y, Z
+      // Insert "..." if there's a gap between the first and last displayed segment
+      const firstDisplayedFullPath = result[result.length - 2]?.fullPath; // Second to last displayed
+      const lastDisplayedFullPath = result[result.length - 1]?.fullPath; // Last displayed
 
-        const lastIndexOfFirstSet = allPathSegments.indexOf(firstSegments[firstSegments.length - 1]);
-        const firstIndexOfLastSet = allPathSegments.indexOf(lastSegments[0]);
+      const lastIndexOfFirstSet = allPathSegments.indexOf(
+        firstSegments[firstSegments.length - 1],
+      );
+      const firstIndexOfLastSet = allPathSegments.indexOf(lastSegments[0]);
 
-        if (firstIndexOfLastSet > lastIndexOfFirstSet + 1) {
-             // Find the actual index where the ellipsis should be inserted in the `result` array
-            const insertionIndex = result.findIndex(s => s.fullPath === lastSegments[0]?.fullPath);
-            if (insertionIndex !== -1) {
-                result.splice(insertionIndex, 0, ellipsisSegment);
-            }
+      if (firstIndexOfLastSet > lastIndexOfFirstSet + 1) {
+        // Find the actual index where the ellipsis should be inserted in the `result` array
+        const insertionIndex = result.findIndex(
+          (s) => s.fullPath === lastSegments[0]?.fullPath,
+        );
+        if (insertionIndex !== -1) {
+          result.splice(insertionIndex, 0, ellipsisSegment);
         }
+      }
     }
 
     return result;
   }, [allPathSegments]);
-
 
   // Callback for handling clicks on individual breadcrumb segments.
   const handleSegmentClick = useCallback(
@@ -177,7 +192,11 @@ export function Breadcrumbs({
           <React.Fragment key={segment.fullPath + index}>
             <Button
               onClick={() =>
-                handleSegmentClick(segment.fullPath, isLastSegment, (segment as any).isEllipsis)
+                handleSegmentClick(
+                  segment.fullPath,
+                  isLastSegment,
+                  (segment as any).isEllipsis,
+                )
               }
               variant="ghost" // Make the button appear as a text link
               size="sm" // Small button size for compact display
@@ -210,4 +229,3 @@ export function Breadcrumbs({
     </nav>
   );
 }
-

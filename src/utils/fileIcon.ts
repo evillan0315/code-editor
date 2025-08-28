@@ -78,9 +78,8 @@ export function getFileIcon({
 
   const ext = filename?.split('.').pop()?.toLowerCase() || '';
   const extensionIcons: Record<string, string> = {
-    js: 'vscode-icons:file-type-js',
+
     jsx: 'tabler:file-type-jsx',
-    ts: 'vscode-icons:file-type-typescript',
     tsx: 'tabler:file-type-tsx',
     json: 'vscode-icons:file-type-json',
     html: 'vscode-icons:file-type-html',
@@ -105,8 +104,7 @@ export function getFileIcon({
     doc: 'vscode-icons:file-type-doc',
     docx: 'vscode-icons:file-type-docx',
     prisma: 'vscode-icons:file-type-prisma',
-    jsx: 'bi:filetype-jsx',
-    tsx: 'vscode-icons:file-type-typescript-official',
+
     ts: 'vscode-icons:file-type-typescript',
 
     webm: 'mdi:music',
